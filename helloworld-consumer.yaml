@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: helloworld-consumer
+  name: helloworld-consumer
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: helloworld-consumer
+    spec:
+      containers:
+      - name: helloworld-consumer
+        image: strimzi/helloworld-consumer:latest
+        env:
+          - name: BOOTSTRAP_SERVERS
+            value: my-cluster-kafka-bootstrap:9092
+          - name: TOPIC
+            value: my-topic
+          - name: GROUP_ID
+            value: my-helloworld-consumer
+          - name: EXAMPLE_LOG_LEVEL
+            value: "INFO"
