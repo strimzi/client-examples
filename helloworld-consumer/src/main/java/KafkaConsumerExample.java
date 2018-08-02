@@ -1,3 +1,4 @@
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -15,12 +16,12 @@ public class KafkaConsumerExample {
         boolean commit;
         int receivedMsgs = 0;
         Properties props = new Properties();
-        props.put("bootstrap.servers", config.getBootstrapServers());
-        props.put("group.id", config.getGroupId());
-        props.put("auto.offset.reset", config.getAutoOffsetReset());
-        props.put("enable.auto.commit", config.getEnableAutoCommit());
-        props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, config.getGroupId());
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, config.getAutoOffsetReset());
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, config.getEnableAutoCommit());
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
 
         if (config.getTrustStorePassword() != null && config.getTrustStorePath() != null)   {
             log.info("Configuring truststore");

@@ -7,13 +7,7 @@ metadata:
 spec:
   replicas: 3
   partitions: 12
-  config:
-    retention.ms: 7200000
-    segment.bytes: 1073741824
-    cleanup.policy: delete
-    min.cleanable.dirty.ratio: 0.5
-    preallocate: true
-
+  config: {}
 ---
 apiVersion: kafka.strimzi.io/v1alpha1
 kind: KafkaUser
@@ -40,18 +34,19 @@ spec:
       - name: helloworld-producer
         image: strimzi/helloworld-producer:latest
         env:
-          - name: CA_CRT
-            valueFrom:
-              secretKeyRef:
-                name: my-cluster-cluster-ca-cert
-                key: ca.crt
+# 	   certification
+#          - name: CA_CRT
+#            valueFrom:
+#              secretKeyRef:
+#                name: my-cluster-cluster-ca-cert
+#                key: ca.crt
           - name: BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9093
           - name: TOPIC
             value: helloworld-test-apps
           - name: TIMER
             value: "1000"
-          - name: NUMBER_OF_KEYS
+          - name: MESSAGE_KEY_COUNT
             value: "3"
           - name: EXAMPLE_LOG_LEVEL
             value: "INFO"
@@ -75,11 +70,12 @@ spec:
       - name: helloworld-consumer
         image: strimzi/helloworld-consumer:latest
         env:
-          - name: CA_CRT
-            valueFrom:
-              secretKeyRef:
-                name: my-cluster-cluster-ca-cert
-                key: ca.crt
+# 	   certification
+#          - name: CA_CRT
+#            valueFrom:
+#              secretKeyRef:
+#                name: my-cluster-cluster-ca-cert
+#                key: ca.crt
           - name: BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9093
           - name: TOPIC
