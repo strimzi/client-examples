@@ -1,5 +1,4 @@
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -11,30 +10,9 @@ public class KafkaProducerExample {
 
     public static void main(String[] args) throws InterruptedException {
         KafkaProducerConfig config = KafkaProducerConfig.fromEnv();
-
-        Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());
-        props.put(ProducerConfig.ACKS_CONFIG, config.getAcks());
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
-
-        if (config.getTrustStorePassword() != null && config.getTrustStorePath() != null)   {
-            log.info("Configuring truststore");
-            props.put("security.protocol", "SSL");
-            props.put("ssl.truststore.type", "PKCS12");
-            props.put("ssl.truststore.password", config.getTrustStorePassword());
-            props.put("ssl.truststore.location", config.getTrustStorePath());
-        }
-
-        if (config.getKeyStorePassword() != null && config.getKeyStorePath() != null)   {
-            log.info("Configuring keystore");
-            props.put("security.protocol", "SSL");
-            props.put("ssl.keystore.type", "PKCS12");
-            props.put("ssl.keystore.password", config.getKeyStorePassword());
-            props.put("ssl.keystore.location", config.getKeyStorePath());
-        }
-
+        Properties props = KafkaProducerConfig.createProperties(config);
         KafkaProducer producer = new KafkaProducer(props);
+
         log.info("Sending {} messages ...", config.getMessageCount());
         for (long i = 0; i < config.getMessageCount(); i++) {
             log.info("Sending messages \"Hello world - {}\"", i);

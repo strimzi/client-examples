@@ -1,4 +1,15 @@
+import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.config.SslConfigs;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.Properties;
+
 public class KafkaProducerConfig {
+    private static final Logger log = LogManager.getLogger(KafkaProducerConfig.class);
+
+    private static final long DEFAULT_MESSAGES_COUNT = 10;
     private final String bootstrapServers;
     private final String topic;
     private final int timer;
@@ -9,7 +20,6 @@ public class KafkaProducerConfig {
     private final String trustStorePath;
     private final String keyStorePassword;
     private final String keyStorePath;
-    private static final long DEFAULT_MESSAGES_COUNT = 10;
 
     public KafkaProducerConfig(String bootstrapServers, String topic, int timer, int numberOfKeys, Long messageCount, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath) {
         this.bootstrapServers = bootstrapServers;
@@ -37,6 +47,30 @@ public class KafkaProducerConfig {
         return new KafkaProducerConfig(bootstrapServers, topic, timer, numberOfKeys, messageCount, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath);
     }
 
+    public static Properties createProperties(KafkaProducerConfig config) {
+        Properties props = new Properties();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());
+        props.put(ProducerConfig.ACKS_CONFIG, config.getAcks());
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+
+        if (config.getTrustStorePassword() != null && config.getTrustStorePath() != null)   {
+            log.info("Configuring truststore");
+            props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
+            props.put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, "PKCS12");
+            props.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, config.getTrustStorePassword());
+            props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, config.getTrustStorePath());
+        }
+
+        if (config.getKeyStorePassword() != null && config.getKeyStorePath() != null)   {
+            log.info("Configuring keystore");
+            props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
+            props.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, "PKCS12");
+            props.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, config.getKeyStorePassword());
+            props.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, config.getKeyStorePath());
+        }
+        return props;
+    }
     public String getBootstrapServers() {
         return bootstrapServers;
     }

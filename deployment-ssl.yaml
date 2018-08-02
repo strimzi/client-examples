@@ -33,8 +33,13 @@ spec:
       - name: helloworld-producer
         image: strimzi/helloworld-producer:latest
         env:
+          - name: CA_CRT
+            valueFrom:
+              secretKeyRef:
+                name: my-cluster-cluster-ca-cert
+                key: ca.crt
           - name: BOOTSTRAP_SERVERS
-            value: my-cluster-kafka-bootstrap:9092
+            value: my-cluster-kafka-bootstrap:9093
           - name: TOPIC
             value: helloworld-test-apps
           - name: TIMER
@@ -63,8 +68,13 @@ spec:
       - name: helloworld-consumer
         image: strimzi/helloworld-consumer:latest
         env:
+          - name: CA_CRT
+            valueFrom:
+              secretKeyRef:
+                name: my-cluster-cluster-ca-cert
+                key: ca.crt
           - name: BOOTSTRAP_SERVERS
-            value: my-cluster-kafka-bootstrap:9092
+            value: my-cluster-kafka-bootstrap:9093
           - name: TOPIC
             value: helloworld-test-apps
           - name: GROUP_ID

@@ -43,5 +43,4 @@ if [ -z "$JAVA_OPTS" ]; then
     export JAVA_OPTS="${JAVA_OPTS} -Dlog4j.configurationFile=file:bin/log4j2.properties"
 fi
 
-
 exec /bin/launch_java.sh $1
