@@ -1,4 +1,4 @@
-PROJECT_NAME=helloworld-consumer
+PROJECT_NAME=hello-world-producer
 
 all: java_build docker_build docker_push
 build: java_build

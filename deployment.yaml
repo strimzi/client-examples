@@ -20,28 +20,26 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   labels:
-    app: helloworld-producer
-  name: helloworld-producer
+    app: hello-world-producer
+  name: hello-world-producer
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: helloworld-producer
+        app: hello-world-producer
     spec:
       containers:
-      - name: helloworld-producer
-        image: strimzi/helloworld-producer:latest
+      - name: hello-world-producer
+        image: strimzi/hello-world-producer:latest
         env:
           - name: BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9092
           - name: TOPIC
-            value: helloworld-test-apps
-          - name: TIMER
+            value: hello-world-test-apps
+          - name: DELAY_MS
             value: "1000"
-          - name: MESSAGE_KEY_COUNT
-            value: "3"
-          - name: EXAMPLE_LOG_LEVEL
+          - name: LOG_LEVEL
             value: "INFO"
           - name: MESSAGE_COUNT
             value: "1000"
@@ -50,26 +48,26 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   labels:
-    app: helloworld-consumer
-  name: helloworld-consumer
+    app: hello-world-consumer
+  name: hello-world-consumer
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: helloworld-consumer
+        app: hello-world-consumer
     spec:
       containers:
-      - name: helloworld-consumer
-        image: strimzi/helloworld-consumer:latest
+      - name: hello-world-consumer
+        image: strimzi/hello-world-consumer:latest
         env:
           - name: BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9092
           - name: TOPIC
-            value: helloworld-test-apps
+            value: hello-world-test-apps
           - name: GROUP_ID
-            value: my-helloworld-consumer
-          - name: EXAMPLE_LOG_LEVEL
+            value: my-hello-world-consumer
+          - name: LOG_LEVEL
             value: "INFO"
           - name: MESSAGE_COUNT
             value: "1000"

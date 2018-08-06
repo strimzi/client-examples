@@ -2,24 +2,24 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   labels:
-    app: helloworld-consumer
-  name: helloworld-consumer
+    app: hello-world-producer
+  name: hello-world-producer
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: helloworld-consumer
+        app: hello-world-producer
     spec:
       containers:
-      - name: helloworld-consumer
-        image: strimzi/helloworld-consumer:latest
+      - name: hello-world-producer
+        image: strimzi/hello-world-producer:latest
         env:
           - name: BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9092
           - name: TOPIC
             value: my-topic
-          - name: GROUP_ID
-            value: my-helloworld-consumer
-          - name: EXAMPLE_LOG_LEVEL
+          - name: DELAY_MS
+            value: "1000"
+          - name: LOG_LEVEL
             value: "INFO"

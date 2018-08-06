@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>strimzi.io</groupId>
-    <artifactId>helloworld-example</artifactId>
+    <artifactId>hello-world-example</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
 
@@ -42,7 +42,7 @@
     </dependencyManagement>
 
     <modules>
-        <module>helloworld-consumer</module>
-        <module>helloworld-producer</module>
+        <module>hello-world-consumer</module>
+        <module>hello-world-producer</module>
     </modules>
 </project>

@@ -16,14 +16,10 @@ public class KafkaProducerExample {
         log.info("Sending {} messages ...", config.getMessageCount());
         for (long i = 0; i < config.getMessageCount(); i++) {
             log.info("Sending messages \"Hello world - {}\"", i);
-            producer.send(new ProducerRecord(config.getTopic(), getKey(i, config.getNumberOfKeys()),  "Hello world - " + i));
-            Thread.sleep(config.getTimer());
+            producer.send(new ProducerRecord(config.getTopic(),  "Hello world - " + i));
+            Thread.sleep(config.getDelay());
         }
         log.info("{} messages sent ...", config.getMessageCount());
         producer.close();
-    }
-
-    private static String getKey(long sentMessages, long numberOfKeys) {
-        return "key-" + sentMessages % numberOfKeys;
     }
 }

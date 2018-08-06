@@ -6,10 +6,10 @@
 
     <parent>
         <groupId>strimzi.io</groupId>
-        <artifactId>helloworld-example</artifactId>
+        <artifactId>hello-world-example</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>helloworld-producer</artifactId>
+    <artifactId>hello-world-producer</artifactId>
 
     <dependencies>
         <dependency>
