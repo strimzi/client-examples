@@ -8,14 +8,6 @@ spec:
   replicas: 3
   partitions: 12
 ---
-apiVersion: kafka.strimzi.io/v1alpha1
-kind: KafkaUser
-metadata:
-  name: minimal
-spec:
-  authentication:
-    type: tls
----
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
