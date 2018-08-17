@@ -4,3 +4,11 @@
 # IntelliJ IDEA specific
 .idea/
 *.iml
+
+# Eclipse specific
+**/.project
+**/.settings/*
+**/.prefs
+**/.classpath
+**/.factorypath
+/target/
