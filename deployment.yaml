@@ -28,7 +28,7 @@ spec:
           - name: BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9092
           - name: TOPIC
-            value: hello-world-test-apps
+            value: my-topic
           - name: DELAY_MS
             value: "1000"
           - name: LOG_LEVEL
@@ -56,7 +56,7 @@ spec:
           - name: BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9092
           - name: TOPIC
-            value: hello-world-test-apps
+            value: my-topic
           - name: GROUP_ID
             value: my-hello-world-consumer
           - name: LOG_LEVEL
