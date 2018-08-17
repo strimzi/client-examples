@@ -34,6 +34,8 @@ This can be done in two ways:
 This deploys producer image ready to publish to the topic which is specified in the `hello-world-producer.yaml` file and and consumer image ready to subscribe to the topic which is specified in the `hello-world-consumer.yaml`.
 * The second option is to apply `deployment.yaml` file. This deploys the producer and consumer ans also creates the topic and example is in ready-to-observe state.
 
+Before deploying the producer and the consumer, remember to update the `image` field with the path where the image was pushed during the build and it's available (i.e. `<my-docker-org>/hello-world-consumer:latest`)
+
 When using `deployment.yaml` file for deployment you can start observing the sending messages in producer container's log and the receiving of messages in consumer container's log.
 The producer sends every `DELAY_MS` ms a message. 
 This message is received and printed by the consumer.
