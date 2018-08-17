@@ -1,12 +1,14 @@
 # Description of client-examples
+
 This repository contains example Kafka clients. 
 Both producer and consumer clients are assembled into docker images which allows them to be deployed on OpenShift.
-This may serve as a basic usage example for the [Strimzi][strimziGH]project.
+This may serve as a basic usage example for the [Strimzi][strimziGH] project.
 
 This repository contains a `deployment.yaml` file with `Deployments` for the producer and consumer as well as `KafkaTopic` and `KafkaUsers` for use by Strimzi operator.
 Logging configuration can be found in the `log4j2.properties` file for the producer and consumer separately.
 
 ## Build
+
 To build this example you need some basic requirements.
 Make sure you have `make`, `docker`, `JDK 1.8` and `mvn` installed. 
 After cloning this repository to your folder Hello World example is fully ready to be build with `maven`.
@@ -17,6 +19,7 @@ The command is:
 Note: Be sure `docker` and `oc` cluster where images should be pushed are running.
 
 ## Usage
+
 Basic requirement to run this example is running OpenShift cluster with deployed Kafka and Zookeeper containers.
 Examples how to deploy basic configuration can be found in the [Strimzi documentation][strimziDoc].
 
@@ -33,30 +36,31 @@ Consumer is running until `MESSAGE_COUNT` messages are received.
 
 
 ## Configuration
+
 Although this Hello World is simple example it is fully configurable.
 Below are listed and described environmental variables.
 
 Producer  
-`BOOTSTRAP_SERVERS` - comma-separated host and port pair that is the address of the Kafka broker. The form of pair is `host:port`, e.g. `my-cluster-kafka-bootstrap:9092` 
-`TOPIC` - the topic the producer will send to  
-`DELAY_MS` - the delay, in ms, between messages  
-`MESSAGE_COUNT` - the number of messages the producer should send  
-`TRUSTSTORE_PASSWORD` - password to unlock the keystore file  
-`TRUSTSTORE_PATH` - location of the keystore file containing the collection of CA certificates  
-`KEYSTORE_PASSWORD` - `TRUSTSTORE_PASSWORD` was the password to unlock, this is the password to access  
-`KEYSTORE_PATH` - location of the keystore file containing certificate and private key  
-`LOG_LEVEL` - logging level  
+* `BOOTSTRAP_SERVERS` - comma-separated host and port pair that is the address of the Kafka broker. The form of pair is `host:port`, e.g. `my-cluster-kafka-bootstrap:9092` 
+* `TOPIC` - the topic the producer will send to  
+* `DELAY_MS` - the delay, in ms, between messages  
+* `MESSAGE_COUNT` - the number of messages the producer should send  
+* `TRUSTSTORE_PASSWORD` - password to unlock the keystore file  
+* `TRUSTSTORE_PATH` - location of the keystore file containing the collection of CA certificates  
+* `KEYSTORE_PASSWORD` - `TRUSTSTORE_PASSWORD` was the password to unlock, this is the password to access  
+* `KEYSTORE_PATH` - location of the keystore file containing certificate and private key  
+* `LOG_LEVEL` - logging level  
 
 Consumer  
-`BOOTSTRAP_SERVERS` - comma-separated host and port pair that is the address of the Kafka broker. The form of pair is `host:port`, e.g. `my-cluster-kafka-bootstrap:9092` 
-`TOPIC` - name of topic which consumer subscribes  
-`GROUP_ID` - specifies the consumer group id for the consumer
-`MESSAGE_COUNT` - the number of messages the consumer should receive
-`TRUSTSTORE_PASSWORD` - password to unlock the keystore file  
-`TRUSTSTORE_PATH` - location of the keystore file containing the collection of CA certificates  
-`KEYSTORE_PASSWORD` - `TRUSTSTORE_PASSWORD` was the password to unlock, this is the password to access
-`KEYSTORE_PATH` - location of the keystore file containing certificate and private key  
-`LOG_LEVEL` - logging level  
+* `BOOTSTRAP_SERVERS` - comma-separated host and port pair that is the address of the Kafka broker. The form of pair is `host:port`, e.g. `my-cluster-kafka-bootstrap:9092` 
+* `TOPIC` - name of topic which consumer subscribes  
+* `GROUP_ID` - specifies the consumer group id for the consumer
+* `MESSAGE_COUNT` - the number of messages the consumer should receive
+* `TRUSTSTORE_PASSWORD` - password to unlock the keystore file  
+* `TRUSTSTORE_PATH` - location of the keystore file containing the collection of CA certificates  
+* `KEYSTORE_PASSWORD` - `TRUSTSTORE_PASSWORD` was the password to unlock, this is the password to access
+* `KEYSTORE_PATH` - location of the keystore file containing certificate and private key  
+* `LOG_LEVEL` - logging level  
 
 Logging configuration is done by setting up `EXAMPLE_LOG_LEVEL` environmental variable.
 Value of this variable is substituted into `log4j2.properties` file under `client/src/main/resources/log4j2.properties`.
