@@ -9,12 +9,12 @@ export DOCKER_ORG=${DOCKER_ORG:-strimzici}
 export DOCKER_REGISTRY=${DOCKER_REGISTRY:-docker.io}
 export DOCKER_TAG=$COMMIT
 
-make build docker_build
+make build
 
 if [ "$PULL_REQUEST" != "false" ] ; then
+  make docker_build
     echo "Building PR: Nothing to push"
 else
-  docker login -u $DOCKER_USER -p $DOCKER_PASS
   if [ "$TAG" = "latest" ] && [ "$BRANCH" != "master" ]; then
     export DOCKER_ORG=strimzici
     export DOCKER_TAG=$TAG
@@ -22,5 +22,7 @@ else
     export DOCKER_ORG=strimzi
     export DOCKER_TAG=$TAG
   fi
+  make docker_build
+  echo "$DOCKER_PASS" | docker login -u $DOCKER_USER --password-stdin
   make docker_push
 fi
