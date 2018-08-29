@@ -53,10 +53,6 @@ Producer
 * `TOPIC` - the topic the producer will send to  
 * `DELAY_MS` - the delay, in ms, between messages  
 * `MESSAGE_COUNT` - the number of messages the producer should send  
-* `TRUSTSTORE_PASSWORD` - password to unlock the truststore file  
-* `TRUSTSTORE_PATH` - location of the truststore file containing the collection of CA certificates for connecting via TLS to the brokers  
-* `KEYSTORE_PASSWORD` - password to unlock the keystore file   
-* `KEYSTORE_PATH` - location of the keystore file containing certificate and private key for TLS client authentication  
 * `CA_CRT` - the certificate of the CA which signed the brokers' TLS certificates, for adding to the client's trust store
 * `USER_CRT` - the user's certificate
 * `USER_KEY` - the user's private key
@@ -67,10 +63,6 @@ Consumer
 * `TOPIC` - name of topic which consumer subscribes  
 * `GROUP_ID` - specifies the consumer group id for the consumer
 * `MESSAGE_COUNT` - the number of messages the consumer should receive
-* `TRUSTSTORE_PASSWORD` - password to unlock the truststore file
-* `TRUSTSTORE_PATH` - location of the truststore file containing the collection of CA certificates for connecting via TLS to the brokers  
-* `KEYSTORE_PASSWORD` - password to unlock the keystore file
-* `KEYSTORE_PATH` - location of the keystore file containing certificate and private key for TLS client authentication  
 * `CA_CRT` - the certificate of the CA which signed the brokers' TLS certificates, for adding to the client's trust store
 * `USER_CRT` - the user's certificate
 * `USER_KEY` - the user's private key
