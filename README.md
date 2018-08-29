@@ -57,6 +57,9 @@ Producer
 * `TRUSTSTORE_PATH` - location of the truststore file containing the collection of CA certificates for connecting via TLS to the brokers  
 * `KEYSTORE_PASSWORD` - password to unlock the keystore file   
 * `KEYSTORE_PATH` - location of the keystore file containing certificate and private key for TLS client authentication  
+* `CA_CRT` - the certificate of the CA which signed the brokers' TLS certificates, for adding to the client's trust store
+* `USER_CRT` - the user's certificate
+* `USER_KEY` - the user's private key
 * `LOG_LEVEL` - logging level  
 
 Consumer  
@@ -68,6 +71,9 @@ Consumer
 * `TRUSTSTORE_PATH` - location of the truststore file containing the collection of CA certificates for connecting via TLS to the brokers  
 * `KEYSTORE_PASSWORD` - password to unlock the keystore file
 * `KEYSTORE_PATH` - location of the keystore file containing certificate and private key for TLS client authentication  
+* `CA_CRT` - the certificate of the CA which signed the brokers' TLS certificates, for adding to the client's trust store
+* `USER_CRT` - the user's certificate
+* `USER_KEY` - the user's private key
 * `LOG_LEVEL` - logging level  
 
 Logging configuration is done by setting up `EXAMPLE_LOG_LEVEL` environmental variable.
