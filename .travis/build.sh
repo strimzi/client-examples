@@ -9,7 +9,7 @@ export DOCKER_ORG=${DOCKER_ORG:-strimzici}
 export DOCKER_REGISTRY=${DOCKER_REGISTRY:-docker.io}
 export DOCKER_TAG=$COMMIT
 
-make java_build docker_build
+make build docker_build
 
 if [ "$PULL_REQUEST" != "false" ] ; then
     echo "Building PR: Nothing to push"
