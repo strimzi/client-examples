@@ -1,0 +1,20 @@
+sudo: required
+language: java
+jdk:
+- oraclejdk8
+services:
+- docker
+script:
+- "./.travis/build.sh"
+cache:
+  directories:
+  - "$HOME/.m2"
+env:
+  global:
+  - PULL_REQUEST=${TRAVIS_PULL_REQUEST}
+  - COMMIT=${TRAVIS_COMMIT::8}
+  - TAG=${TRAVIS_TAG:-latest}
+  - BRANCH=${TRAVIS_BRANCH:-master}
+  - DOCKER_ORG=strimzici
+  - secure: "Z4w5aDXP0hjd9riH/pNH5xNUj6ZfrFSTFpnihO1Xq4BB6dE+3P3feyibS5NMAflu3eUajwGXff26uF/nPmT4gVnuKQILfWNmq8qc5EiJucMRnrkPidMGDtAsE+equIla7hgSPHmBjX6XRHBMzVJXag4JKNcq005WpES4p0VpsP3aXmQsr7gp9st+FYC1dacZAWkWVdTts+83/swPyd2cMqYW6SpWWaSD7LoYn4bPfcIrg15aa5RcO0CS//HXPX17R0QR3WSvGuu39mHgCRZ2B56PTdQdTAs+FTr865t7lDUKSMv8rtrPNiXOrqB9nD4yD4/S6CjbzCzT7RGgPbOPzishJitR3IYWKN8ucoUSr+LZ8F9evhidNVKK9vz3SdwKV6YO4468C13QblISsut7MH7Z8btW//vBbGEh8Oe06tuN1DILbhDNfqJ6BW0ycB486QxUMjynf+QGaw7X5AojwGzww/31vfkglVov4q8Y3aSK51rRFVRSasbZZiCZs6HmLbnVxXY9LnwLVHqZ4Ca6QluitmtjFrnI4hxyUsG9X4xi2P+wpLvjtbdq3+CLPlTw6wjerpriUl89bOj44ofK3Bqmv/pXmgEh19oFG2MSKe/4AK/MwPpJ5IGpzmIWRGqN3S+2w6RikNp25Zx6XV16jyUdxRz18pOoOqqhmrTMaIg="
+  - secure: "kkcHbtiu7Fbxz6+TTJIWkuUkaW0/WKicCM+bGydXqBcE4INkpGtG/NQdftXMMJCWYxZWosVyzjb+g3j0jl9wt37tJcVXmHvzaeK0P9lKpu9Fb2gegOQdcHN3qKHHaJgSElcgBSqyNFkTZ87wPRLER0Ouap34DczWl5rFbeyDIVwdTQIgqqB6rH6/VMQt4PYyo3NYpg2AcJ6YOJaW+60b0jsOh3ulplQ1SfTCML/m7UdNtZLyG/0Gn2+RA8tNeNdtJbXvEK8ym/IqOyT4TnSaYMBbzsVFlq/HyNxyXGEarkwdop/lDB9r2wfQnuIDK30hfnveUNA3FQn+hvvAdq8/hoOqGtpyV64i6Mz1REEOjZxWlbeoeIPbm8fs/VAg/amHHCWqp9XA2+Zl5w16jPn1r0US/HgGYMqlOnk4Fm0/ZIVmkb2+3w3jTOoQb19HXNlfiqMr5/4ggOXVb9ZEhqH1xoF2hp+4ht+KiifWkK5y5KoWqAEA6bUMhRDotPL0PY+Xlhb9Yv856SzooFFmEfffllD/qH5C97sywxaXcFdhG3FY4VCdNg5v6sehOf11q+aJN8NQTdwymwTAAIHyuBf0QiXH9bpi5GsmOICykYklHtQFuR3ra3XrskcghBfIqF6SYPgLwEO9Dh6sF5C7mRp+izJT2H/mKhM2NJFr7FgmW6E="
