@@ -43,4 +43,11 @@ if [ -z "$JAVA_OPTS" ]; then
     export JAVA_OPTS="${JAVA_OPTS} -Dlog4j.configurationFile=file:bin/log4j2.properties"
 fi
 
-exec /bin/launch_java.sh $1
+
+# Make sure that we use /dev/urandom
+JAVA_OPTS="${JAVA_OPTS} -Dvertx.cacheDirBase=/tmp -Djava.security.egd=file:/dev/./urandom"
+
+# Enable GC logging for memory tracking
+JAVA_OPTS="${JAVA_OPTS} -XX:NativeMemoryTracking=summary -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps"
+
+exec java $JAVA_OPTS -jar $JAR $@
