@@ -50,4 +50,6 @@ JAVA_OPTS="${JAVA_OPTS} -Dvertx.cacheDirBase=/tmp -Djava.security.egd=file:/dev/
 # Enable GC logging for memory tracking
 JAVA_OPTS="${JAVA_OPTS} -XX:NativeMemoryTracking=summary -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps"
 
+JAVA_OPTS="${JAVA_OPTS} -Dorg.slf4j.simpleLogger.defaultLogLevel=debug"
+
 exec java $JAVA_OPTS -jar $JAR $@
