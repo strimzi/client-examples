@@ -1,3 +1,9 @@
+import io.jaegertracing.Configuration;
+import io.opentracing.Tracer;
+import io.opentracing.contrib.kafka.TracingConsumerInterceptor;
+import io.opentracing.contrib.kafka.TracingProducerInterceptor;
+import io.opentracing.util.GlobalTracer;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -14,6 +20,14 @@ public class KafkaConsumerExample {
         KafkaConsumerConfig config = KafkaConsumerConfig.fromEnv();
         Properties props = KafkaConsumerConfig.createProperties(config);
         int receivedMsgs = 0;
+
+        if (System.getenv("JAEGER_SERVICE_NAME") != null)   {
+            Tracer tracer = Configuration.fromEnv().getTracer();
+            GlobalTracer.registerIfAbsent(tracer);
+
+            props.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, TracingConsumerInterceptor.class.getName());
+        }
+
         boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
         KafkaConsumer consumer = new KafkaConsumer(props);
         consumer.subscribe(Collections.singletonList(config.getTopic()));
