@@ -1,4 +1,4 @@
-# Description of client-examples
+# Apache Kafka client examples
 
 This repository contains examples of Apache Kafka clients written using the Apache Kafka Java APIs:
 * Message Producer which periodically produces messages into a topic
