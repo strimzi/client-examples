@@ -157,7 +157,7 @@ spec:
                   name: hello-world-streams
                   key: user.key
             - name: BOOTSTRAP_SERVERS
-              value: my-source-cluster-kafka-bootstrap:9093
+              value: my-cluster-kafka-bootstrap:9093
             - name: APPLICATION_ID
               value: hello-world-streams
             - name: SOURCE_TOPIC

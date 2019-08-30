@@ -72,7 +72,7 @@ spec:
           image: strimzi/hello-world-streams:latest
           env:
             - name: BOOTSTRAP_SERVERS
-              value: my-source-cluster-kafka-bootstrap:9092
+              value: my-cluster-kafka-bootstrap:9092
             - name: APPLICATION_ID
               value: hello-world-streams
             - name: SOURCE_TOPIC
