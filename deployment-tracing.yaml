@@ -45,6 +45,14 @@ spec:
             value: "INFO"
           - name: MESSAGE_COUNT
             value: "1000"
+          - name: JAEGER_SERVICE_NAME
+            value: hello-world-producer
+          - name: JAEGER_AGENT_HOST
+            value: my-jaeger-agent
+          - name: JAEGER_SAMPLER_TYPE
+            value: const
+          - name: JAEGER_SAMPLER_PARAM
+            value: "1"
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -73,6 +81,14 @@ spec:
               value: my-topic-reversed
             - name: LOG_LEVEL
               value: "INFO"
+            - name: JAEGER_SERVICE_NAME
+              value: hello-world-streams
+            - name: JAEGER_AGENT_HOST
+              value: my-jaeger-agent
+            - name: JAEGER_SAMPLER_TYPE
+              value: const
+            - name: JAEGER_SAMPLER_PARAM
+              value: "1"
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -101,3 +117,11 @@ spec:
               value: "INFO"
             - name: MESSAGE_COUNT
               value: "1000"
+            - name: JAEGER_SERVICE_NAME
+              value: hello-world-consumer
+            - name: JAEGER_AGENT_HOST
+              value: my-jaeger-agent
+            - name: JAEGER_SAMPLER_TYPE
+              value: const
+            - name: JAEGER_SAMPLER_PARAM
+              value: "1"

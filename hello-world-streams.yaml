@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: hello-world-streams
+  name: hello-world-streams
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hello-world-streams
+    spec:
+      containers:
+      - name: hello-world-streams
+        image: strimzi/hello-world-streams:latest
+        env:
+          - name: BOOTSTRAP_SERVERS
+            value: my-source-cluster-kafka-bootstrap:9092
+          - name: APPLICATION_ID
+            value: hello-world-streams
+          - name: SOURCE_TOPIC
+            value: my-topic
+          - name: TARGET_TOPIC
+            value: cipot-ym
+          - name: LOG_LEVEL
+            value: "INFO"

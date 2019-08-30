@@ -11,6 +11,7 @@ public class KafkaStreamsConfig {
     private static final Logger log = LogManager.getLogger(KafkaStreamsConfig.class);
 
     private final String bootstrapServers;
+    private final String applicationId;
     private final String sourceTopic;
     private final String targetTopic;
     private final String trustStorePassword;
@@ -18,8 +19,9 @@ public class KafkaStreamsConfig {
     private final String keyStorePassword;
     private final String keyStorePath;
 
-    public KafkaStreamsConfig(String bootstrapServers, String sourceTopic, String targetTopic, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath) {
+    public KafkaStreamsConfig(String bootstrapServers, String applicationId, String sourceTopic, String targetTopic, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath) {
         this.bootstrapServers = bootstrapServers;
+        this.applicationId = applicationId;
         this.sourceTopic = sourceTopic;
         this.targetTopic = targetTopic;
         this.trustStorePassword = trustStorePassword;
@@ -32,18 +34,19 @@ public class KafkaStreamsConfig {
         String bootstrapServers = System.getenv("BOOTSTRAP_SERVERS");
         String sourceTopic = System.getenv("SOURCE_TOPIC");
         String targetTopic = System.getenv("TARGET_TOPIC");
+        String applicationId = System.getenv("APPLICATION_ID");
         String trustStorePassword = System.getenv("TRUSTSTORE_PASSWORD") == null ? null : System.getenv("TRUSTSTORE_PASSWORD");
         String trustStorePath = System.getenv("TRUSTSTORE_PATH") == null ? null : System.getenv("TRUSTSTORE_PATH");
         String keyStorePassword = System.getenv("KEYSTORE_PASSWORD") == null ? null : System.getenv("KEYSTORE_PASSWORD");
         String keyStorePath = System.getenv("KEYSTORE_PATH") == null ? null : System.getenv("KEYSTORE_PATH");
 
-        return new KafkaStreamsConfig(bootstrapServers, sourceTopic, targetTopic, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath);
+        return new KafkaStreamsConfig(bootstrapServers, applicationId, sourceTopic, targetTopic, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath);
     }
 
     public static Properties createProperties(KafkaStreamsConfig config) {
         Properties props = new Properties();
 
-        props.put(StreamsConfig.APPLICATION_ID_CONFIG, "hello-world-streams");
+        props.put(StreamsConfig.APPLICATION_ID_CONFIG, config.getApplicationId());
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());
         props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 5000);
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
@@ -68,6 +71,10 @@ public class KafkaStreamsConfig {
     }
     public String getBootstrapServers() {
         return bootstrapServers;
+    }
+
+    public String getApplicationId() {
+        return applicationId;
     }
 
     public String getSourceTopic() {

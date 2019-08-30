@@ -9,12 +9,14 @@ spec:
   partitions: 12
 ---
 apiVersion: kafka.strimzi.io/v1alpha1
-kind: KafkaUser
+kind: KafkaTopic
 metadata:
-  name: minimal
+  name: my-topic-reversed
+  labels:
+    strimzi.io/cluster: my-cluster
 spec:
-  authentication:
-    type: tls
+  replicas: 3
+  partitions: 12
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -53,6 +55,39 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   labels:
+    app: hello-world-streams
+  name: hello-world-streams
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hello-world-streams
+    spec:
+      containers:
+        - name: hello-world-streams
+          image: strimzi/hello-world-streams:latest
+          env:
+            - name: CA_CRT
+              valueFrom:
+                secretKeyRef:
+                  name: my-cluster-cluster-ca-cert
+                  key: ca.crt
+            - name: BOOTSTRAP_SERVERS
+              value: my-source-cluster-kafka-bootstrap:9093
+            - name: APPLICATION_ID
+              value: hello-world-streams
+            - name: SOURCE_TOPIC
+              value: my-topic
+            - name: TARGET_TOPIC
+              value: my-topic-reversed
+            - name: LOG_LEVEL
+              value: "INFO"
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
     app: hello-world-consumer
   name: hello-world-consumer
 spec:
@@ -74,9 +109,9 @@ spec:
           - name: BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9093
           - name: TOPIC
-            value: my-topic
+            value: my-topic-reversed
           - name: GROUP_ID
-            value: my-hello-world-consumer
+            value: hello-world-consumer
           - name: LOG_LEVEL
             value: "INFO"
           - name: MESSAGE_COUNT

@@ -3,7 +3,7 @@ kind: KafkaTopic
 metadata:
   name: my-topic
   labels:
-      strimzi.io/cluster: my-cluster
+      strimzi.io/cluster: my-source-cluster
 spec:
   replicas: 3
   partitions: 12
@@ -13,7 +13,27 @@ kind: KafkaTopic
 metadata:
   name: cipot-ym
   labels:
-    strimzi.io/cluster: my-cluster
+    strimzi.io/cluster: my-source-cluster
+spec:
+  replicas: 3
+  partitions: 12
+---
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: KafkaTopic
+metadata:
+  name: my-topic
+  labels:
+    strimzi.io/cluster: my-target-cluster
+spec:
+  replicas: 3
+  partitions: 12
+---
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: KafkaTopic
+metadata:
+  name: cipot-ym
+  labels:
+    strimzi.io/cluster: my-target-cluster
 spec:
   replicas: 3
   partitions: 12
@@ -36,7 +56,7 @@ spec:
         image: scholzj/hello-world-producer:latest
         env:
           - name: BOOTSTRAP_SERVERS
-            value: my-cluster-kafka-bootstrap:9092
+            value: my-source-cluster-kafka-bootstrap:9092
           - name: TOPIC
             value: my-topic
           - name: DELAY_MS
@@ -72,7 +92,7 @@ spec:
         image: scholzj/hello-world-consumer:latest
         env:
           - name: BOOTSTRAP_SERVERS
-            value: my-cluster-kafka-bootstrap:9092
+            value: my-target-cluster-kafka-bootstrap:9092
           - name: TOPIC
             value: my-topic
           - name: GROUP_ID
@@ -90,41 +110,41 @@ spec:
           - name: JAEGER_SAMPLER_PARAM
             value: "1"
 ---
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  labels:
-    app: ahoj-svete-consumer
-  name: ahoj-svete-consumer
-spec:
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: ahoj-svete-consumer
-    spec:
-      containers:
-        - name: ahoj-svete-consumer
-          image: scholzj/hello-world-consumer:latest
-          env:
-            - name: BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9092
-            - name: TOPIC
-              value: my-topic
-            - name: GROUP_ID
-              value: my-ahoj-svete-consumer
-            - name: LOG_LEVEL
-              value: "INFO"
-            - name: MESSAGE_COUNT
-              value: "1000000"
-            - name: JAEGER_SERVICE_NAME
-              value: ahoj-svete-consumer
-            - name: JAEGER_AGENT_HOST
-              value: my-jaeger-agent
-            - name: JAEGER_SAMPLER_TYPE
-              value: const
-            - name: JAEGER_SAMPLER_PARAM
-              value: "1"
+#apiVersion: extensions/v1beta1
+#kind: Deployment
+#metadata:
+#  labels:
+#    app: ahoj-svete-consumer
+#  name: ahoj-svete-consumer
+#spec:
+#  replicas: 1
+#  template:
+#    metadata:
+#      labels:
+#        app: ahoj-svete-consumer
+#    spec:
+#      containers:
+#        - name: ahoj-svete-consumer
+#          image: scholzj/hello-world-consumer:latest
+#          env:
+#            - name: BOOTSTRAP_SERVERS
+#              value: my-cluster-target-kafka-bootstrap:9092
+#            - name: TOPIC
+#              value: my-topic
+#            - name: GROUP_ID
+#              value: my-ahoj-svete-consumer
+#            - name: LOG_LEVEL
+#              value: "INFO"
+#            - name: MESSAGE_COUNT
+#              value: "1000000"
+#            - name: JAEGER_SERVICE_NAME
+#              value: ahoj-svete-consumer
+#            - name: JAEGER_AGENT_HOST
+#              value: my-jaeger-agent
+#            - name: JAEGER_SAMPLER_TYPE
+#              value: const
+#            - name: JAEGER_SAMPLER_PARAM
+#              value: "1"
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -144,7 +164,7 @@ spec:
           image: scholzj/hello-world-streams:latest
           env:
             - name: BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9092
+              value: my-source-cluster-kafka-bootstrap:9092
             - name: SOURCE_TOPIC
               value: my-topic
             - name: TARGET_TOPIC
@@ -178,7 +198,7 @@ spec:
           image: scholzj/hello-world-consumer:latest
           env:
             - name: BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9092
+              value: my-target-cluster-kafka-bootstrap:9092
             - name: TOPIC
               value: cipot-ym
             - name: GROUP_ID
