@@ -44,7 +44,7 @@ This deploys the producer, consumer and streams and also creates the topics they
 If you built your own version of these examples, remember to update the `image` field with the path where the image was pushed during the build and it's available (i.e. `<my-docker-org>/hello-world-consumer:latest`).
 
 When using [`deployment.yaml`](./deployment.yaml) file for deployment you can start observing the sending messages in producer container's log and the receiving of messages in consumer container's log.
-It's also available a [`deployment-ssl.yaml`](./deployment-ssl.yaml) file which deploys the same producer and consumer applications but using a TLS connection to the cluster.
+It's also available a [`deployment-ssl.yaml`](./deployment-ssl.yaml) which deploys the same producer and consumer applications but using a TLS encryption and [`deployment-ssl.yaml`](./deployment-ssl.yaml) which uses TLS client authentication and ACLs.
 
 ## Configuration
 
