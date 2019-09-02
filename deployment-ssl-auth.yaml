@@ -18,6 +18,31 @@ spec:
   replicas: 3
   partitions: 12
 ---
+apiVersion: kafka.strimzi.io/v1beta1
+kind: KafkaUser
+metadata:
+  name: hello-world-producer
+  labels:
+    strimzi.io/cluster: my-cluster
+spec:
+  authentication:
+    type: tls
+  authorization:
+    type: simple
+    acls:
+      - resource:
+          type: topic
+          name: my-topic
+        operation: Write
+      - resource:
+          type: topic
+          name: my-topic
+        operation: Create
+      - resource:
+          type: topic
+          name: my-topic
+        operation: Describe
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -40,6 +65,16 @@ spec:
               secretKeyRef:
                 name: my-cluster-cluster-ca-cert
                 key: ca.crt
+          - name: USER_CRT
+            valueFrom:
+              secretKeyRef:
+                name: hello-world-producer
+                key: user.crt
+          - name: USER_KEY
+            valueFrom:
+              secretKeyRef:
+                name: hello-world-producer
+                key: user.key
           - name: BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9093
           - name: TOPIC
@@ -50,6 +85,44 @@ spec:
             value: "INFO"
           - name: MESSAGE_COUNT
             value: "1000"
+---
+apiVersion: kafka.strimzi.io/v1beta1
+kind: KafkaUser
+metadata:
+  name: hello-world-streams
+  labels:
+    strimzi.io/cluster: my-cluster
+spec:
+  authentication:
+    type: tls
+  authorization:
+    type: simple
+    acls:
+      - resource:
+          type: topic
+          name: my-topic
+        operation: Read
+      - resource:
+          type: topic
+          name: my-topic
+        operation: Describe
+      - resource:
+          type: group
+          name: hello-world-streams
+          patternType: prefix
+        operation: Read
+      - resource:
+          type: topic
+          name: my-topic-reversed
+        operation: Write
+      - resource:
+          type: topic
+          name: my-topic-reversed
+        operation: Create
+      - resource:
+          type: topic
+          name: my-topic-reversed
+        operation: Describe
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -73,6 +146,16 @@ spec:
                 secretKeyRef:
                   name: my-cluster-cluster-ca-cert
                   key: ca.crt
+            - name: USER_CRT
+              valueFrom:
+                secretKeyRef:
+                  name: hello-world-streams
+                  key: user.crt
+            - name: USER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: hello-world-streams
+                  key: user.key
             - name: BOOTSTRAP_SERVERS
               value: my-cluster-kafka-bootstrap:9093
             - name: APPLICATION_ID
@@ -83,6 +166,31 @@ spec:
               value: my-topic-reversed
             - name: LOG_LEVEL
               value: "INFO"
+---
+apiVersion: kafka.strimzi.io/v1beta1
+kind: KafkaUser
+metadata:
+  name: hello-world-consumer
+  labels:
+    strimzi.io/cluster: my-cluster
+spec:
+  authentication:
+    type: tls
+  authorization:
+    type: simple
+    acls:
+      - resource:
+          type: topic
+          name: my-topic-reversed
+        operation: Read
+      - resource:
+          type: topic
+          name: my-topic-reversed
+        operation: Describe
+      - resource:
+          type: group
+          name: hello-world-consumer
+        operation: Read
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -106,6 +214,16 @@ spec:
               secretKeyRef:
                 name: my-cluster-cluster-ca-cert
                 key: ca.crt
+          - name: USER_CRT
+            valueFrom:
+              secretKeyRef:
+                name: hello-world-consumer
+                key: user.crt
+          - name: USER_KEY
+            valueFrom:
+              secretKeyRef:
+                name: hello-world-consumer
+                key: user.key
           - name: BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9093
           - name: TOPIC
