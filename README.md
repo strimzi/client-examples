@@ -2,8 +2,8 @@
 
 This repository contains examples of Apache Kafka clients written using the Apache Kafka Java APIs:
 * Message Producer which periodically produces messages into a topic
-* Steams application which reads messages from a topic, transforms them (reverses the message payload) and sends them to another topic
-* Consumer whihc is consuming messages from a topic
+* Streams application which reads messages from a topic, transforms them (reverses the message payload) and sends them to another topic
+* Consumer which is consuming messages from a topic
 
 All examples are assembled into Docker images which allows them to be deployed on Kubernetes or OpenShift.
 This may serve as a basic usage example for the [Strimzi project](https://strimzi.io).
@@ -44,7 +44,7 @@ This deploys the producer, consumer and streams and also creates the topics they
 If you built your own version of these examples, remember to update the `image` field with the path where the image was pushed during the build and it's available (i.e. `<my-docker-org>/hello-world-consumer:latest`).
 
 When using [`deployment.yaml`](./deployment.yaml) file for deployment you can start observing the sending messages in producer container's log and the receiving of messages in consumer container's log.
-It's also available a [`deployment-ssl.yaml`](./deployment-ssl.yaml) which deploys the same producer and consumer applications but using a TLS encryption and [`deployment-ssl.yaml`](./deployment-ssl.yaml) which uses TLS client authentication and ACLs.
+It's also available a [`deployment-ssl.yaml`](./deployment-ssl.yaml) which deploys the same producer and consumer applications but using a TLS encryption and [`deployment-ssl-auth.yaml`](./deployment-ssl-auth.yaml) which uses TLS client authentication and ACLs.
 
 ## Configuration
 
@@ -72,14 +72,14 @@ Consumer
 * `LOG_LEVEL` - logging level  
 
 Streams  
-* `BOOTSTRAP_SERVERS` - comma-separated host and port pairs that is a list of Kafka broker addresses. The form of pair is `host:port`, e.g. `my-cluster-kafka-bootstrap:9092`. 
-* `APPLICATION_ID` - The Kafka Streams application ID.
-* `SOURCE_TOPIC` - name of topic which will be used as the source of messages.
-* `TARGET_TOPIC` - name of topic where the transformed images are sent.
-* `CA_CRT` - the certificate of the CA which signed the brokers' TLS certificates, for adding to the client's trust store.
-* `USER_CRT` - the user's certificate.
-* `USER_KEY` - the user's private key.
-* `LOG_LEVEL` - logging level  .
+* `BOOTSTRAP_SERVERS` - comma-separated host and port pairs that is a list of Kafka broker addresses. The form of pair is `host:port`, e.g. `my-cluster-kafka-bootstrap:9092`
+* `APPLICATION_ID` - The Kafka Streams application ID
+* `SOURCE_TOPIC` - name of topic which will be used as the source of messages
+* `TARGET_TOPIC` - name of topic where the transformed images are sent
+* `CA_CRT` - the certificate of the CA which signed the brokers' TLS certificates, for adding to the client's trust store
+* `USER_CRT` - the user's certificate
+* `USER_KEY` - the user's private key
+* `LOG_LEVEL` - logging level
 
 ### Tracing
 
