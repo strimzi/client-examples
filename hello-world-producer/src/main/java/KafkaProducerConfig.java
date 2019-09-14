@@ -1,5 +1,6 @@
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,8 +20,13 @@ public class KafkaProducerConfig {
     private final String trustStorePath;
     private final String keyStorePassword;
     private final String keyStorePath;
+    private final String oauthClientId;
+    private final String oauthClientSecret;
+    private final String oauthAccessToken;
+    private final String oauthRefreshToken;
+    private final String oauthTokenEndpointUri;
 
-    public KafkaProducerConfig(String bootstrapServers, String topic, int delay, Long messageCount, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath) {
+    public KafkaProducerConfig(String bootstrapServers, String topic, int delay, Long messageCount, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath, String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken, String oauthTokenEndpointUri) {
         this.bootstrapServers = bootstrapServers;
         this.topic = topic;
         this.delay = delay;
@@ -29,6 +35,11 @@ public class KafkaProducerConfig {
         this.trustStorePath = trustStorePath;
         this.keyStorePassword = keyStorePassword;
         this.keyStorePath = keyStorePath;
+        this.oauthClientId = oauthClientId;
+        this.oauthClientSecret = oauthClientSecret;
+        this.oauthAccessToken = oauthAccessToken;
+        this.oauthRefreshToken = oauthRefreshToken;
+        this.oauthTokenEndpointUri = oauthTokenEndpointUri;
     }
 
     public static KafkaProducerConfig fromEnv() {
@@ -40,8 +51,13 @@ public class KafkaProducerConfig {
         String trustStorePath = System.getenv("TRUSTSTORE_PATH") == null ? null : System.getenv("TRUSTSTORE_PATH");
         String keyStorePassword = System.getenv("KEYSTORE_PASSWORD") == null ? null : System.getenv("KEYSTORE_PASSWORD");
         String keyStorePath = System.getenv("KEYSTORE_PATH") == null ? null : System.getenv("KEYSTORE_PATH");
+        String oauthClientId = System.getenv("OAUTH_CLIENT_ID");
+        String oauthClientSecret = System.getenv("OAUTH_CLIENT_SECRET");
+        String oauthAccessToken = System.getenv("OAUTH_ACCESS_TOKEN");
+        String oauthRefreshToken = System.getenv("OAUTH_REFRESH_TOKEN");
+        String oauthTokenEndpointUri = System.getenv("OAUTH_TOKEN_ENDPOINT_URI");
 
-        return new KafkaProducerConfig(bootstrapServers, topic, delay, messageCount, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath);
+        return new KafkaProducerConfig(bootstrapServers, topic, delay, messageCount, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri);
     }
 
     public static Properties createProperties(KafkaProducerConfig config) {
@@ -66,6 +82,16 @@ public class KafkaProducerConfig {
             props.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, config.getKeyStorePassword());
             props.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, config.getKeyStorePath());
         }
+
+        if ((config.getOauthAccessToken() != null)
+                || (config.getOauthTokenEndpointUri() != null && config.getOauthClientId() != null && config.getOauthRefreshToken() != null)
+                || (config.getOauthTokenEndpointUri() != null && config.getOauthClientId() != null && config.getOauthClientSecret() != null))    {
+            props.put(SaslConfigs.SASL_JAAS_CONFIG, "org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;");
+            props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL".equals(props.getProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG)) ? "SASL_SSL" : "SASL_PLAINTEXT");
+            props.put(SaslConfigs.SASL_MECHANISM, "OAUTHBEARER");
+            props.put(SaslConfigs.SASL_LOGIN_CALLBACK_HANDLER_CLASS, "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler");
+        }
+
         return props;
     }
     public String getBootstrapServers() {
@@ -102,5 +128,25 @@ public class KafkaProducerConfig {
 
     public String getKeyStorePath() {
         return keyStorePath;
+    }
+
+    public String getOauthClientId() {
+        return oauthClientId;
+    }
+
+    public String getOauthClientSecret() {
+        return oauthClientSecret;
+    }
+
+    public String getOauthAccessToken() {
+        return oauthAccessToken;
+    }
+
+    public String getOauthRefreshToken() {
+        return oauthRefreshToken;
+    }
+
+    public String getOauthTokenEndpointUri() {
+        return oauthTokenEndpointUri;
     }
 }
