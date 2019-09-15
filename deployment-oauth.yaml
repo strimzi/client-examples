@@ -49,7 +49,7 @@ type: Opaque
 data:
   clientSecret: aGVsbG8td29ybGQtcHJvZHVjZXItc2VjcmV0
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -57,6 +57,9 @@ metadata:
   name: hello-world-producer
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-producer
   template:
     metadata:
       labels:
@@ -135,7 +138,7 @@ type: Opaque
 data:
   clientSecret: aGVsbG8td29ybGQtc3RyZWFtcy1zZWNyZXQ=
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -143,6 +146,9 @@ metadata:
   name: hello-world-streams
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-streams
   template:
     metadata:
       labels:
@@ -208,7 +214,7 @@ type: Opaque
 data:
   clientSecret: aGVsbG8td29ybGQtY29uc3VtZXItc2VjcmV0
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -216,6 +222,9 @@ metadata:
   name: hello-world-consumer
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-consumer
   template:
     metadata:
       labels:
