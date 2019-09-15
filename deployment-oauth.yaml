@@ -47,7 +47,7 @@ metadata:
   name: hello-world-producer-oauth
 type: Opaque
 data:
-  clientSecret: ZGQ5OTM2NzctZmViMS00MjM0LThiZGMtNjQ2ZmYxOGM3Y2Ni
+  clientSecret: aGVsbG8td29ybGQtcHJvZHVjZXItc2VjcmV0
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -84,7 +84,12 @@ spec:
                 name: hello-world-producer-oauth
                 key: clientSecret
           - name: OAUTH_TOKEN_ENDPOINT_URI
-            value: http://sso2-sso.apps.jscholz.rhmw-integrations.net/auth/realms/internal/protocol/openid-connect/token
+            value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
+          - name: OAUTH_CRT
+            valueFrom:
+              secretKeyRef:
+                name: sso-x509-https-secret
+                key: tls.crt
 ---
 apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaUser
@@ -128,7 +133,7 @@ metadata:
   name: hello-world-streams-oauth
 type: Opaque
 data:
-  clientSecret: YjUwYTg0ZWItNjA4OC00NDY1LWI5NzQtNzg3NTNhMWEyYjcy
+  clientSecret: aGVsbG8td29ybGQtc3RyZWFtcy1zZWNyZXQ=
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -165,7 +170,12 @@ spec:
                   name: hello-world-streams-oauth
                   key: clientSecret
             - name: OAUTH_TOKEN_ENDPOINT_URI
-              value: http://sso2-sso.apps.jscholz.rhmw-integrations.net/auth/realms/internal/protocol/openid-connect/token
+              value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
+            - name: OAUTH_CRT
+              valueFrom:
+                secretKeyRef:
+                  name: sso-x509-https-secret
+                  key: tls.crt
 ---
 apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaUser
@@ -196,7 +206,7 @@ metadata:
   name: hello-world-consumer-oauth
 type: Opaque
 data:
-  clientSecret: NGQ5MmJhY2UtZmRlYy00OTgyLWFlMTQtZmMyZjllNGViYzlk
+  clientSecret: aGVsbG8td29ybGQtY29uc3VtZXItc2VjcmV0
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -233,4 +243,9 @@ spec:
                   name: hello-world-consumer-oauth
                   key: clientSecret
             - name: OAUTH_TOKEN_ENDPOINT_URI
-              value: http://sso2-sso.apps.jscholz.rhmw-integrations.net/auth/realms/internal/protocol/openid-connect/token
+              value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
+            - name: OAUTH_CRT
+              valueFrom:
+                secretKeyRef:
+                  name: sso-x509-https-secret
+                  key: tls.crt

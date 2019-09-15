@@ -43,6 +43,14 @@ if [ -z "$JAVA_OPTS" ]; then
     export JAVA_OPTS="${JAVA_OPTS} -Dlog4j.configurationFile=file:bin/log4j2.properties"
 fi
 
+if [ "$OAUTH_CRT" ];
+then
+    echo "Preparing OAuth truststore"
+    export OAUTH_SSL_TRUSTSTORE_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c32)
+    echo "$OAUTH_CRT" > /tmp/oauth.crt
+    create_truststore /tmp/oauth-truststore.p12 $OAUTH_SSL_TRUSTSTORE_PASSWORD /tmp/oauth.crt ca
+    export OAUTH_SSL_TRUSTSTORE_LOCATION=/tmp/oauth-truststore.p12
+fi
 
 # Make sure that we use /dev/urandom
 JAVA_OPTS="${JAVA_OPTS} -Dvertx.cacheDirBase=/tmp -Djava.security.egd=file:/dev/./urandom"
