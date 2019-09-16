@@ -62,12 +62,19 @@
                 <version>${opentracing-kafka.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.strimzi.oauth</groupId>
-                <artifactId>strimzi-kafka-oauth-client</artifactId>
+                <groupId>io.strimzi</groupId>
+                <artifactId>kafka-oauth-client</artifactId>
                 <version>${strimzi-oauth-callback.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <repositories>
+        <repository>
+            <id>oss.sonatype.org-snapshot</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
 
     <modules>
         <module>hello-world-consumer</module>
