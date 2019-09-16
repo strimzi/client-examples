@@ -18,7 +18,7 @@ spec:
   replicas: 3
   partitions: 12
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -26,6 +26,9 @@ metadata:
   name: hello-world-producer
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-producer
   template:
     metadata:
       labels:
@@ -46,7 +49,7 @@ spec:
           - name: MESSAGE_COUNT
             value: "1000"
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -54,6 +57,9 @@ metadata:
   name: hello-world-streams
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-streams
   template:
     metadata:
       labels:
@@ -74,7 +80,7 @@ spec:
             - name: LOG_LEVEL
               value: "INFO"
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -82,6 +88,9 @@ metadata:
   name: hello-world-consumer
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-consumer
   template:
     metadata:
       labels:
