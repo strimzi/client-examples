@@ -67,7 +67,7 @@ spec:
     spec:
       containers:
       - name: hello-world-producer
-        image: scholzj/hello-world-producer:latest
+        image: strimzi/hello-world-producer:latest
         env:
           - name: BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9092
@@ -156,7 +156,7 @@ spec:
     spec:
       containers:
         - name: hello-world-streams
-          image: scholzj/hello-world-streams:latest
+          image: strimzi/hello-world-streams:latest
           env:
             - name: BOOTSTRAP_SERVERS
               value: my-cluster-kafka-bootstrap:9092
@@ -232,7 +232,7 @@ spec:
     spec:
       containers:
         - name: hello-world-consumer
-          image: scholzj/hello-world-consumer:latest
+          image: strimzi/hello-world-consumer:latest
           env:
             - name: BOOTSTRAP_SERVERS
               value: my-cluster-kafka-bootstrap:9092

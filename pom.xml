@@ -16,7 +16,7 @@
         <kafka.version>2.3.0</kafka.version>
         <opentracing-kafka.version>0.1.4</opentracing-kafka.version>
         <jaeger.version>1.0.0</jaeger.version>
-        <strimzi-oauth-callback.version>1.0.0-SNAPSHOT</strimzi-oauth-callback.version>
+        <strimzi-oauth-callback.version>0.1.0</strimzi-oauth-callback.version>
     </properties>
 
     <dependencyManagement>
@@ -68,13 +68,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <repositories>
-        <repository>
-            <id>oss.sonatype.org-snapshot</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>
-    </repositories>
 
     <modules>
         <module>hello-world-consumer</module>
