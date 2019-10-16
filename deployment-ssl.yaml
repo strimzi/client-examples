@@ -52,7 +52,7 @@ spec:
           - name: LOG_LEVEL
             value: "INFO"
           - name: MESSAGE_COUNT
-            value: "1000"
+            value: "1000000"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -124,4 +124,4 @@ spec:
           - name: LOG_LEVEL
             value: "INFO"
           - name: MESSAGE_COUNT
-            value: "1000"
+            value: "1000000"
