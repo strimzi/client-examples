@@ -1,6 +1,16 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import io.opentracing.Span;
+import io.opentracing.SpanContext;
+import io.opentracing.Tracer;
+import io.opentracing.propagation.Format;
+import io.opentracing.propagation.TextMapAdapter;
+import io.opentracing.tag.Tags;
+import io.opentracing.util.GlobalTracer;
+import io.vertx.core.MultiMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,6 +152,30 @@ public class HttpKafkaConsumer extends AbstractVerticle {
                 if (ar.succeeded()) {
                     HttpResponse<JsonArray> response = ar.result();
                     if (response.statusCode() == HttpResponseStatus.OK.code()) {
+
+                        Tracer tracer = GlobalTracer.get();
+
+                        MultiMap rawHeaders = response.headers();
+                        final Map<String, String> headers = new HashMap<>();
+                        for (Map.Entry<String, String> header : rawHeaders) {
+                            headers.put(header.getKey(), header.getValue());
+                        }
+
+                        String operation = "poll";
+                        Tracer.SpanBuilder spanBuilder;
+                        try {
+                            SpanContext parentSpan = tracer.extract(Format.Builtin.HTTP_HEADERS, new TextMapAdapter(headers));
+                            if (parentSpan == null) {
+                                spanBuilder = tracer.buildSpan(operation);
+                            } else {
+                                spanBuilder = tracer.buildSpan(operation).asChildOf(parentSpan);
+                            }
+                        } catch (IllegalArgumentException e) {
+                            spanBuilder = tracer.buildSpan(operation);
+                        }
+
+                        Span span = spanBuilder.withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER).start();
+
                         List<ConsumerRecord> list = new ArrayList<>();
                         response.body().forEach(obj -> {
                             JsonObject json = (JsonObject) obj;
@@ -154,6 +188,9 @@ public class HttpKafkaConsumer extends AbstractVerticle {
                                 );
                         });
                         this.messagesReceived += list.size();
+
+                        span.finish();
+
                         fut.complete(list);
                     } else {
                         fut.fail(new RuntimeException("Got HTTP status code " + response.statusCode()));

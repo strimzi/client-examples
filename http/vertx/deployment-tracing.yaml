@@ -1,0 +1,83 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: kafka-http-producer
+  name: kafka-http-producer
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kafka-http-producer
+    spec:
+      containers:
+      - name: kafka-http-producer
+        image: strimzi/kafka-http-producer:latest
+        env:
+          - name: HOSTNAME
+            value: my-bridge-bridge-service
+          - name: PORT
+            value: "8080"
+          - name: TOPIC
+            value: my-topic
+          - name: SEND_INTERVAL
+            value: "1000"
+          - name: JAEGER_SERVICE_NAME
+            value: kafka-http-producer
+          - name: JAEGER_AGENT_HOST
+            value: my-jaeger-agent
+          - name: JAEGER_SAMPLER_TYPE
+            value: const
+          - name: JAEGER_SAMPLER_PARAM
+            value: "1"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: kafka-http-consumer
+  name: kafka-http-consumer
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kafka-http-consumer
+    spec:
+      containers:
+      - name: kafka-http-consumer
+        image: strimzi/kafka-http-consumer:latest
+        env:
+          - name: HOSTNAME
+            value: my-bridge-bridge-service
+          - name: PORT
+            value: "8080"
+          - name: TOPIC
+            value: my-topic
+          - name: GROUPID
+            value: "my-group"
+          - name: POLL_INTERVAL
+            value: "1000"
+          - name: JAEGER_SERVICE_NAME
+            value: kafka-http-consumer
+          - name: JAEGER_AGENT_HOST
+            value: my-jaeger-agent
+          - name: JAEGER_SAMPLER_TYPE
+            value: const
+          - name: JAEGER_SAMPLER_PARAM
+            value: "1"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"

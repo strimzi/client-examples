@@ -2,6 +2,9 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import io.jaegertracing.Configuration;
+import io.opentracing.Tracer;
+import io.opentracing.util.GlobalTracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +41,12 @@ public final class ProducerApp {
             vertx.deployVerticle(httpKafkaProducer, done -> {
                 if (done.succeeded()) {
                     deploymentId = done.result();
+
+                    if (envConfig.get("JAEGER_SERVICE_NAME") != null) {
+                        Tracer tracer = Configuration.fromEnv().getTracer();
+                        GlobalTracer.registerIfAbsent(tracer);
+                    }
+                    
                     log.info("HTTP Kafka producer started successfully");
                 } else {
                     log.error("Failed to deploy HTTP Kafka producer", done.cause());
