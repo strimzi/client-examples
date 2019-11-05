@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: kafka-http-producer
+  name: kafka-http-producer
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kafka-http-producer
+    spec:
+      containers:
+      - name: kafka-http-producer
+        image: strimzi/kafka-http-producer:latest
+        env:
+          - name: HOSTNAME
+            value: my-bridge-bridge-service
+          - name: PORT
+            value: "8080"
+          - name: TOPIC
+            value: my-topic
+          - name: SEND_INTERVAL
+            value: "1000"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
