@@ -26,3 +26,5 @@ spec:
             value: "1000"
           - name: LOG_LEVEL
             value: "INFO"
+          - name: MESSAGE_COUNT
+            value: "1000000"

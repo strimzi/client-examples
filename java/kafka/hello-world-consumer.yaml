@@ -26,3 +26,5 @@ spec:
             value: my-hello-world-consumer
           - name: LOG_LEVEL
             value: "INFO"
+          - name: MESSAGE_COUNT
+            value: "1000000"
