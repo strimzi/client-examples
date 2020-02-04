@@ -46,7 +46,7 @@ If you built your own version of these examples, remember to update the `image` 
 When using [`deployment.yaml`](./java/kafka/deployment.yaml) file for deployment you can start observing the sending messages in producer container's log and the receiving of messages in consumer container's log.
 It's also available as a [`deployment-ssl.yaml`](./java/kafka/deployment-ssl.yaml) which deploys the same producer and consumer applications but using a TLS encryption and [`deployment-ssl-auth.yaml`](./java/kafka/deployment-ssl-auth.yaml) which uses TLS client authentication and ACLs.
 
-You can also use these example clients with OAuth authentication. See the exmaple [`deployment-oauth.yaml`](./java/kafka/deployment-oauth.yaml) for more details.
+You can also use these example clients with OAuth authentication. See the example [`deployment-oauth.yaml`](./java/kafka/deployment-oauth.yaml) for more details.
 To run the OAuth example, you will need to have your Kafka cluster configured with OAuth and change the configuration in [`deployment-oauth.yaml`](./java/kafka/deployment-oauth.yaml) to point to your OAuth server.
 
 ## Configuration
