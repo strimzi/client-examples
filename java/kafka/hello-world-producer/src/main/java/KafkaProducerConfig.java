@@ -16,10 +16,12 @@ public class KafkaProducerConfig {
     private static final Logger log = LogManager.getLogger(KafkaProducerConfig.class);
 
     private static final long DEFAULT_MESSAGES_COUNT = 10;
+    private static final String DEFAULT_MESSAGE = "Hello world";
     private final String bootstrapServers;
     private final String topic;
     private final int delay;
     private final Long messageCount;
+    private final String message;
     private String acks = "1";
     private final String trustStorePassword;
     private final String trustStorePath;
@@ -31,11 +33,12 @@ public class KafkaProducerConfig {
     private final String oauthRefreshToken;
     private final String oauthTokenEndpointUri;
 
-    public KafkaProducerConfig(String bootstrapServers, String topic, int delay, Long messageCount, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath, String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken, String oauthTokenEndpointUri) {
+    public KafkaProducerConfig(String bootstrapServers, String topic, int delay, Long messageCount, String message, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath, String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken, String oauthTokenEndpointUri) {
         this.bootstrapServers = bootstrapServers;
         this.topic = topic;
         this.delay = delay;
         this.messageCount = messageCount;
+        this.message = message;
         this.trustStorePassword = trustStorePassword;
         this.trustStorePath = trustStorePath;
         this.keyStorePassword = keyStorePassword;
@@ -52,6 +55,7 @@ public class KafkaProducerConfig {
         String topic = System.getenv("TOPIC");
         int delay = Integer.valueOf(System.getenv("DELAY_MS"));
         Long messageCount = System.getenv("MESSAGE_COUNT") == null ? DEFAULT_MESSAGES_COUNT : Long.valueOf(System.getenv("MESSAGE_COUNT"));
+        String message = System.getenv("MESSAGE") == null ? DEFAULT_MESSAGE : System.getenv("MESSAGE");
         String trustStorePassword = System.getenv("TRUSTSTORE_PASSWORD") == null ? null : System.getenv("TRUSTSTORE_PASSWORD");
         String trustStorePath = System.getenv("TRUSTSTORE_PATH") == null ? null : System.getenv("TRUSTSTORE_PATH");
         String keyStorePassword = System.getenv("KEYSTORE_PASSWORD") == null ? null : System.getenv("KEYSTORE_PASSWORD");
@@ -62,7 +66,7 @@ public class KafkaProducerConfig {
         String oauthRefreshToken = System.getenv("OAUTH_REFRESH_TOKEN");
         String oauthTokenEndpointUri = System.getenv("OAUTH_TOKEN_ENDPOINT_URI");
 
-        return new KafkaProducerConfig(bootstrapServers, topic, delay, messageCount, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri);
+        return new KafkaProducerConfig(bootstrapServers, topic, delay, messageCount, message, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri);
     }
 
     public static Properties createProperties(KafkaProducerConfig config) {
@@ -113,6 +117,10 @@ public class KafkaProducerConfig {
 
     public Long getMessageCount() {
         return messageCount;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
     public String getAcks() {
