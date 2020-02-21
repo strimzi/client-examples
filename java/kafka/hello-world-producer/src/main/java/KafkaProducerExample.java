@@ -32,7 +32,7 @@ public class KafkaProducerExample {
         KafkaProducer producer = new KafkaProducer(props);
         log.info("Sending {} messages ...", config.getMessageCount());
         for (long i = 0; i < config.getMessageCount(); i++) {
-            log.info("Sending messages \"Hello world - {}\"", i);
+            log.info("Sending messages \"" + config.getMessage() + " - {}\"", i);
             producer.send(new ProducerRecord(config.getTopic(),  "\"" + config.getMessage()  + " - " + i + "\""));
             Thread.sleep(config.getDelay());
         }
