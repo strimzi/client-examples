@@ -22,6 +22,7 @@ public class KafkaConsumerConfig {
     private final String groupId;
     private final String autoOffsetReset = "earliest";
     private final String enableAutoCommit = "false";
+    private final String clientRack;
     private final Long messageCount;
     private final String trustStorePassword;
     private final String trustStorePath;
@@ -33,10 +34,11 @@ public class KafkaConsumerConfig {
     private final String oauthRefreshToken;
     private final String oauthTokenEndpointUri;
 
-    public KafkaConsumerConfig(String bootstrapServers, String topic, String groupId, Long messageCount, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath, String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken, String oauthTokenEndpointUri) {
+    public KafkaConsumerConfig(String bootstrapServers, String topic, String groupId, String clientRack, Long messageCount, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath, String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken, String oauthTokenEndpointUri) {
         this.bootstrapServers = bootstrapServers;
         this.topic = topic;
         this.groupId = groupId;
+        this.clientRack = clientRack;
         this.messageCount = messageCount;
         this.trustStorePassword = trustStorePassword;
         this.trustStorePath = trustStorePath;
@@ -53,6 +55,7 @@ public class KafkaConsumerConfig {
         String bootstrapServers = System.getenv("BOOTSTRAP_SERVERS");
         String topic = System.getenv("TOPIC");
         String groupId = System.getenv("GROUP_ID");
+        String clientRack = System.getenv("CLIENT_RACK");
         Long messageCount = System.getenv("MESSAGE_COUNT") == null ? DEFAULT_MESSAGES_COUNT : Long.valueOf(System.getenv("MESSAGE_COUNT"));
         String trustStorePassword = System.getenv("TRUSTSTORE_PASSWORD") == null ? null : System.getenv("TRUSTSTORE_PASSWORD");
         String trustStorePath = System.getenv("TRUSTSTORE_PATH") == null ? null : System.getenv("TRUSTSTORE_PATH");
@@ -64,13 +67,14 @@ public class KafkaConsumerConfig {
         String oauthRefreshToken = System.getenv("OAUTH_REFRESH_TOKEN");
         String oauthTokenEndpointUri = System.getenv("OAUTH_TOKEN_ENDPOINT_URI");
 
-        return new KafkaConsumerConfig(bootstrapServers, topic, groupId, messageCount, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri);
+        return new KafkaConsumerConfig(bootstrapServers, topic, groupId, clientRack, messageCount, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri);
     }
 
     public static Properties createProperties(KafkaConsumerConfig config) {
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());
         props.put(ConsumerConfig.GROUP_ID_CONFIG, config.getGroupId());
+        props.put(ConsumerConfig.CLIENT_RACK_CONFIG, config.getClientRack());
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, config.getAutoOffsetReset());
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, config.getEnableAutoCommit());
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
@@ -122,6 +126,10 @@ public class KafkaConsumerConfig {
 
     public String getEnableAutoCommit() {
         return enableAutoCommit;
+    }
+
+    public String getClientRack() {
+        return clientRack;
     }
 
     public Long getMessageCount() {
