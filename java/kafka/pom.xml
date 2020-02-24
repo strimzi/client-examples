@@ -4,16 +4,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>strimzi.io</groupId>
-    <artifactId>hello-world-example</artifactId>
+    <parent>
+        <groupId>strimzi.io</groupId>
+        <artifactId>java-examples</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>kafka-java-example</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <log4j.version>2.11.1</log4j.version>
-        <kafka.version>2.3.0</kafka.version>
+        <kafka.version>2.4.0</kafka.version>
         <opentracing-kafka.version>0.1.4</opentracing-kafka.version>
         <jaeger.version>1.0.0</jaeger.version>
         <strimzi-oauth-callback.version>0.1.0</strimzi-oauth-callback.version>
