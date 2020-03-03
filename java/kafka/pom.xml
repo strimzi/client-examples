@@ -18,9 +18,9 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <log4j.version>2.11.1</log4j.version>
         <kafka.version>2.4.0</kafka.version>
-        <opentracing-kafka.version>0.1.4</opentracing-kafka.version>
+        <opentracing-kafka.version>0.1.11</opentracing-kafka.version>
         <jaeger.version>1.0.0</jaeger.version>
-        <strimzi-oauth-callback.version>0.1.0</strimzi-oauth-callback.version>
+        <strimzi-oauth-callback.version>0.3.0</strimzi-oauth-callback.version>
     </properties>
 
     <dependencyManagement>
