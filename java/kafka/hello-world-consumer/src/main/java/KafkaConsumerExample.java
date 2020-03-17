@@ -44,10 +44,10 @@ public class KafkaConsumerExample {
                 log.info("\tpartition: {}", record.partition());
                 log.info("\toffset: {}", record.offset());
                 log.info("\tvalue: {}", record.value());
-                if (commit) {
-                    consumer.commitSync();
-                }
                 receivedMsgs++;
+            }
+            if (commit) {
+                consumer.commitSync();
             }
         }
     }
