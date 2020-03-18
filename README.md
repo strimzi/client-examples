@@ -79,6 +79,7 @@ Streams
 * `APPLICATION_ID` - The Kafka Streams application ID
 * `SOURCE_TOPIC` - name of topic which will be used as the source of messages
 * `TARGET_TOPIC` - name of topic where the transformed images are sent
+* `COMMIT_INTERVAL_MS` - the interval for the Kafka Streams consumer part committing the offsets
 * `CA_CRT` - the certificate of the CA which signed the brokers' TLS certificates, for adding to the client's trust store
 * `USER_CRT` - the user's certificate
 * `USER_KEY` - the user's private key
