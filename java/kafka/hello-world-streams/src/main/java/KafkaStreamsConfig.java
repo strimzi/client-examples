@@ -16,10 +16,12 @@ import java.util.Properties;
 public class KafkaStreamsConfig {
     private static final Logger log = LogManager.getLogger(KafkaStreamsConfig.class);
 
+    private static final int DEFAULT_COMMIT_INTERVAL_MS = 5000;
     private final String bootstrapServers;
     private final String applicationId;
     private final String sourceTopic;
     private final String targetTopic;
+    private final int commitIntervalMs;
     private final String trustStorePassword;
     private final String trustStorePath;
     private final String keyStorePassword;
@@ -30,11 +32,12 @@ public class KafkaStreamsConfig {
     private final String oauthRefreshToken;
     private final String oauthTokenEndpointUri;
 
-    public KafkaStreamsConfig(String bootstrapServers, String applicationId, String sourceTopic, String targetTopic, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath, String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken, String oauthTokenEndpointUri) {
+    public KafkaStreamsConfig(String bootstrapServers, String applicationId, String sourceTopic, String targetTopic, int commitIntervalMs, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath, String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken, String oauthTokenEndpointUri) {
         this.bootstrapServers = bootstrapServers;
         this.applicationId = applicationId;
         this.sourceTopic = sourceTopic;
         this.targetTopic = targetTopic;
+        this.commitIntervalMs = commitIntervalMs;
         this.trustStorePassword = trustStorePassword;
         this.trustStorePath = trustStorePath;
         this.keyStorePassword = keyStorePassword;
@@ -51,6 +54,7 @@ public class KafkaStreamsConfig {
         String sourceTopic = System.getenv("SOURCE_TOPIC");
         String targetTopic = System.getenv("TARGET_TOPIC");
         String applicationId = System.getenv("APPLICATION_ID");
+        int commitIntervalMs = System.getenv("COMMIT_INTERVAL_MS") == null ? DEFAULT_COMMIT_INTERVAL_MS : Integer.valueOf(System.getenv("COMMIT_INTERVAL_MS"));
         String trustStorePassword = System.getenv("TRUSTSTORE_PASSWORD") == null ? null : System.getenv("TRUSTSTORE_PASSWORD");
         String trustStorePath = System.getenv("TRUSTSTORE_PATH") == null ? null : System.getenv("TRUSTSTORE_PATH");
         String keyStorePassword = System.getenv("KEYSTORE_PASSWORD") == null ? null : System.getenv("KEYSTORE_PASSWORD");
@@ -61,7 +65,7 @@ public class KafkaStreamsConfig {
         String oauthRefreshToken = System.getenv("OAUTH_REFRESH_TOKEN");
         String oauthTokenEndpointUri = System.getenv("OAUTH_TOKEN_ENDPOINT_URI");
 
-        return new KafkaStreamsConfig(bootstrapServers, applicationId, sourceTopic, targetTopic, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri);
+        return new KafkaStreamsConfig(bootstrapServers, applicationId, sourceTopic, targetTopic, commitIntervalMs, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri);
     }
 
     public static Properties createProperties(KafkaStreamsConfig config) {
@@ -69,7 +73,7 @@ public class KafkaStreamsConfig {
 
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, config.getApplicationId());
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());
-        props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 5000);
+        props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, config.getCommitInterval());
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
 
@@ -114,6 +118,10 @@ public class KafkaStreamsConfig {
 
     public String getTargetTopic() {
         return targetTopic;
+    }
+
+    public int getCommitInterval() {
+        return commitIntervalMs;
     }
 
     public String getTrustStorePassword() {
