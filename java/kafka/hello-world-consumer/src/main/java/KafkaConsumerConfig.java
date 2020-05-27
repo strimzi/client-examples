@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 public class KafkaConsumerConfig {
     private static final Logger log = LogManager.getLogger(KafkaConsumerConfig.class);
@@ -85,9 +86,16 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
 
         if (!config.getAdditionalConfig().isEmpty()) {
-            for (String configItem : config.getAdditionalConfig().split("\n")) {
-                String[] configuration = configItem.split("=");
-                props.put(configuration[0], configuration[1]);
+            StringTokenizer tok = new StringTokenizer(config.getAdditionalConfig(), ", \t\n\r");
+            while (tok.hasMoreTokens()) {
+                String record = tok.nextToken();
+                int endIndex = record.indexOf('=');
+                if (endIndex == -1) {
+                    throw new RuntimeException("Failed to parse Map from String");
+                }
+                String key = record.substring(0, endIndex);
+                String value = record.substring(endIndex + 1);
+                props.put(key.trim(), value.trim());
             }
         }
 
