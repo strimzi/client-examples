@@ -22,7 +22,7 @@ public class KafkaProducerConfig {
     private final int delay;
     private final Long messageCount;
     private final String message;
-    private String acks = "1";
+    private final String acks;
     private final String trustStorePassword;
     private final String trustStorePath;
     private final String keyStorePassword;
@@ -32,8 +32,9 @@ public class KafkaProducerConfig {
     private final String oauthAccessToken;
     private final String oauthRefreshToken;
     private final String oauthTokenEndpointUri;
+    private final String additionalConfig;
 
-    public KafkaProducerConfig(String bootstrapServers, String topic, int delay, Long messageCount, String message, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath, String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken, String oauthTokenEndpointUri) {
+    public KafkaProducerConfig(String bootstrapServers, String topic, int delay, Long messageCount, String message, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath, String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken, String oauthTokenEndpointUri, String acks, String additionalConfig) {
         this.bootstrapServers = bootstrapServers;
         this.topic = topic;
         this.delay = delay;
@@ -48,6 +49,8 @@ public class KafkaProducerConfig {
         this.oauthAccessToken = oauthAccessToken;
         this.oauthRefreshToken = oauthRefreshToken;
         this.oauthTokenEndpointUri = oauthTokenEndpointUri;
+        this.acks = acks;
+        this.additionalConfig = additionalConfig;
     }
 
     public static KafkaProducerConfig fromEnv() {
@@ -65,8 +68,10 @@ public class KafkaProducerConfig {
         String oauthAccessToken = System.getenv("OAUTH_ACCESS_TOKEN");
         String oauthRefreshToken = System.getenv("OAUTH_REFRESH_TOKEN");
         String oauthTokenEndpointUri = System.getenv("OAUTH_TOKEN_ENDPOINT_URI");
+        String acks = System.getenv().getOrDefault("PRODUCER_ACKS", "1");
+        String additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
 
-        return new KafkaProducerConfig(bootstrapServers, topic, delay, messageCount, message, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri);
+        return new KafkaProducerConfig(bootstrapServers, topic, delay, messageCount, message, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri, acks, additionalConfig);
     }
 
     public static Properties createProperties(KafkaProducerConfig config) {
@@ -75,6 +80,13 @@ public class KafkaProducerConfig {
         props.put(ProducerConfig.ACKS_CONFIG, config.getAcks());
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+
+        if (!config.getAdditionalConfig().isEmpty()) {
+            for (String configItem : config.getAdditionalConfig().split("\n")) {
+                String[] configuration = configItem.split("=");
+                props.put(configuration[0], configuration[1]);
+            }
+        }
 
         if (config.getTrustStorePassword() != null && config.getTrustStorePath() != null)   {
             log.info("Configuring truststore");
@@ -161,5 +173,9 @@ public class KafkaProducerConfig {
 
     public String getOauthTokenEndpointUri() {
         return oauthTokenEndpointUri;
+    }
+
+    public String getAdditionalConfig() {
+        return additionalConfig;
     }
 }

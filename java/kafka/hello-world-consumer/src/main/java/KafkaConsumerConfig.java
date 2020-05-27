@@ -5,7 +5,6 @@
 
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.common.config.Config;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.logging.log4j.LogManager;
@@ -33,8 +32,9 @@ public class KafkaConsumerConfig {
     private final String oauthAccessToken;
     private final String oauthRefreshToken;
     private final String oauthTokenEndpointUri;
+    private final String additionalConfig;
 
-    public KafkaConsumerConfig(String bootstrapServers, String topic, String groupId, String clientRack, Long messageCount, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath, String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken, String oauthTokenEndpointUri) {
+    public KafkaConsumerConfig(String bootstrapServers, String topic, String groupId, String clientRack, Long messageCount, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath, String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken, String oauthTokenEndpointUri, String additionalConfig) {
         this.bootstrapServers = bootstrapServers;
         this.topic = topic;
         this.groupId = groupId;
@@ -49,6 +49,7 @@ public class KafkaConsumerConfig {
         this.oauthAccessToken = oauthAccessToken;
         this.oauthRefreshToken = oauthRefreshToken;
         this.oauthTokenEndpointUri = oauthTokenEndpointUri;
+        this.additionalConfig = additionalConfig;
     }
 
     public static KafkaConsumerConfig fromEnv() {
@@ -66,8 +67,9 @@ public class KafkaConsumerConfig {
         String oauthAccessToken = System.getenv("OAUTH_ACCESS_TOKEN");
         String oauthRefreshToken = System.getenv("OAUTH_REFRESH_TOKEN");
         String oauthTokenEndpointUri = System.getenv("OAUTH_TOKEN_ENDPOINT_URI");
+        String additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
 
-        return new KafkaConsumerConfig(bootstrapServers, topic, groupId, clientRack, messageCount, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri);
+        return new KafkaConsumerConfig(bootstrapServers, topic, groupId, clientRack, messageCount, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri, additionalConfig);
     }
 
     public static Properties createProperties(KafkaConsumerConfig config) {
@@ -81,6 +83,13 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, config.getEnableAutoCommit());
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+
+        if (!config.getAdditionalConfig().isEmpty()) {
+            for (String configItem : config.getAdditionalConfig().split("\n")) {
+                String[] configuration = configItem.split("=");
+                props.put(configuration[0], configuration[1]);
+            }
+        }
 
         if (config.getTrustStorePassword() != null && config.getTrustStorePath() != null)   {
             log.info("Configuring truststore");
@@ -172,5 +181,9 @@ public class KafkaConsumerConfig {
 
     public String getOauthTokenEndpointUri() {
         return oauthTokenEndpointUri;
+    }
+
+    public String getAdditionalConfig() {
+        return additionalConfig;
     }
 }

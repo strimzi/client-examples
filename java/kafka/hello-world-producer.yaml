@@ -28,3 +28,8 @@ spec:
             value: "INFO"
           - name: MESSAGE_COUNT
             value: "1000000"
+          - name: PRODUCER_ACKS
+            value: "all"
+          - name: ADDITIONAL_CONFIG
+            value: |
+              retries=100
