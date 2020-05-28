@@ -64,7 +64,7 @@ Producer
 * `USER_KEY` - the user's private key
 * `LOG_LEVEL` - logging level  
 * `PRODUCER_ACKS` = acknowledgement level
-* `ADDITIONAL_CONFIG` = additional configuration for producer
+* `ADDITIONAL_CONFIG` = additional configuration for a producer application. The form is `key=value` records separated by new line character
 
 Consumer  
 * `BOOTSTRAP_SERVERS` - comma-separated host and port pairs that is a list of Kafka broker addresses. The form of pair is `host:port`, e.g. `my-cluster-kafka-bootstrap:9092` 
@@ -75,7 +75,7 @@ Consumer
 * `USER_CRT` - the user's certificate
 * `USER_KEY` - the user's private key
 * `LOG_LEVEL` - logging level  
-* `ADDITIONAL_CONFIG` = additional configuration for consumer
+* `ADDITIONAL_CONFIG` = additional configuration for a consumer application. The form is `key=value` records separated by new line character
 
 Streams  
 * `BOOTSTRAP_SERVERS` - comma-separated host and port pairs that is a list of Kafka broker addresses. The form of pair is `host:port`, e.g. `my-cluster-kafka-bootstrap:9092`
@@ -87,7 +87,7 @@ Streams
 * `USER_CRT` - the user's certificate
 * `USER_KEY` - the user's private key
 * `LOG_LEVEL` - logging level
-* `ADDITIONAL_CONFIG` = additional configuration for streams
+* `ADDITIONAL_CONFIG` = additional configuration for a streams application. The form is `key=value` records separated by new line character
 
 ### Tracing
 
