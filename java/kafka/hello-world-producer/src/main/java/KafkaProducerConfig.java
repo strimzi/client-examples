@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 public class KafkaProducerConfig {
     private static final Logger log = LogManager.getLogger(KafkaProducerConfig.class);
@@ -22,7 +23,7 @@ public class KafkaProducerConfig {
     private final int delay;
     private final Long messageCount;
     private final String message;
-    private String acks = "1";
+    private final String acks;
     private final String trustStorePassword;
     private final String trustStorePath;
     private final String keyStorePassword;
@@ -32,8 +33,9 @@ public class KafkaProducerConfig {
     private final String oauthAccessToken;
     private final String oauthRefreshToken;
     private final String oauthTokenEndpointUri;
+    private final String additionalConfig;
 
-    public KafkaProducerConfig(String bootstrapServers, String topic, int delay, Long messageCount, String message, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath, String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken, String oauthTokenEndpointUri) {
+    public KafkaProducerConfig(String bootstrapServers, String topic, int delay, Long messageCount, String message, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath, String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken, String oauthTokenEndpointUri, String acks, String additionalConfig) {
         this.bootstrapServers = bootstrapServers;
         this.topic = topic;
         this.delay = delay;
@@ -48,6 +50,8 @@ public class KafkaProducerConfig {
         this.oauthAccessToken = oauthAccessToken;
         this.oauthRefreshToken = oauthRefreshToken;
         this.oauthTokenEndpointUri = oauthTokenEndpointUri;
+        this.acks = acks;
+        this.additionalConfig = additionalConfig;
     }
 
     public static KafkaProducerConfig fromEnv() {
@@ -65,8 +69,10 @@ public class KafkaProducerConfig {
         String oauthAccessToken = System.getenv("OAUTH_ACCESS_TOKEN");
         String oauthRefreshToken = System.getenv("OAUTH_REFRESH_TOKEN");
         String oauthTokenEndpointUri = System.getenv("OAUTH_TOKEN_ENDPOINT_URI");
+        String acks = System.getenv().getOrDefault("PRODUCER_ACKS", "1");
+        String additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
 
-        return new KafkaProducerConfig(bootstrapServers, topic, delay, messageCount, message, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri);
+        return new KafkaProducerConfig(bootstrapServers, topic, delay, messageCount, message, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri, acks, additionalConfig);
     }
 
     public static Properties createProperties(KafkaProducerConfig config) {
@@ -75,6 +81,20 @@ public class KafkaProducerConfig {
         props.put(ProducerConfig.ACKS_CONFIG, config.getAcks());
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+
+        if (!config.getAdditionalConfig().isEmpty()) {
+            StringTokenizer tok = new StringTokenizer(config.getAdditionalConfig(), ", \t\n\r");
+            while (tok.hasMoreTokens()) {
+                String record = tok.nextToken();
+                int endIndex = record.indexOf('=');
+                if (endIndex == -1) {
+                    throw new RuntimeException("Failed to parse Map from String");
+                }
+                String key = record.substring(0, endIndex);
+                String value = record.substring(endIndex + 1);
+                props.put(key.trim(), value.trim());
+            }
+        }
 
         if (config.getTrustStorePassword() != null && config.getTrustStorePath() != null)   {
             log.info("Configuring truststore");
@@ -161,5 +181,9 @@ public class KafkaProducerConfig {
 
     public String getOauthTokenEndpointUri() {
         return oauthTokenEndpointUri;
+    }
+
+    public String getAdditionalConfig() {
+        return additionalConfig;
     }
 }

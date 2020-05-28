@@ -28,3 +28,6 @@ spec:
             value: "INFO"
           - name: MESSAGE_COUNT
             value: "1000000"
+          - name: ADDITIONAL_CONFIG
+            value: |
+              max.poll.records=100
