@@ -95,8 +95,11 @@ public class HttpKafkaConsumer extends AbstractVerticle {
         Future<CreatedConsumer> fut = Future.future();
 
         JsonObject json = new JsonObject()
-            .put("name", "my-consumer")
             .put("format", "json");
+        
+        if (config.getClientId() != null) {
+            json.put("name", config.getClientId());
+        }
 
         this.client.post(this.config.getEndpointPrefix() + "/consumers/" + this.config.getGroupid())
             .putHeader(HttpHeaderNames.CONTENT_LENGTH.toString(), String.valueOf(json.toBuffer().length()))

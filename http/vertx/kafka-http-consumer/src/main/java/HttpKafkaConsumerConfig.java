@@ -16,6 +16,7 @@ public class HttpKafkaConsumerConfig {
     private static final String ENV_HOSTNAME = "HOSTNAME";
     private static final String ENV_PORT = "PORT";
     private static final String ENV_TOPIC = "TOPIC";
+    private static final String ENV_CLIENTID = "CLIENTID";
     private static final String ENV_GROUPID = "GROUPID";
     private static final String ENV_POLL_INTERVAL = "POLL_INTERVAL";
     private static final String ENV_POLL_TIMEOUT = "POLL_TIMEOUT";
@@ -37,6 +38,7 @@ public class HttpKafkaConsumerConfig {
     private final String hostname;
     private final int port;
     private final String topic;
+    private final String clientId;
     private final String groupid;
     private final int pollInterval;
     private final int pollTimeout;
@@ -51,6 +53,7 @@ public class HttpKafkaConsumerConfig {
      * @param hostname hostname to which connect to
      * @param port host port to which connect to
      * @param topic Kafka topic from which consume messages
+     * @param clientId Kafka consumer clientId used as consumer name
      * @param groupid consumer group name the consumer belong to
      * @param pollInterval interval (in ms) for polling to get messages
      * @param pollTimeout timeout (in ms) for polling to get messages
@@ -60,7 +63,7 @@ public class HttpKafkaConsumerConfig {
      * @param endpointPrefix a prefix to use in the endpoint path
      */
     private HttpKafkaConsumerConfig(String hostname, int port, 
-                                    String topic, String groupid, 
+                                    String topic, String clientId, String groupid, 
                                     int pollInterval, int pollTimeout,
                                     boolean pipelining, int pipeliningLimit,
                                     Optional<Long> messageCount,
@@ -68,6 +71,7 @@ public class HttpKafkaConsumerConfig {
         this.hostname = hostname;
         this.port = port;
         this.topic = topic;
+        this.clientId = clientId;
         this.groupid = groupid;
         this.pollInterval = pollInterval;
         this.pollTimeout = pollTimeout;
@@ -96,6 +100,13 @@ public class HttpKafkaConsumerConfig {
      */
     public String getTopic() {
         return topic;
+    }
+
+    /**
+     * @return Kafka consumer clientId used as consumer name
+     */
+    public String getClientId() {
+        return clientId;
     }
 
     /**
@@ -157,6 +168,7 @@ public class HttpKafkaConsumerConfig {
         String hostname = (String) map.getOrDefault(ENV_HOSTNAME, DEFAULT_HOSTNAME);
         int port = Integer.parseInt(map.getOrDefault(ENV_PORT, DEFAULT_PORT).toString());
         String topic = (String) map.getOrDefault(ENV_TOPIC, DEFAULT_TOPIC);
+        String clientId = (String) map.get(ENV_CLIENTID);
         String groupid = (String) map.getOrDefault(ENV_GROUPID, DEFAULT_GROUPID);
         int pollInterval = Integer.parseInt(map.getOrDefault(ENV_POLL_INTERVAL, DEFAULT_POLL_INTERVAL).toString());
         int pollTimeout = Integer.parseInt(map.getOrDefault(ENV_POLL_TIMEOUT, DEFAULT_POLL_TIMEOUT).toString());
@@ -165,7 +177,7 @@ public class HttpKafkaConsumerConfig {
         String envMessageCount = (String) map.get(ENV_MESSAGE_COUNT);
         Optional<Long> messageCount = envMessageCount != null ? Optional.of((Long.parseLong(envMessageCount))) : Optional.empty();
         String endpointPrefix = (String) map.getOrDefault(ENV_ENDPOINT_PREFIX, DEFAULT_ENDPOINT_PREFIX);
-        return new HttpKafkaConsumerConfig(hostname, port, topic, groupid, pollInterval, pollTimeout, pipelining, pipeliningLimit, messageCount, endpointPrefix);
+        return new HttpKafkaConsumerConfig(hostname, port, topic, clientId, groupid, pollInterval, pollTimeout, pipelining, pipeliningLimit, messageCount, endpointPrefix);
     }
 
     @Override
@@ -174,6 +186,7 @@ public class HttpKafkaConsumerConfig {
                 "hostname=" + this.hostname +
                 ",port=" + this.port +
                 ",topic=" + this.topic +
+                ",clientId=" + this.clientId +
                 ",groupid=" + this.groupid +
                 ",pollInterval=" + this.pollInterval +
                 ",pollTimeout=" + this.pollTimeout +

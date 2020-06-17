@@ -21,6 +21,8 @@ spec:
             value: "8080"
           - name: TOPIC
             value: my-topic
+          - name: CLIENTID
+            value: "my-consumer"
           - name: GROUPID
             value: "my-group"
           - name: POLL_INTERVAL
