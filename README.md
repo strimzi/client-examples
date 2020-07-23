@@ -64,6 +64,7 @@ Producer
 * `USER_KEY` - the user's private key
 * `LOG_LEVEL` - logging level  
 * `PRODUCER_ACKS` = acknowledgement level
+* `HEADERS` = custom headers list separated by commas of `key1=value1, key2=value2`
 * `ADDITIONAL_CONFIG` = additional configuration for a producer application. The form is `key=value` records separated by new line character
 
 Consumer  

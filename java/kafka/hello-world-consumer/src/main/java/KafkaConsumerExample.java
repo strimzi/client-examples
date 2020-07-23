@@ -12,6 +12,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.header.Header;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -44,6 +45,12 @@ public class KafkaConsumerExample {
                 log.info("\tpartition: {}", record.partition());
                 log.info("\toffset: {}", record.offset());
                 log.info("\tvalue: {}", record.value());
+                if (record.headers() != null) {
+                    log.info("\theaders: ");
+                    for (Header header : record.headers()) {
+                        log.info("\t\tkey: {}, value: {}", header.key(), new String(header.value()));
+                    }
+                }
                 receivedMsgs++;
             }
             if (commit) {
