@@ -64,6 +64,7 @@ Producer
 * `USER_KEY` - the user's private key
 * `LOG_LEVEL` - logging level  
 * `PRODUCER_ACKS` = acknowledgement level
+* `HEADERS` = custom headers for sending messages
 * `ADDITIONAL_CONFIG` = additional configuration for a producer application. The form is `key=value` records separated by new line character
 
 Consumer  
@@ -74,7 +75,8 @@ Consumer
 * `CA_CRT` - the certificate of the CA which signed the brokers' TLS certificates, for adding to the client's trust store
 * `USER_CRT` - the user's certificate
 * `USER_KEY` - the user's private key
-* `LOG_LEVEL` - logging level  
+* `LOG_LEVEL` - logging level
+* `HEADERS` = custom headers for receiving messages  
 * `ADDITIONAL_CONFIG` = additional configuration for a consumer application. The form is `key=value` records separated by new line character
 
 Streams  
