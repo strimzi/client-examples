@@ -44,6 +44,9 @@ public class KafkaConsumerExample {
                 log.info("\tpartition: {}", record.partition());
                 log.info("\toffset: {}", record.offset());
                 log.info("\tvalue: {}", record.value());
+                if (record.headers() != null) {
+                    log.info("\theaders: {}", record.headers());
+                }
                 receivedMsgs++;
             }
             if (commit) {
