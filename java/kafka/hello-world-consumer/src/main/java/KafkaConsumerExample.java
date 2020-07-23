@@ -47,7 +47,7 @@ public class KafkaConsumerExample {
                 log.info("\tvalue: {}", record.value());
                 if (record.headers() != null) {
                     log.info("\theaders: ");
-                    for (Header header : record.headers().toArray()) {
+                    for (Header header : record.headers()) {
                         log.info("\t\tkey: {}, value: {}", header.key(), new String(header.value()));
                     }
                 }

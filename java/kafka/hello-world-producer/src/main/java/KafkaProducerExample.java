@@ -38,7 +38,7 @@ public class KafkaProducerExample {
         if (config.getHeaders() != null) {
             headers = new ArrayList<>();
 
-            String[] headersArray = config.getHeaders().split(", [\t\n\r]");
+            String[] headersArray = config.getHeaders().split(", [\t\n\r]?");
             for (String header : headersArray) {
                 headers.add(new RecordHeader(header.split("=")[0], header.split("=")[1].getBytes()));
             }
