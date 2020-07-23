@@ -48,7 +48,7 @@ public class KafkaConsumerExample {
                 if (record.headers() != null) {
                     log.info("\theaders: ");
                     for (Header header : record.headers().toArray()) {
-                        log.info("\tkey: {}, value: {}", header.key(), new String(header.value()));
+                        log.info("\t\tkey: {}, value: {}", header.key(), new String(header.value()));
                     }
                 }
                 receivedMsgs++;
