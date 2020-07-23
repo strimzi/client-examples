@@ -33,10 +33,9 @@ public class KafkaConsumerConfig {
     private final String oauthAccessToken;
     private final String oauthRefreshToken;
     private final String oauthTokenEndpointUri;
-    private final String headers;
     private final String additionalConfig;
 
-    public KafkaConsumerConfig(String bootstrapServers, String topic, String groupId, String clientRack, Long messageCount, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath, String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken, String oauthTokenEndpointUri, String additionalConfig, String headers) {
+    public KafkaConsumerConfig(String bootstrapServers, String topic, String groupId, String clientRack, Long messageCount, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath, String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken, String oauthTokenEndpointUri, String additionalConfig) {
         this.bootstrapServers = bootstrapServers;
         this.topic = topic;
         this.groupId = groupId;
@@ -51,7 +50,6 @@ public class KafkaConsumerConfig {
         this.oauthAccessToken = oauthAccessToken;
         this.oauthRefreshToken = oauthRefreshToken;
         this.oauthTokenEndpointUri = oauthTokenEndpointUri;
-        this.headers = headers;
         this.additionalConfig = additionalConfig;
     }
 
@@ -70,10 +68,9 @@ public class KafkaConsumerConfig {
         String oauthAccessToken = System.getenv("OAUTH_ACCESS_TOKEN");
         String oauthRefreshToken = System.getenv("OAUTH_REFRESH_TOKEN");
         String oauthTokenEndpointUri = System.getenv("OAUTH_TOKEN_ENDPOINT_URI");
-        String headers = System.getenv("HEADERS");
         String additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
 
-        return new KafkaConsumerConfig(bootstrapServers, topic, groupId, clientRack, messageCount, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri, additionalConfig, headers);
+        return new KafkaConsumerConfig(bootstrapServers, topic, groupId, clientRack, messageCount, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri, additionalConfig);
     }
 
     public static Properties createProperties(KafkaConsumerConfig config) {
@@ -192,10 +189,6 @@ public class KafkaConsumerConfig {
 
     public String getOauthTokenEndpointUri() {
         return oauthTokenEndpointUri;
-    }
-
-    public String getHeaders() {
-        return headers;
     }
 
     public String getAdditionalConfig() {
