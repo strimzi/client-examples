@@ -1,4 +1,4 @@
-apiVersion: kafka.strimzi.io/v1alpha1
+apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaTopic
 metadata:
   name: my-topic
@@ -8,7 +8,7 @@ spec:
   replicas: 3
   partitions: 12
 ---
-apiVersion: kafka.strimzi.io/v1alpha1
+apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaTopic
 metadata:
   name: my-topic-reversed
@@ -18,7 +18,7 @@ spec:
   replicas: 3
   partitions: 12
 ---
-apiVersion: kafka.strimzi.io/v1alpha1
+apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaUser
 metadata:
   name: service-account-hello-world-producer
@@ -94,7 +94,7 @@ spec:
                 name: sso-x509-https-secret
                 key: tls.crt
 ---
-apiVersion: kafka.strimzi.io/v1alpha1
+apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaUser
 metadata:
   name: service-account-hello-world-streams
@@ -183,7 +183,7 @@ spec:
                   name: sso-x509-https-secret
                   key: tls.crt
 ---
-apiVersion: kafka.strimzi.io/v1alpha1
+apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaUser
 metadata:
   name: service-account-hello-world-consumer
