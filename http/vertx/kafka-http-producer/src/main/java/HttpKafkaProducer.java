@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 import io.opentracing.Span;
 import io.opentracing.Tracer;
@@ -43,13 +44,17 @@ public class HttpKafkaProducer extends AbstractVerticle {
     private long sendTimer;
     private int messagesSent;
 
+    private CountDownLatch messagesSentLatch;
+
     /**
      * Constructor
      * 
      * @param config configuration
+     * @param messagesSentLatch latch to set when the number of requested messaged are sent
      */
-    public HttpKafkaProducer(HttpKafkaProducerConfig config) {
+    public HttpKafkaProducer(HttpKafkaProducerConfig config, CountDownLatch messagesSentLatch) {
         this.config = config;
+        this.messagesSentLatch = messagesSentLatch;
     }
 
     @Override
@@ -129,7 +134,9 @@ public class HttpKafkaProducer extends AbstractVerticle {
 
                     if (this.config.getMessageCount().isPresent() &&
                         this.messagesSent >= this.config.getMessageCount().get()) {
-                            this.vertx.close(done -> System.exit(0));
+                            // signal to main thread that all messages are sent, application can exit
+                            this.messagesSentLatch.countDown();
+                            log.info("All messages sent");
                     }
                 });
         return fut;

@@ -25,8 +25,11 @@ public final class ProducerApp {
 
     private static String deploymentId;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Vertx vertx = Vertx.vertx();
+
+        CountDownLatch messagesSentLatch = new CountDownLatch(1);
+        CountDownLatch exitLatch = new CountDownLatch(1);
 
         ConfigStoreOptions envStore = new ConfigStoreOptions()
                 .setType("env")
@@ -41,7 +44,7 @@ public final class ProducerApp {
             Map<String, Object> envConfig = ar.result().getMap();
             HttpKafkaProducerConfig httpKafkaConsumerConfig = HttpKafkaProducerConfig.fromMap(envConfig);
 
-            HttpKafkaProducer httpKafkaProducer = new HttpKafkaProducer(httpKafkaConsumerConfig);
+            HttpKafkaProducer httpKafkaProducer = new HttpKafkaProducer(httpKafkaConsumerConfig, messagesSentLatch);
 
             vertx.deployVerticle(httpKafkaProducer, done -> {
                 if (done.succeeded()) {
@@ -60,22 +63,10 @@ public final class ProducerApp {
             });
         });
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-                CountDownLatch latch = new CountDownLatch(1);
-                vertx.undeploy(deploymentId, v -> latch.countDown());
-                try {
-                    if (!latch.await(60000, TimeUnit.MILLISECONDS)) {
-                        log.info("App exiting for timeout on undeploy verticle");
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } finally {
-                    vertx.close();
-                }
-            }
-        });
+        log.info("Waiting for sending all messages");
+        messagesSentLatch.await();
+        vertx.close(done -> exitLatch.countDown());
+        log.info("Waiting HTTP producer verticle to be closed");
+        exitLatch.await(60000, TimeUnit.MILLISECONDS);
     }
 }
