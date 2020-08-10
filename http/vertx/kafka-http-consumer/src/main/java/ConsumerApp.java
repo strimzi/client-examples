@@ -25,8 +25,11 @@ public final class ConsumerApp {
     
     private static String deploymentId;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Vertx vertx = Vertx.vertx();
+
+        CountDownLatch messagesReceivedLatch = new CountDownLatch(1);
+        CountDownLatch exitLatch = new CountDownLatch(1);
 
         ConfigStoreOptions envStore = new ConfigStoreOptions()
                 .setType("env")
@@ -41,7 +44,7 @@ public final class ConsumerApp {
             Map<String, Object> envConfig = ar.result().getMap();
             HttpKafkaConsumerConfig httpKafkaConsumerConfig = HttpKafkaConsumerConfig.fromMap(envConfig);
 
-            HttpKafkaConsumer httpKafkaConsumer = new HttpKafkaConsumer(httpKafkaConsumerConfig);
+            HttpKafkaConsumer httpKafkaConsumer = new HttpKafkaConsumer(httpKafkaConsumerConfig, messagesReceivedLatch);
 
             vertx.deployVerticle(httpKafkaConsumer, done -> {
                 if (done.succeeded()) {
@@ -60,22 +63,10 @@ public final class ConsumerApp {
             });
         });
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-                CountDownLatch latch = new CountDownLatch(1);
-                vertx.undeploy(deploymentId, v -> latch.countDown());
-                try {
-                    if (!latch.await(60000, TimeUnit.MILLISECONDS)) {
-                        log.info("App exiting for timeout on undeploy verticle");
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } finally {
-                    vertx.close();
-                }
-            }
-        });
+        log.info("Waiting for receiveing all messages");
+        messagesReceivedLatch.await();
+        vertx.close(done -> exitLatch.countDown());
+        log.info("Waiting HTTP consumer verticle to be closed");
+        exitLatch.await(60000, TimeUnit.MILLISECONDS);
     }
 }

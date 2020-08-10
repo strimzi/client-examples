@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
@@ -44,13 +45,17 @@ public class HttpKafkaConsumer extends AbstractVerticle {
     private long pollTimer;
     private int messagesReceived;
 
+    private CountDownLatch messagesReceivedLatch;
+
     /**
      * Constructor
      * 
      * @param config configuration
+     * @param messagesReceivedLatch latch to set when the number of requested messaged are received
      */
-    public HttpKafkaConsumer(HttpKafkaConsumerConfig config) {
+    public HttpKafkaConsumer(HttpKafkaConsumerConfig config, CountDownLatch messagesReceivedLatch) {
         this.config = config;
+        this.messagesReceivedLatch = messagesReceivedLatch;
     }
 
     @Override
@@ -209,7 +214,9 @@ public class HttpKafkaConsumer extends AbstractVerticle {
 
                 if (this.config.getMessageCount().isPresent() &&
                     this.messagesReceived >= this.config.getMessageCount().get()) {
-                        this.vertx.close(done -> System.exit(0));
+                        // signal to main thread that all messages are received, application can exit
+                        this.messagesReceivedLatch.countDown();
+                        log.info("All messages received");
                 }
             });
         return fut;
