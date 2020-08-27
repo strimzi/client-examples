@@ -24,6 +24,9 @@ public class KafkaConsumerExample {
 
     public static void main(String[] args) {
         KafkaConsumerConfig config = KafkaConsumerConfig.fromEnv();
+
+        log.info(KafkaConsumerConfig.class.getName() + ": {}", config.toString());
+
         Properties props = KafkaConsumerConfig.createProperties(config);
         int receivedMsgs = 0;
 
