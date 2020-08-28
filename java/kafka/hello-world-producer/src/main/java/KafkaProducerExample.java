@@ -7,9 +7,11 @@ import io.jaegertracing.Configuration;
 import io.opentracing.Tracer;
 import io.opentracing.contrib.kafka.TracingProducerInterceptor;
 import io.opentracing.util.GlobalTracer;
+import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.internals.RecordHeader;
 import org.apache.logging.log4j.Logger;
@@ -19,6 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class KafkaProducerExample {
     private static final Logger log = LogManager.getLogger(KafkaProducerExample.class);
@@ -46,12 +51,21 @@ public class KafkaProducerExample {
 
         KafkaProducer producer = new KafkaProducer(props);
         log.info("Sending {} messages ...", config.getMessageCount());
+
+        AtomicLong numSent = new AtomicLong(0);
         for (long i = 0; i < config.getMessageCount(); i++) {
             log.info("Sending messages \"" + config.getMessage() + " - {}\"{}", i, config.getHeaders() == null ? "" : " - with headers - " + config.getHeaders());
-            producer.send(new ProducerRecord(config.getTopic(), null,null, null, "\"" + config.getMessage()  + " - " + i + "\"", headers));
+            try {
+                producer.send(new ProducerRecord(config.getTopic(), null, null, null, "\"" + config.getMessage() + " - " + i + "\"", headers)).get();
+                numSent.incrementAndGet();
+            } catch (ExecutionException e) {
+                log.warn("Message {} wasn't sent properly!", i);
+            }
             Thread.sleep(config.getDelay());
         }
-        log.info("{} messages sent ...", config.getMessageCount());
+
+        log.info("{} messages sent ...", numSent.get());
         producer.close();
+        System.exit(numSent.get() == config.getMessageCount() ? 0 : 1);
     }
 }
