@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -52,14 +53,18 @@ public class KafkaProducerExample {
         KafkaProducer producer = new KafkaProducer(props);
         log.info("Sending {} messages ...", config.getMessageCount());
 
+        boolean blockProducer = System.getenv("BLOCKING_PRODUCER") != null;
         AtomicLong numSent = new AtomicLong(0);
         for (long i = 0; i < config.getMessageCount(); i++) {
             log.info("Sending messages \"" + config.getMessage() + " - {}\"{}", i, config.getHeaders() == null ? "" : " - with headers - " + config.getHeaders());
-            try {
-                producer.send(new ProducerRecord(config.getTopic(), null, null, null, "\"" + config.getMessage() + " - " + i + "\"", headers)).get();
-                numSent.incrementAndGet();
-            } catch (ExecutionException e) {
-                log.warn("Message {} wasn't sent properly!", i);
+            Future<RecordMetadata> recordMetadataFuture = producer.send(new ProducerRecord(config.getTopic(), null, null, null, "\"" + config.getMessage() + " - " + i + "\"", headers));
+            if(blockProducer) {
+                try {
+                    recordMetadataFuture.get();
+                    numSent.incrementAndGet();
+                } catch (ExecutionException e) {
+                    log.warn("Message {} wasn't sent properly!", i);
+                }
             }
             Thread.sleep(config.getDelay());
         }
