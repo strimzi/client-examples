@@ -61,10 +61,14 @@ public class KafkaProducerExample {
             if(blockProducer) {
                 try {
                     recordMetadataFuture.get();
+                    // Increment number of sent messages only if ack is received by producer
                     numSent.incrementAndGet();
                 } catch (ExecutionException e) {
                     log.warn("Message {} wasn't sent properly!", i);
                 }
+            } else {
+                // Increment number of sent messages for non blocking producer
+                numSent.incrementAndGet();
             }
             Thread.sleep(config.getDelay());
         }
