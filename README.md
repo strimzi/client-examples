@@ -67,6 +67,7 @@ Producer
 * `HEADERS` = custom headers list separated by commas of `key1=value1, key2=value2`
 * `ADDITIONAL_CONFIG` = additional configuration for a producer application. The form is `key=value` records separated by new line character
 * `BLOCKING_PRODUCER` = if it's set, the producer will block another message until ack will be received
+* `MESSAGES_PER_TRANSACTION` = how many messages will be part of one transaction. Transaction config could be set via `ADDITIONAL_CONFIG` variable. Default is 10.
 
 Consumer  
 * `BOOTSTRAP_SERVERS` - comma-separated host and port pairs that is a list of Kafka broker addresses. The form of pair is `host:port`, e.g. `my-cluster-kafka-bootstrap:9092` 
