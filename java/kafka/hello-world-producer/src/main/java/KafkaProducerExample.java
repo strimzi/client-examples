@@ -51,8 +51,18 @@ public class KafkaProducerExample {
         log.info("Sending {} messages ...", config.getMessageCount());
 
         boolean blockProducer = System.getenv("BLOCKING_PRODUCER") != null;
+        boolean transactionalProducer = config.getAdditionalConfig().contains("transactional.id");
+        int msgPerTx = Integer.parseInt(System.getenv().getOrDefault("MESSAGES_PER_TRANSACTION", "10"));
+        if(transactionalProducer) {
+            log.info("Using transactional producer. Initializing the transactions ...");
+            producer.initTransactions();
+        }
         AtomicLong numSent = new AtomicLong(0);
         for (long i = 0; i < config.getMessageCount(); i++) {
+            if (transactionalProducer && i % msgPerTx == 0) {
+                log.info("Begging new transaction. Messages sent: {}", i);
+                producer.beginTransaction();
+            }
             log.info("Sending messages \"" + config.getMessage() + " - {}\"{}", i, config.getHeaders() == null ? "" : " - with headers - " + config.getHeaders());
             Future<RecordMetadata> recordMetadataFuture = producer.send(new ProducerRecord(config.getTopic(), null, null, null, "\"" + config.getMessage() + " - " + i + "\"", headers));
             if(blockProducer) {
@@ -67,6 +77,11 @@ public class KafkaProducerExample {
                 // Increment number of sent messages for non blocking producer
                 numSent.incrementAndGet();
             }
+            if (transactionalProducer && ((i + 1) % msgPerTx == 0)) {
+                log.info("Committing the transaction. Messages sent: {}", i);
+                producer.commitTransaction();
+            }
+
             Thread.sleep(config.getDelay());
         }
 
