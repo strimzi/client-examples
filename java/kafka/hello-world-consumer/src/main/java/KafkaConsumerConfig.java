@@ -194,4 +194,27 @@ public class KafkaConsumerConfig {
     public String getAdditionalConfig() {
         return additionalConfig;
     }
+
+    @Override
+    public String toString() {
+        return "KafkaConsumerConfig{" +
+            "bootstrapServers='" + bootstrapServers + '\'' +
+            ", topic='" + topic + '\'' +
+            ", groupId='" + groupId + '\'' +
+            ", autoOffsetReset='" + autoOffsetReset + '\'' +
+            ", enableAutoCommit='" + enableAutoCommit + '\'' +
+            ", clientRack='" + clientRack + '\'' +
+            ", messageCount=" + messageCount +
+            ", trustStorePassword='" + trustStorePassword + '\'' +
+            ", trustStorePath='" + trustStorePath + '\'' +
+            ", keyStorePassword='" + keyStorePassword + '\'' +
+            ", keyStorePath='" + keyStorePath + '\'' +
+            ", oauthClientId='" + oauthClientId + '\'' +
+            ", oauthClientSecret='" + oauthClientSecret + '\'' +
+            ", oauthAccessToken='" + oauthAccessToken + '\'' +
+            ", oauthRefreshToken='" + oauthRefreshToken + '\'' +
+            ", oauthTokenEndpointUri='" + oauthTokenEndpointUri + '\'' +
+            ", additionalConfig='" + additionalConfig + '\'' +
+            '}';
+    }
 }

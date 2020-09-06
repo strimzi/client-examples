@@ -21,8 +21,11 @@ import java.util.Properties;
 public class KafkaStreamsExample {
     private static final Logger log = LogManager.getLogger(KafkaStreamsExample.class);
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         KafkaStreamsConfig config = KafkaStreamsConfig.fromEnv();
+
+        log.info(KafkaStreamsConfig.class.getName() + ": {}",  config.toString());
+
         Properties props = KafkaStreamsConfig.createProperties(config);
 
         StreamsBuilder builder = new StreamsBuilder();

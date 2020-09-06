@@ -28,6 +28,9 @@ public class KafkaProducerExample {
 
     public static void main(String[] args) throws InterruptedException {
         KafkaProducerConfig config = KafkaProducerConfig.fromEnv();
+
+        log.info(KafkaProducerConfig.class.getName() + ": {}", config.toString());
+
         Properties props = KafkaProducerConfig.createProperties(config);
         List<Header> headers = null;
 

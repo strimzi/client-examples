@@ -193,4 +193,27 @@ public class KafkaProducerConfig {
     public String getAdditionalConfig() {
         return additionalConfig;
     }
+
+    @Override
+    public String toString() {
+        return "KafkaProducerConfig{" +
+            "bootstrapServers='" + bootstrapServers + '\'' +
+            ", topic='" + topic + '\'' +
+            ", delay=" + delay +
+            ", messageCount=" + messageCount +
+            ", message='" + message + '\'' +
+            ", acks='" + acks + '\'' +
+            ", headers='" + headers + '\'' +
+            ", trustStorePassword='" + trustStorePassword + '\'' +
+            ", trustStorePath='" + trustStorePath + '\'' +
+            ", keyStorePassword='" + keyStorePassword + '\'' +
+            ", keyStorePath='" + keyStorePath + '\'' +
+            ", oauthClientId='" + oauthClientId + '\'' +
+            ", oauthClientSecret='" + oauthClientSecret + '\'' +
+            ", oauthAccessToken='" + oauthAccessToken + '\'' +
+            ", oauthRefreshToken='" + oauthRefreshToken + '\'' +
+            ", oauthTokenEndpointUri='" + oauthTokenEndpointUri + '\'' +
+            ", additionalConfig='" + additionalConfig + '\'' +
+            '}';
+    }
 }

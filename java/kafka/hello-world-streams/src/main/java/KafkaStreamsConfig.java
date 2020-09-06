@@ -189,4 +189,25 @@ public class KafkaStreamsConfig {
     public String getAdditionalConfig() {
         return additionalConfig;
     }
+
+    @Override
+    public String toString() {
+        return "KafkaStreamsConfig{" +
+            "bootstrapServers='" + bootstrapServers + '\'' +
+            ", applicationId='" + applicationId + '\'' +
+            ", sourceTopic='" + sourceTopic + '\'' +
+            ", targetTopic='" + targetTopic + '\'' +
+            ", commitIntervalMs=" + commitIntervalMs +
+            ", trustStorePassword='" + trustStorePassword + '\'' +
+            ", trustStorePath='" + trustStorePath + '\'' +
+            ", keyStorePassword='" + keyStorePassword + '\'' +
+            ", keyStorePath='" + keyStorePath + '\'' +
+            ", oauthClientId='" + oauthClientId + '\'' +
+            ", oauthClientSecret='" + oauthClientSecret + '\'' +
+            ", oauthAccessToken='" + oauthAccessToken + '\'' +
+            ", oauthRefreshToken='" + oauthRefreshToken + '\'' +
+            ", oauthTokenEndpointUri='" + oauthTokenEndpointUri + '\'' +
+            ", additionalConfig='" + additionalConfig + '\'' +
+            '}';
+    }
 }
