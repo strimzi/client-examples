@@ -10,18 +10,18 @@ import java.util.concurrent.TimeUnit;
 import io.jaegertracing.Configuration;
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public final class ConsumerApp {
 
-    private static final Logger log = LoggerFactory.getLogger(ConsumerApp.class);
+    private static final Logger log = LogManager.getLogger(ConsumerApp.class);
     
     private static String deploymentId;
 

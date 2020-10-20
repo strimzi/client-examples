@@ -9,7 +9,7 @@ ARG version=latest
 ENV VERSION ${version}
 
 COPY ./scripts/ /bin
-COPY ./src/main/resources/log4j.properties /bin/log4j.properties
+COPY ./src/main/resources/log4j2.properties /bin/log4j2.properties
 
 COPY ./scripts/ /bin
 

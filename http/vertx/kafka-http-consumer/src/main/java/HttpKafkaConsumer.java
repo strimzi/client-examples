@@ -17,8 +17,6 @@ import io.opentracing.propagation.TextMapAdapter;
 import io.opentracing.tag.Tags;
 import io.opentracing.util.GlobalTracer;
 import io.vertx.core.MultiMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -30,13 +28,15 @@ import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.ext.web.codec.BodyCodec;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * HttpKafkaConsumer
  */
 public class HttpKafkaConsumer extends AbstractVerticle {
 
-    private final static Logger log = LoggerFactory.getLogger(HttpKafkaConsumer.class);
+    private final static Logger log = LogManager.getLogger(HttpKafkaConsumer.class);
 
     private final HttpKafkaConsumerConfig config;
 

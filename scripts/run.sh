@@ -40,7 +40,7 @@ then
 fi
 
 if [ -z "$JAVA_OPTS" ]; then
-    export JAVA_OPTS="${JAVA_OPTS} -Dlog4j.configurationFile=file:bin/log4j2.properties"
+    export JAVA_OPTS="${JAVA_OPTS} -Dlog4j2.configurationFile=file:bin/log4j2.properties"
 fi
 
 if [ "$OAUTH_CRT" ];
@@ -58,4 +58,4 @@ JAVA_OPTS="${JAVA_OPTS} -Dvertx.cacheDirBase=/tmp -Djava.security.egd=file:/dev/
 # Enable GC logging for memory tracking
 JAVA_OPTS="${JAVA_OPTS} -XX:NativeMemoryTracking=summary -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps"
 
-exec java $JAVA_OPTS -jar $JAR $@
+exec java $JAVA_OPTS -jar $JAR "$@"
