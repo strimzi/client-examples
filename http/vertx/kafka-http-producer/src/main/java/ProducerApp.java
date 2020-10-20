@@ -10,8 +10,8 @@ import java.util.concurrent.TimeUnit;
 import io.jaegertracing.Configuration;
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
@@ -21,7 +21,7 @@ import io.vertx.core.json.JsonObject;
 
 public final class ProducerApp {
     
-    private static final Logger log = LoggerFactory.getLogger(ProducerApp.class);
+    private static final Logger log = LogManager.getLogger(ProducerApp.class);
 
     private static String deploymentId;
 

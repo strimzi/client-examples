@@ -6,7 +6,6 @@
 import io.jaegertracing.Configuration;
 import io.opentracing.Tracer;
 import io.opentracing.contrib.kafka.TracingConsumerInterceptor;
-import io.opentracing.contrib.kafka.TracingProducerInterceptor;
 import io.opentracing.util.GlobalTracer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -16,6 +15,7 @@ import org.apache.kafka.common.header.Header;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -42,7 +42,7 @@ public class KafkaConsumerExample {
         consumer.subscribe(Collections.singletonList(config.getTopic()));
 
         while (receivedMsgs < config.getMessageCount()) {
-            ConsumerRecords<String, String> records = consumer.poll(Long.MAX_VALUE);
+            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
             for (ConsumerRecord<String, String> record : records) {
                 log.info("Received message:");
                 log.info("\tpartition: {}", record.partition());

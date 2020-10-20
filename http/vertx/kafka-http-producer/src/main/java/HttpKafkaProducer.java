@@ -17,8 +17,6 @@ import io.opentracing.tag.Tags;
 import io.opentracing.util.GlobalTracer;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.web.client.HttpRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -30,13 +28,15 @@ import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.ext.web.codec.BodyCodec;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * HttpKafkaProducer
  */
 public class HttpKafkaProducer extends AbstractVerticle {
 
-    private final static Logger log = LoggerFactory.getLogger(HttpKafkaProducer.class);
+    private final static Logger log = LogManager.getLogger(HttpKafkaProducer.class);
 
     private final HttpKafkaProducerConfig config;
 
@@ -65,11 +65,11 @@ public class HttpKafkaProducer extends AbstractVerticle {
                 .setDefaultHost(this.config.getHostname())
                 .setDefaultPort(this.config.getPort());
         this.client = WebClient.create(vertx, options);
-
         this.sendTimer = vertx.setPeriodic(this.config.getSendInterval(), t -> {
             Tracer tracer = GlobalTracer.get();
             Span span = tracer.buildSpan("send").withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_CLIENT).start();
 
+            log.info("Sending ...");
             this.send(this.config.getTopic(), span).setHandler(ar -> {
                 if (ar.succeeded()) {
                     log.info("Sent {}", ar.result());
