@@ -75,8 +75,8 @@
     </dependencyManagement>
 
     <modules>
-        <module>hello-world-consumer</module>
-        <module>hello-world-producer</module>
-        <module>hello-world-streams</module>
+        <module>kafka-native-consumer</module>
+        <module>kafka-native-producer</module>
+        <module>kafka-native-streams</module>
     </modules>
 </project>

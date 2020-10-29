@@ -21,7 +21,7 @@ spec:
 apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaUser
 metadata:
-  name: service-account-hello-world-producer
+  name: service-account-kafka-native-producer
   labels:
     strimzi.io/cluster: my-cluster
 spec:
@@ -44,7 +44,7 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: hello-world-producer-oauth
+  name: kafka-native-producer-oauth
 type: Opaque
 data:
   clientSecret: aGVsbG8td29ybGQtcHJvZHVjZXItc2VjcmV0
@@ -53,21 +53,21 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: hello-world-producer
-  name: hello-world-producer
+    app: kafka-native-producer
+  name: kafka-native-producer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: hello-world-producer
+      app: kafka-native-producer
   template:
     metadata:
       labels:
-        app: hello-world-producer
+        app: kafka-native-producer
     spec:
       containers:
-      - name: hello-world-producer
-        image: strimzi/hello-world-producer:latest
+      - name: kafka-native-producer
+        image: strimzi/kafka-native-producer:latest
         env:
           - name: BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9092
@@ -80,11 +80,11 @@ spec:
           - name: MESSAGE_COUNT
             value: "1000000"
           - name: OAUTH_CLIENT_ID
-            value: hello-world-producer
+            value: kafka-native-producer
           - name: OAUTH_CLIENT_SECRET
             valueFrom:
               secretKeyRef:
-                name: hello-world-producer-oauth
+                name: kafka-native-producer-oauth
                 key: clientSecret
           - name: OAUTH_TOKEN_ENDPOINT_URI
             value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
@@ -97,7 +97,7 @@ spec:
 apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaUser
 metadata:
-  name: service-account-hello-world-streams
+  name: service-account-kafka-native-streams
   labels:
     strimzi.io/cluster: my-cluster
 spec:
@@ -114,7 +114,7 @@ spec:
         operation: Describe
       - resource:
           type: group
-          name: hello-world-streams
+          name: kafka-native-streams
           patternType: prefix
         operation: Read
       - resource:
@@ -133,7 +133,7 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: hello-world-streams-oauth
+  name: kafka-native-streams-oauth
 type: Opaque
 data:
   clientSecret: aGVsbG8td29ybGQtc3RyZWFtcy1zZWNyZXQ=
@@ -142,26 +142,26 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: hello-world-streams
-  name: hello-world-streams
+    app: kafka-native-streams
+  name: kafka-native-streams
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: hello-world-streams
+      app: kafka-native-streams
   template:
     metadata:
       labels:
-        app: hello-world-streams
+        app: kafka-native-streams
     spec:
       containers:
-        - name: hello-world-streams
-          image: strimzi/hello-world-streams:latest
+        - name: kafka-native-streams
+          image: strimzi/kafka-native-streams:latest
           env:
             - name: BOOTSTRAP_SERVERS
               value: my-cluster-kafka-bootstrap:9092
             - name: APPLICATION_ID
-              value: hello-world-streams
+              value: kafka-native-streams
             - name: SOURCE_TOPIC
               value: my-topic
             - name: TARGET_TOPIC
@@ -169,11 +169,11 @@ spec:
             - name: LOG_LEVEL
               value: "INFO"
             - name: OAUTH_CLIENT_ID
-              value: hello-world-streams
+              value: kafka-native-streams
             - name: OAUTH_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: hello-world-streams-oauth
+                  name: kafka-native-streams-oauth
                   key: clientSecret
             - name: OAUTH_TOKEN_ENDPOINT_URI
               value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
@@ -186,7 +186,7 @@ spec:
 apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaUser
 metadata:
-  name: service-account-hello-world-consumer
+  name: service-account-kafka-native-consumer
   labels:
     strimzi.io/cluster: my-cluster
 spec:
@@ -203,13 +203,13 @@ spec:
         operation: Describe
       - resource:
           type: group
-          name: hello-world-consumer
+          name: kafka-native-consumer
         operation: Read
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: hello-world-consumer-oauth
+  name: kafka-native-consumer-oauth
 type: Opaque
 data:
   clientSecret: aGVsbG8td29ybGQtY29uc3VtZXItc2VjcmV0
@@ -218,38 +218,38 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: hello-world-consumer
-  name: hello-world-consumer
+    app: kafka-native-consumer
+  name: kafka-native-consumer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: hello-world-consumer
+      app: kafka-native-consumer
   template:
     metadata:
       labels:
-        app: hello-world-consumer
+        app: kafka-native-consumer
     spec:
       containers:
-        - name: hello-world-consumer
-          image: strimzi/hello-world-consumer:latest
+        - name: kafka-native-consumer
+          image: strimzi/kafka-native-consumer:latest
           env:
             - name: BOOTSTRAP_SERVERS
               value: my-cluster-kafka-bootstrap:9092
             - name: TOPIC
               value: my-topic-reversed
             - name: GROUP_ID
-              value: hello-world-consumer
+              value: kafka-native-consumer
             - name: LOG_LEVEL
               value: "INFO"
             - name: MESSAGE_COUNT
               value: "1000000"
             - name: OAUTH_CLIENT_ID
-              value: hello-world-consumer
+              value: kafka-native-consumer
             - name: OAUTH_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: hello-world-consumer-oauth
+                  name: kafka-native-consumer-oauth
                   key: clientSecret
             - name: OAUTH_TOKEN_ENDPOINT_URI
               value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token

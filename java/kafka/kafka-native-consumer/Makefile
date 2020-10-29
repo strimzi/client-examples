@@ -1,4 +1,4 @@
-PROJECT_NAME=hello-world-producer
+PROJECT_NAME=kafka-native-consumer
 
 all: java_build docker_build docker_push
 build: java_build

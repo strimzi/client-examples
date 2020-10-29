@@ -11,6 +11,6 @@ ENV VERSION ${version}
 COPY ./scripts/ /bin
 COPY ./src/main/resources/log4j2.properties /bin/log4j2.properties
 
-ADD target/hello-world-producer-1.0-SNAPSHOT.jar /
+ADD target/kafka-native-consumer-1.0-SNAPSHOT.jar /
 
-CMD ["/bin/run.sh", "/hello-world-producer-1.0-SNAPSHOT.jar"]
+CMD ["/bin/run.sh", "/kafka-native-consumer-1.0-SNAPSHOT.jar"]

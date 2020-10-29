@@ -9,7 +9,7 @@
         <artifactId>kafka-java-example</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>hello-world-streams</artifactId>
+    <artifactId>kafka-native-streams</artifactId>
 
     <dependencies>
         <dependency>

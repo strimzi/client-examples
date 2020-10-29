@@ -9,7 +9,7 @@
         <artifactId>kafka-java-example</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>hello-world-consumer</artifactId>
+    <artifactId>kafka-native-producer</artifactId>
 
     <dependencies>
         <dependency>
@@ -19,17 +19,14 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>${log4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>${log4j.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>${log4j.version}</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
         </dependency>
         <dependency>
             <groupId>io.jaegertracing</groupId>
@@ -44,7 +41,6 @@
             <artifactId>kafka-oauth-client</artifactId>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -70,7 +66,7 @@
                             </filters>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>KafkaConsumerExample</mainClass>
+                                    <mainClass>KafkaProducerExample</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
