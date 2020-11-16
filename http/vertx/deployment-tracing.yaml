@@ -2,21 +2,21 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: kafka-http-producer
-  name: kafka-http-producer
+    app: java-http-vertx-producer
+  name: java-http-vertx-producer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kafka-http-producer
+      app: java-http-vertx-producer
   template:
     metadata:
       labels:
-        app: kafka-http-producer
+        app: java-http-vertx-producer
     spec:
       containers:
-      - name: kafka-http-producer
-        image: strimzi/kafka-http-producer:latest
+      - name: java-http-vertx-producer
+        image: strimzi/java-http-vertx-producer:latest
         env:
           - name: HOSTNAME
             value: my-bridge-bridge-service
@@ -27,7 +27,7 @@ spec:
           - name: SEND_INTERVAL
             value: "1000"
           - name: JAEGER_SERVICE_NAME
-            value: kafka-http-producer
+            value: java-http-vertx-producer
           - name: JAEGER_AGENT_HOST
             value: my-jaeger-agent
           - name: JAEGER_SAMPLER_TYPE
@@ -46,21 +46,21 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: kafka-http-consumer
-  name: kafka-http-consumer
+    app: java-http-vertx-consumer
+  name: java-http-vertx-consumer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kafka-http-consumer
+      app: java-http-vertx-consumer
   template:
     metadata:
       labels:
-        app: kafka-http-consumer
+        app: java-http-vertx-consumer
     spec:
       containers:
-      - name: kafka-http-consumer
-        image: strimzi/kafka-http-consumer:latest
+      - name: java-http-vertx-consumer
+        image: strimzi/java-http-vertx-consumer:latest
         env:
           - name: HOSTNAME
             value: my-bridge-bridge-service
@@ -73,7 +73,7 @@ spec:
           - name: POLL_INTERVAL
             value: "1000"
           - name: JAEGER_SERVICE_NAME
-            value: kafka-http-consumer
+            value: java-http-vertx-consumer
           - name: JAEGER_AGENT_HOST
             value: my-jaeger-agent
           - name: JAEGER_SAMPLER_TYPE
