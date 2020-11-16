@@ -21,7 +21,7 @@ spec:
 apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaUser
 metadata:
-  name: hello-world-producer
+  name: java-kafka-producer
   labels:
     strimzi.io/cluster: my-cluster
 spec:
@@ -47,21 +47,21 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: hello-world-producer
-  name: hello-world-producer
+    app: java-kafka-producer
+  name: java-kafka-producer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: hello-world-producer
+      app: java-kafka-producer
   template:
     metadata:
       labels:
-        app: hello-world-producer
+        app: java-kafka-producer
     spec:
       containers:
-      - name: hello-world-producer
-        image: strimzi/hello-world-producer:latest
+      - name: java-kafka-producer
+        image: strimzi/java-kafka-producer:latest
         env:
           - name: CA_CRT
             valueFrom:
@@ -71,12 +71,12 @@ spec:
           - name: USER_CRT
             valueFrom:
               secretKeyRef:
-                name: hello-world-producer
+                name: java-kafka-producer
                 key: user.crt
           - name: USER_KEY
             valueFrom:
               secretKeyRef:
-                name: hello-world-producer
+                name: java-kafka-producer
                 key: user.key
           - name: BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9093
@@ -92,7 +92,7 @@ spec:
 apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaUser
 metadata:
-  name: hello-world-streams
+  name: java-kafka-streams
   labels:
     strimzi.io/cluster: my-cluster
 spec:
@@ -111,7 +111,7 @@ spec:
         operation: Describe
       - resource:
           type: group
-          name: hello-world-streams
+          name: java-kafka-streams
           patternType: prefix
         operation: Read
       - resource:
@@ -131,21 +131,21 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: hello-world-streams
-  name: hello-world-streams
+    app: java-kafka-streams
+  name: java-kafka-streams
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: hello-world-streams
+      app: java-kafka-streams
   template:
     metadata:
       labels:
-        app: hello-world-streams
+        app: java-kafka-streams
     spec:
       containers:
-        - name: hello-world-streams
-          image: strimzi/hello-world-streams:latest
+        - name: java-kafka-streams
+          image: strimzi/java-kafka-streams:latest
           env:
             - name: CA_CRT
               valueFrom:
@@ -155,17 +155,17 @@ spec:
             - name: USER_CRT
               valueFrom:
                 secretKeyRef:
-                  name: hello-world-streams
+                  name: java-kafka-streams
                   key: user.crt
             - name: USER_KEY
               valueFrom:
                 secretKeyRef:
-                  name: hello-world-streams
+                  name: java-kafka-streams
                   key: user.key
             - name: BOOTSTRAP_SERVERS
               value: my-cluster-kafka-bootstrap:9093
             - name: APPLICATION_ID
-              value: hello-world-streams
+              value: java-kafka-streams
             - name: SOURCE_TOPIC
               value: my-topic
             - name: TARGET_TOPIC
@@ -176,7 +176,7 @@ spec:
 apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaUser
 metadata:
-  name: hello-world-consumer
+  name: java-kafka-consumer
   labels:
     strimzi.io/cluster: my-cluster
 spec:
@@ -195,28 +195,28 @@ spec:
         operation: Describe
       - resource:
           type: group
-          name: hello-world-consumer
+          name: java-kafka-consumer
         operation: Read
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: hello-world-consumer
-  name: hello-world-consumer
+    app: java-kafka-consumer
+  name: java-kafka-consumer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: hello-world-consumer
+      app: java-kafka-consumer
   template:
     metadata:
       labels:
-        app: hello-world-consumer
+        app: java-kafka-consumer
     spec:
       containers:
-      - name: hello-world-consumer
-        image: strimzi/hello-world-consumer:latest
+      - name: java-kafka-consumer
+        image: strimzi/java-kafka-consumer:latest
         env:
           - name: CA_CRT
             valueFrom:
@@ -226,19 +226,19 @@ spec:
           - name: USER_CRT
             valueFrom:
               secretKeyRef:
-                name: hello-world-consumer
+                name: java-kafka-consumer
                 key: user.crt
           - name: USER_KEY
             valueFrom:
               secretKeyRef:
-                name: hello-world-consumer
+                name: java-kafka-consumer
                 key: user.key
           - name: BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9093
           - name: TOPIC
             value: my-topic-reversed
           - name: GROUP_ID
-            value: hello-world-consumer
+            value: java-kafka-consumer
           - name: LOG_LEVEL
             value: "INFO"
           - name: MESSAGE_COUNT

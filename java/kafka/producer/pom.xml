@@ -6,30 +6,27 @@
 
     <parent>
         <groupId>strimzi.io</groupId>
-        <artifactId>kafka-java-example</artifactId>
+        <artifactId>java-kafka-examples</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>hello-world-streams</artifactId>
+    <artifactId>java-kafka-producer</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-streams</artifactId>
+            <artifactId>kafka-clients</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>${log4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>${log4j.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>${log4j.version}</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
         </dependency>
         <dependency>
             <groupId>io.jaegertracing</groupId>
@@ -37,7 +34,7 @@
         </dependency>
         <dependency>
             <groupId>io.opentracing.contrib</groupId>
-            <artifactId>opentracing-kafka-streams</artifactId>
+            <artifactId>opentracing-kafka-client</artifactId>
         </dependency>
         <dependency>
             <groupId>io.strimzi</groupId>
@@ -69,7 +66,7 @@
                             </filters>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>KafkaStreamsExample</mainClass>
+                                    <mainClass>KafkaProducerExample</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

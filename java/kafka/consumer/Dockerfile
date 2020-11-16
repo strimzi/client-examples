@@ -11,6 +11,6 @@ ENV VERSION ${version}
 COPY ./scripts/ /bin
 COPY ./src/main/resources/log4j2.properties /bin/log4j2.properties
 
-ADD target/hello-world-streams-1.0-SNAPSHOT.jar /
+ADD target/java-kafka-consumer-1.0-SNAPSHOT.jar /
 
-CMD ["/bin/run.sh", "/hello-world-streams-1.0-SNAPSHOT.jar"]
+CMD ["/bin/run.sh", "/java-kafka-consumer-1.0-SNAPSHOT.jar"]

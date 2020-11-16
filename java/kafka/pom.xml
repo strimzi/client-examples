@@ -10,7 +10,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>kafka-java-example</artifactId>
+    <artifactId>java-kafka-examples</artifactId>
     <packaging>pom</packaging>
 
     <properties>
@@ -75,8 +75,8 @@
     </dependencyManagement>
 
     <modules>
-        <module>hello-world-consumer</module>
-        <module>hello-world-producer</module>
-        <module>hello-world-streams</module>
+        <module>consumer</module>
+        <module>producer</module>
+        <module>streams</module>
     </modules>
 </project>

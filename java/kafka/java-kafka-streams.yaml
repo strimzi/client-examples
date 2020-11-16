@@ -2,26 +2,26 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: hello-world-streams
-  name: hello-world-streams
+    app: java-kafka-streams
+  name: java-kafka-streams
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: hello-world-streams
+      app: java-kafka-streams
   template:
     metadata:
       labels:
-        app: hello-world-streams
+        app: java-kafka-streams
     spec:
       containers:
-      - name: hello-world-streams
-        image: strimzi/hello-world-streams:latest
+      - name: java-kafka-streams
+        image: strimzi/java-kafka-streams:latest
         env:
           - name: BOOTSTRAP_SERVERS
             value: my-source-cluster-kafka-bootstrap:9092
           - name: APPLICATION_ID
-            value: hello-world-streams
+            value: java-kafka-streams
           - name: SOURCE_TOPIC
             value: my-topic
           - name: TARGET_TOPIC

@@ -1,4 +1,4 @@
-PROJECT_NAME=hello-world-consumer
+PROJECT_NAME=java-kafka-streams
 
 all: java_build docker_build docker_push
 build: java_build

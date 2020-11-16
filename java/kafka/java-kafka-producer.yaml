@@ -2,21 +2,21 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: hello-world-producer
-  name: hello-world-producer
+    app: java-kafka-producer
+  name: java-kafka-producer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: hello-world-producer
+      app: java-kafka-producer
   template:
     metadata:
       labels:
-        app: hello-world-producer
+        app: java-kafka-producer
     spec:
       containers:
-      - name: hello-world-producer
-        image: strimzi/hello-world-producer:latest
+      - name: java-kafka-producer
+        image: strimzi/java-kafka-producer:latest
         env:
           - name: BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9092
