@@ -2,21 +2,21 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: kafka-http-producer
-  name: kafka-http-producer
+    app: java-http-vertx-producer
+  name: java-http-vertx-producer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kafka-http-producer
+      app: java-http-vertx-producer
   template:
     metadata:
       labels:
-        app: kafka-http-producer
+        app: java-http-vertx-producer
     spec:
       containers:
-      - name: kafka-http-producer
-        image: strimzi/kafka-http-producer:latest
+      - name: java-http-vertx-producer
+        image: strimzi/java-http-vertx-producer:latest
         env:
           - name: HOSTNAME
             value: my-bridge-bridge-service

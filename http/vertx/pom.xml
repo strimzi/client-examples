@@ -8,7 +8,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>kafka-http-example</artifactId>
+    <artifactId>java-http-vertx-examples</artifactId>
     <packaging>pom</packaging>
 
     <properties>
@@ -24,8 +24,8 @@
     </properties>
 
     <modules>
-        <module>kafka-http-consumer</module>
-        <module>kafka-http-producer</module>
+        <module>java-http-vertx-consumer</module>
+        <module>java-http-vertx-producer</module>
     </modules>
 
     <dependencyManagement>

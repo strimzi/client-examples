@@ -1,4 +1,4 @@
-PROJECT_NAME=kafka-http-producer
+PROJECT_NAME=java-http-vertx-producer
 
 all: java_build docker_build docker_push
 build: java_build

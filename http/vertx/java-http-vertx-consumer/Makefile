@@ -1,4 +1,4 @@
-PROJECT_NAME=kafka-http-consumer
+PROJECT_NAME=java-http-vertx-consumer
 
 all: java_build docker_build docker_push
 build: java_build

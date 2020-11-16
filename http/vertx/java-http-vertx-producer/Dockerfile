@@ -11,8 +11,6 @@ ENV VERSION ${version}
 COPY ./scripts/ /bin
 COPY ./src/main/resources/log4j2.properties /bin/log4j2.properties
 
-COPY ./scripts/ /bin
+ADD target/java-http-vertx-producer.jar /
 
-ADD target/kafka-http-consumer.jar /
-
-CMD ["/bin/run.sh", "/kafka-http-consumer.jar"]
+CMD ["/bin/run.sh", "/java-http-vertx-producer.jar"]

@@ -2,21 +2,21 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: kafka-http-consumer
-  name: kafka-http-consumer
+    app: java-http-vertx-consumer
+  name: java-http-vertx-consumer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kafka-http-consumer
+      app: java-http-vertx-consumer
   template:
     metadata:
       labels:
-        app: kafka-http-consumer
+        app: java-http-vertx-consumer
     spec:
       containers:
-      - name: kafka-http-consumer
-        image: strimzi/kafka-http-consumer:latest
+      - name: java-http-vertx-consumer
+        image: strimzi/java-http-vertx-consumer:latest
         env:
           - name: HOSTNAME
             value: my-bridge-bridge-service
