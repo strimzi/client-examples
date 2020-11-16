@@ -36,12 +36,12 @@ Examples how to deploy Apache Kafka using Strimzi can be found on the [Strimzi w
 
 After successfully building the images (which will cause the images to be pushed to the specified Docker repository) you are ready to deploy the producer and consumer containers along with Kafka and Zookeper.
 
-You can deploy the examples individually by applying [`kafka-native-producer.yaml`](./java/kafka/kafka-native-producer.yaml), [`kafka-native-consumer.yaml`](./java/kafka/kafka-native-consumer.yaml) and [`kafka-native-streams.yaml`](./java/kafka/kafka-native-streams.yaml) files.
+You can deploy the examples individually by applying [`java-kafka-producer.yaml`](./java/kafka/java-kafka-producer.yaml), [`java-kafka-consumer.yaml`](./java/kafka/java-kafka-consumer.yaml) and [`java-kafka-streams.yaml`](./java/kafka/java-kafka-streams.yaml) files.
 This will create Kubernetes `Deployments` with the example image.
 The second option is to apply `deployment.yaml` file.
 This deploys the producer, consumer and streams and also creates the topics they are using.
 
-If you built your own version of these examples, remember to update the `image` field with the path where the image was pushed during the build and it's available (i.e. `<my-docker-org>/kafka-native-consumer:latest`).
+If you built your own version of these examples, remember to update the `image` field with the path where the image was pushed during the build and it's available (i.e. `<my-docker-org>/java-kafka-consumer:latest`).
 
 When using [`deployment.yaml`](./java/kafka/deployment.yaml) file for deployment you can start observing the sending messages in producer container's log and the receiving of messages in consumer container's log.
 It's also available as a [`deployment-ssl.yaml`](./java/kafka/deployment-ssl.yaml) which deploys the same producer and consumer applications but using a TLS encryption and [`deployment-ssl-auth.yaml`](./java/kafka/deployment-ssl-auth.yaml) which uses TLS client authentication and ACLs.

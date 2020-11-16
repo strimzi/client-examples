@@ -6,10 +6,10 @@
 
     <parent>
         <groupId>strimzi.io</groupId>
-        <artifactId>kafka-java-example</artifactId>
+        <artifactId>java-kafka-examples</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>kafka-native-consumer</artifactId>
+    <artifactId>java-kafka-consumer</artifactId>
 
     <dependencies>
         <dependency>

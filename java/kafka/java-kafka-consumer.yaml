@@ -2,28 +2,28 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: kafka-native-consumer
-  name: kafka-native-consumer
+    app: java-kafka-consumer
+  name: java-kafka-consumer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kafka-native-consumer
+      app: java-kafka-consumer
   template:
     metadata:
       labels:
-        app: kafka-native-consumer
+        app: java-kafka-consumer
     spec:
       containers:
-      - name: kafka-native-consumer
-        image: strimzi/kafka-native-consumer:latest
+      - name: java-kafka-consumer
+        image: strimzi/java-kafka-consumer:latest
         env:
           - name: BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9092
           - name: TOPIC
             value: my-topic
           - name: GROUP_ID
-            value: my-kafka-native-consumer
+            value: my-java-kafka-consumer
           - name: LOG_LEVEL
             value: "INFO"
           - name: MESSAGE_COUNT

@@ -1,4 +1,4 @@
-PROJECT_NAME=kafka-native-streams
+PROJECT_NAME=java-kafka-streams
 
 all: java_build docker_build docker_push
 build: java_build

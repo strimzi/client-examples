@@ -1,4 +1,4 @@
-PROJECT_NAME=kafka-native-producer
+PROJECT_NAME=java-kafka-consumer
 
 all: java_build docker_build docker_push
 build: java_build
