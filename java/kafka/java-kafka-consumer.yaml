@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: java-kafka-consumer
-        image: strimzi/java-kafka-consumer:latest
+        image: quay.io/strimzi-examples/java-kafka-consumer:latest
         env:
           - name: BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9092

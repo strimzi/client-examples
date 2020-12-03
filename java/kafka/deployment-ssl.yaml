@@ -36,7 +36,7 @@ spec:
     spec:
       containers:
       - name: java-kafka-producer
-        image: strimzi/java-kafka-producer:latest
+        image: quay.io/strimzi-examples/java-kafka-producer:latest
         env:
           - name: CA_CRT
             valueFrom:
@@ -72,7 +72,7 @@ spec:
     spec:
       containers:
         - name: java-kafka-streams
-          image: strimzi/java-kafka-streams:latest
+          image: quay.io/strimzi-examples/java-kafka-streams:latest
           env:
             - name: CA_CRT
               valueFrom:
@@ -108,7 +108,7 @@ spec:
     spec:
       containers:
       - name: java-kafka-consumer
-        image: strimzi/java-kafka-consumer:latest
+        image: quay.io/strimzi-examples/java-kafka-consumer:latest
         env:
           - name: CA_CRT
             valueFrom:
