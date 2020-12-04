@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: java-kafka-producer
-        image: strimzi/java-kafka-producer:latest
+        image: quay.io/strimzi-examples/java-kafka-producer:latest
         env:
           - name: BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9092

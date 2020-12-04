@@ -13,16 +13,18 @@ make build
 
 if [ "$PULL_REQUEST" != "false" ] ; then
   make docker_build
-    echo "Building PR: Nothing to push"
+  echo "Building PR: Nothing to push"
 else
   if [ "$TAG" = "latest" ] && [ "$BRANCH" != "master" ]; then
-    export DOCKER_ORG=strimzici
-    export DOCKER_TAG=$TAG
+    make docker_build
+    echo "Not in tag or master branch: Nothing to push"
   else
-    export DOCKER_ORG=strimzi
     export DOCKER_TAG=$TAG
+    make docker_build
+
+    echo "In tag or master branch: Pushing images"
+    docker login -u $QUAY_USER -p $QUAY_PASS $DOCKER_REGISTRY
+    make docker_push
   fi
-  make docker_build
-  echo "$DOCKER_PASS" | docker login -u $DOCKER_USER --password-stdin
-  make docker_push
+  
 fi

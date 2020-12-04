@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: java-http-vertx-producer
-        image: strimzi/java-http-vertx-producer:latest
+        image: quay.io/strimzi-examples/java-http-vertx-producer:latest
         env:
           - name: HOSTNAME
             value: my-bridge-bridge-service
@@ -60,7 +60,7 @@ spec:
     spec:
       containers:
       - name: java-http-vertx-consumer
-        image: strimzi/java-http-vertx-consumer:latest
+        image: quay.io/strimzi-examples/java-http-vertx-consumer:latest
         env:
           - name: HOSTNAME
             value: my-bridge-bridge-service
