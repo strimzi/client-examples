@@ -56,6 +56,6 @@ fi
 JAVA_OPTS="${JAVA_OPTS} -Dvertx.cacheDirBase=/tmp -Djava.security.egd=file:/dev/./urandom"
 
 # Enable GC logging for memory tracking
-JAVA_OPTS="${JAVA_OPTS} -XX:NativeMemoryTracking=summary -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps"
+JAVA_OPTS="${JAVA_OPTS} -Xlog:gc*:stdout:time -XX:NativeMemoryTracking=summary"
 
 exec java $JAVA_OPTS -jar $JAR "$@"

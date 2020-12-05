@@ -14,14 +14,14 @@
     <packaging>pom</packaging>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <log4j.version>2.13.3</log4j.version>
         <slf4j-simple.version>1.6.2</slf4j-simple.version>
         <kafka.version>2.6.0</kafka.version>
         <opentracing-kafka.version>0.1.11</opentracing-kafka.version>
         <jaeger.version>1.1.0</jaeger.version>
-        <strimzi-oauth-callback.version>0.6.0</strimzi-oauth-callback.version>
+        <strimzi-oauth-callback.version>0.6.1</strimzi-oauth-callback.version>
     </properties>
 
     <dependencyManagement>
