@@ -74,7 +74,7 @@ public class KafkaProducerExample {
                     // Increment number of sent messages only if ack is received by producer
                     numSent.incrementAndGet();
                 } catch (ExecutionException e) {
-                    log.warn("Message {} wasn't sent properly! \n{}", i, e.getCause());
+                    log.warn("Message {} wasn't sent properly!", i, e.getCause());
                 }
             } else {
                 // Increment number of sent messages for non blocking producer
