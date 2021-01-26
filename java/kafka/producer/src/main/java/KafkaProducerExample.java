@@ -63,7 +63,7 @@ public class KafkaProducerExample {
         AtomicLong numSent = new AtomicLong(0);
         for (long i = 0; i < config.getMessageCount(); i++) {
             if (transactionalProducer && i % msgPerTx == 0) {
-                log.info("Begging new transaction. Messages sent: {}", i);
+                log.info("Beginning new transaction. Messages sent: {}", i);
                 producer.beginTransaction();
             }
             log.info("Sending messages \"" + config.getMessage() + " - {}\"{}", i, config.getHeaders() == null ? "" : " - with headers - " + config.getHeaders());
@@ -74,7 +74,7 @@ public class KafkaProducerExample {
                     // Increment number of sent messages only if ack is received by producer
                     numSent.incrementAndGet();
                 } catch (ExecutionException e) {
-                    log.warn("Message {} wasn't sent properly!", i);
+                    log.warn("Message {} wasn't sent properly! \n{}", i, e.getCause());
                 }
             } else {
                 // Increment number of sent messages for non blocking producer
