@@ -60,5 +60,6 @@ public class KafkaConsumerExample {
                 consumer.commitSync();
             }
         }
+        log.info("Received {} messages", receivedMsgs);
     }
 }
