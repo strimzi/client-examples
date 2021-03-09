@@ -85,20 +85,6 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
 
-        if (!config.getAdditionalConfig().isEmpty()) {
-            StringTokenizer tok = new StringTokenizer(config.getAdditionalConfig(), ", \t\n\r");
-            while (tok.hasMoreTokens()) {
-                String record = tok.nextToken();
-                int endIndex = record.indexOf('=');
-                if (endIndex == -1) {
-                    throw new RuntimeException("Failed to parse Map from String");
-                }
-                String key = record.substring(0, endIndex);
-                String value = record.substring(endIndex + 1);
-                props.put(key.trim(), value.trim());
-            }
-        }
-
         if (config.getTrustStorePassword() != null && config.getTrustStorePath() != null)   {
             log.info("Configuring truststore");
             props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
@@ -122,6 +108,20 @@ public class KafkaConsumerConfig {
             props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL".equals(props.getProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG)) ? "SASL_SSL" : "SASL_PLAINTEXT");
             props.put(SaslConfigs.SASL_MECHANISM, "OAUTHBEARER");
             props.put(SaslConfigs.SASL_LOGIN_CALLBACK_HANDLER_CLASS, "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler");
+        }
+
+        if (!config.getAdditionalConfig().isEmpty()) {
+            StringTokenizer tok = new StringTokenizer(config.getAdditionalConfig(), System.lineSeparator());
+            while (tok.hasMoreTokens()) {
+                String record = tok.nextToken();
+                int endIndex = record.indexOf('=');
+                if (endIndex == -1) {
+                    throw new RuntimeException("Failed to parse Map from String");
+                }
+                String key = record.substring(0, endIndex);
+                String value = record.substring(endIndex + 1);
+                props.put(key.trim(), value.trim());
+            }
         }
 
         return props;
