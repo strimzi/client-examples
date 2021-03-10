@@ -34,8 +34,12 @@ public class KafkaConsumerConfig {
     private final String oauthRefreshToken;
     private final String oauthTokenEndpointUri;
     private final String additionalConfig;
+    private final String saslLoginCallbackClass;
 
-    public KafkaConsumerConfig(String bootstrapServers, String topic, String groupId, String clientRack, Long messageCount, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath, String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken, String oauthTokenEndpointUri, String additionalConfig) {
+    public KafkaConsumerConfig(String bootstrapServers, String topic, String groupId, String clientRack, Long messageCount,
+                               String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath,
+                               String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken,
+                               String oauthTokenEndpointUri, String additionalConfig, String saslLoginCallbackClass) {
         this.bootstrapServers = bootstrapServers;
         this.topic = topic;
         this.groupId = groupId;
@@ -51,26 +55,30 @@ public class KafkaConsumerConfig {
         this.oauthRefreshToken = oauthRefreshToken;
         this.oauthTokenEndpointUri = oauthTokenEndpointUri;
         this.additionalConfig = additionalConfig;
+        this.saslLoginCallbackClass = saslLoginCallbackClass;
     }
 
     public static KafkaConsumerConfig fromEnv() {
         String bootstrapServers = System.getenv("BOOTSTRAP_SERVERS");
         String topic = System.getenv("TOPIC");
         String groupId = System.getenv("GROUP_ID");
-        String clientRack = System.getenv("CLIENT_RACK") == null ? null : System.getenv("CLIENT_RACK");
+        String clientRack = System.getenv("CLIENT_RACK");
         Long messageCount = System.getenv("MESSAGE_COUNT") == null ? DEFAULT_MESSAGES_COUNT : Long.valueOf(System.getenv("MESSAGE_COUNT"));
-        String trustStorePassword = System.getenv("TRUSTSTORE_PASSWORD") == null ? null : System.getenv("TRUSTSTORE_PASSWORD");
-        String trustStorePath = System.getenv("TRUSTSTORE_PATH") == null ? null : System.getenv("TRUSTSTORE_PATH");
-        String keyStorePassword = System.getenv("KEYSTORE_PASSWORD") == null ? null : System.getenv("KEYSTORE_PASSWORD");
-        String keyStorePath = System.getenv("KEYSTORE_PATH") == null ? null : System.getenv("KEYSTORE_PATH");
+        String trustStorePassword = System.getenv("TRUSTSTORE_PASSWORD");
+        String trustStorePath = System.getenv("TRUSTSTORE_PATH");
+        String keyStorePassword = System.getenv("KEYSTORE_PASSWORD");
+        String keyStorePath = System.getenv("KEYSTORE_PATH");
         String oauthClientId = System.getenv("OAUTH_CLIENT_ID");
         String oauthClientSecret = System.getenv("OAUTH_CLIENT_SECRET");
         String oauthAccessToken = System.getenv("OAUTH_ACCESS_TOKEN");
         String oauthRefreshToken = System.getenv("OAUTH_REFRESH_TOKEN");
         String oauthTokenEndpointUri = System.getenv("OAUTH_TOKEN_ENDPOINT_URI");
         String additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
+        String saslLoginCallbackClass = System.getenv("SASL_CALLBACK_CLASS") == null ? null : System.getenv().getOrDefault("SASL_CALLBACK_CLASS", "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler");
 
-        return new KafkaConsumerConfig(bootstrapServers, topic, groupId, clientRack, messageCount, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri, additionalConfig);
+        return new KafkaConsumerConfig(bootstrapServers, topic, groupId, clientRack, messageCount, trustStorePassword, trustStorePath,
+                keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri,
+                additionalConfig, saslLoginCallbackClass);
     }
 
     public static Properties createProperties(KafkaConsumerConfig config) {
@@ -101,15 +109,7 @@ public class KafkaConsumerConfig {
             props.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, config.getKeyStorePath());
         }
 
-        if ((config.getOauthAccessToken() != null)
-                || (config.getOauthTokenEndpointUri() != null && config.getOauthClientId() != null && config.getOauthRefreshToken() != null)
-                || (config.getOauthTokenEndpointUri() != null && config.getOauthClientId() != null && config.getOauthClientSecret() != null))    {
-            props.put(SaslConfigs.SASL_JAAS_CONFIG, "org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;");
-            props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL".equals(props.getProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG)) ? "SASL_SSL" : "SASL_PLAINTEXT");
-            props.put(SaslConfigs.SASL_MECHANISM, "OAUTHBEARER");
-            props.put(SaslConfigs.SASL_LOGIN_CALLBACK_HANDLER_CLASS, "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler");
-        }
-
+        Properties additionalProps = new Properties();
         if (!config.getAdditionalConfig().isEmpty()) {
             StringTokenizer tok = new StringTokenizer(config.getAdditionalConfig(), System.lineSeparator());
             while (tok.hasMoreTokens()) {
@@ -120,9 +120,25 @@ public class KafkaConsumerConfig {
                 }
                 String key = record.substring(0, endIndex);
                 String value = record.substring(endIndex + 1);
-                props.put(key.trim(), value.trim());
+//                additionalProps.put(key.trim(), value.trim());
             }
         }
+
+        if ((config.getOauthAccessToken() != null)
+                || (config.getOauthTokenEndpointUri() != null && config.getOauthClientId() != null && config.getOauthRefreshToken() != null)
+                || (config.getOauthTokenEndpointUri() != null && config.getOauthClientId() != null && config.getOauthClientSecret() != null))    {
+            log.info("Configuring OAuth");
+            props.put(SaslConfigs.SASL_JAAS_CONFIG, "org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;");
+            props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL".equals(props.getProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG)) ? "SASL_SSL" : "SASL_PLAINTEXT");
+            props.put(SaslConfigs.SASL_MECHANISM, "OAUTHBEARER");
+            if (config.saslLoginCallbackClass != null ||
+                    (additionalProps.contains(SaslConfigs.SASL_MECHANISM) && !additionalProps.getProperty(SaslConfigs.SASL_MECHANISM).equals("PLAIN"))) {
+                props.put(SaslConfigs.SASL_LOGIN_CALLBACK_HANDLER_CLASS, config.saslLoginCallbackClass);
+            }
+        }
+
+        // override properties with defined additional properties
+        props.putAll(additionalProps);
 
         return props;
     }
