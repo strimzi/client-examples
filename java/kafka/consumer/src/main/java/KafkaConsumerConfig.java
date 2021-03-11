@@ -74,7 +74,7 @@ public class KafkaConsumerConfig {
         String oauthRefreshToken = System.getenv("OAUTH_REFRESH_TOKEN");
         String oauthTokenEndpointUri = System.getenv("OAUTH_TOKEN_ENDPOINT_URI");
         String additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
-        String saslLoginCallbackClass = System.getenv("SASL_CALLBACK_CLASS") == null ? null : System.getenv().getOrDefault("SASL_CALLBACK_CLASS", "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler");
+        String saslLoginCallbackClass = System.getenv().getOrDefault("SASL_CALLBACK_CLASS", "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler");
 
         return new KafkaConsumerConfig(bootstrapServers, topic, groupId, clientRack, messageCount, trustStorePassword, trustStorePath,
                 keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri,
@@ -120,7 +120,7 @@ public class KafkaConsumerConfig {
                 }
                 String key = record.substring(0, endIndex);
                 String value = record.substring(endIndex + 1);
-//                additionalProps.put(key.trim(), value.trim());
+                additionalProps.put(key.trim(), value.trim());
             }
         }
 
@@ -131,8 +131,7 @@ public class KafkaConsumerConfig {
             props.put(SaslConfigs.SASL_JAAS_CONFIG, "org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;");
             props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL".equals(props.getProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG)) ? "SASL_SSL" : "SASL_PLAINTEXT");
             props.put(SaslConfigs.SASL_MECHANISM, "OAUTHBEARER");
-            if (config.saslLoginCallbackClass != null ||
-                    (additionalProps.contains(SaslConfigs.SASL_MECHANISM) && !additionalProps.getProperty(SaslConfigs.SASL_MECHANISM).equals("PLAIN"))) {
+            if (!(additionalProps.containsKey(SaslConfigs.SASL_MECHANISM) && additionalProps.getProperty(SaslConfigs.SASL_MECHANISM).equals("PLAIN"))) {
                 props.put(SaslConfigs.SASL_LOGIN_CALLBACK_HANDLER_CLASS, config.saslLoginCallbackClass);
             }
         }
