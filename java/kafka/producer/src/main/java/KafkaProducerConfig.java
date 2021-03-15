@@ -35,8 +35,12 @@ public class KafkaProducerConfig {
     private final String oauthRefreshToken;
     private final String oauthTokenEndpointUri;
     private final String additionalConfig;
+    private final String saslLoginCallbackClass;
 
-    public KafkaProducerConfig(String bootstrapServers, String topic, int delay, Long messageCount, String message, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath, String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken, String oauthTokenEndpointUri, String acks, String additionalConfig, String headers) {
+    public KafkaProducerConfig(String bootstrapServers, String topic, int delay, Long messageCount, String message,
+                               String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath,
+                               String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken,
+                               String oauthTokenEndpointUri, String acks, String additionalConfig, String headers, String saslLoginCallbackClass) {
         this.bootstrapServers = bootstrapServers;
         this.topic = topic;
         this.delay = delay;
@@ -54,18 +58,19 @@ public class KafkaProducerConfig {
         this.acks = acks;
         this.headers = headers;
         this.additionalConfig = additionalConfig;
+        this.saslLoginCallbackClass = saslLoginCallbackClass;
     }
 
     public static KafkaProducerConfig fromEnv() {
         String bootstrapServers = System.getenv("BOOTSTRAP_SERVERS");
         String topic = System.getenv("TOPIC");
-        int delay = Integer.valueOf(System.getenv("DELAY_MS"));
+        int delay = Integer.parseInt(System.getenv("DELAY_MS"));
         Long messageCount = System.getenv("MESSAGE_COUNT") == null ? DEFAULT_MESSAGES_COUNT : Long.valueOf(System.getenv("MESSAGE_COUNT"));
         String message = System.getenv("MESSAGE") == null ? DEFAULT_MESSAGE : System.getenv("MESSAGE");
-        String trustStorePassword = System.getenv("TRUSTSTORE_PASSWORD") == null ? null : System.getenv("TRUSTSTORE_PASSWORD");
-        String trustStorePath = System.getenv("TRUSTSTORE_PATH") == null ? null : System.getenv("TRUSTSTORE_PATH");
-        String keyStorePassword = System.getenv("KEYSTORE_PASSWORD") == null ? null : System.getenv("KEYSTORE_PASSWORD");
-        String keyStorePath = System.getenv("KEYSTORE_PATH") == null ? null : System.getenv("KEYSTORE_PATH");
+        String trustStorePassword = System.getenv("TRUSTSTORE_PASSWORD");
+        String trustStorePath = System.getenv("TRUSTSTORE_PATH");
+        String keyStorePassword = System.getenv("KEYSTORE_PASSWORD");
+        String keyStorePath = System.getenv("KEYSTORE_PATH");
         String oauthClientId = System.getenv("OAUTH_CLIENT_ID");
         String oauthClientSecret = System.getenv("OAUTH_CLIENT_SECRET");
         String oauthAccessToken = System.getenv("OAUTH_ACCESS_TOKEN");
@@ -74,8 +79,11 @@ public class KafkaProducerConfig {
         String acks = System.getenv().getOrDefault("PRODUCER_ACKS", "1");
         String headers = System.getenv("HEADERS");
         String additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
+        String saslLoginCallbackClass = System.getenv().getOrDefault("SASL_CALLBACK_CLASS", "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler");
 
-        return new KafkaProducerConfig(bootstrapServers, topic, delay, messageCount, message, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri, acks, additionalConfig, headers);
+        return new KafkaProducerConfig(bootstrapServers, topic, delay, messageCount, message, trustStorePassword, trustStorePath,
+                keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken,
+                oauthTokenEndpointUri, acks, additionalConfig, headers, saslLoginCallbackClass);
     }
 
     public static Properties createProperties(KafkaProducerConfig config) {
@@ -84,20 +92,6 @@ public class KafkaProducerConfig {
         props.put(ProducerConfig.ACKS_CONFIG, config.getAcks());
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
-
-        if (!config.getAdditionalConfig().isEmpty()) {
-            StringTokenizer tok = new StringTokenizer(config.getAdditionalConfig(), ", \t\n\r");
-            while (tok.hasMoreTokens()) {
-                String record = tok.nextToken();
-                int endIndex = record.indexOf('=');
-                if (endIndex == -1) {
-                    throw new RuntimeException("Failed to parse Map from String");
-                }
-                String key = record.substring(0, endIndex);
-                String value = record.substring(endIndex + 1);
-                props.put(key.trim(), value.trim());
-            }
-        }
 
         if (config.getTrustStorePassword() != null && config.getTrustStorePath() != null)   {
             log.info("Configuring truststore");
@@ -115,14 +109,35 @@ public class KafkaProducerConfig {
             props.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, config.getKeyStorePath());
         }
 
+        Properties additionalProps = new Properties();
+        if (!config.getAdditionalConfig().isEmpty()) {
+            StringTokenizer tok = new StringTokenizer(config.getAdditionalConfig(), System.lineSeparator());
+            while (tok.hasMoreTokens()) {
+                String record = tok.nextToken();
+                int endIndex = record.indexOf('=');
+                if (endIndex == -1) {
+                    throw new RuntimeException("Failed to parse Map from String");
+                }
+                String key = record.substring(0, endIndex);
+                String value = record.substring(endIndex + 1);
+                additionalProps.put(key.trim(), value.trim());
+            }
+        }
+
         if ((config.getOauthAccessToken() != null)
                 || (config.getOauthTokenEndpointUri() != null && config.getOauthClientId() != null && config.getOauthRefreshToken() != null)
                 || (config.getOauthTokenEndpointUri() != null && config.getOauthClientId() != null && config.getOauthClientSecret() != null))    {
+            log.info("Configuring OAuth");
             props.put(SaslConfigs.SASL_JAAS_CONFIG, "org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;");
             props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL".equals(props.getProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG)) ? "SASL_SSL" : "SASL_PLAINTEXT");
             props.put(SaslConfigs.SASL_MECHANISM, "OAUTHBEARER");
-            props.put(SaslConfigs.SASL_LOGIN_CALLBACK_HANDLER_CLASS, "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler");
+            if (!(additionalProps.containsKey(SaslConfigs.SASL_MECHANISM) && additionalProps.getProperty(SaslConfigs.SASL_MECHANISM).equals("PLAIN"))) {
+                props.put(SaslConfigs.SASL_LOGIN_CALLBACK_HANDLER_CLASS, config.saslLoginCallbackClass);
+            }
         }
+
+        // override properties with defined additional properties
+        props.putAll(additionalProps);
 
         return props;
     }

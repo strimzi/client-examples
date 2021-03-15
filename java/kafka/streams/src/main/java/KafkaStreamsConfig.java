@@ -34,8 +34,13 @@ public class KafkaStreamsConfig {
     private final String oauthRefreshToken;
     private final String oauthTokenEndpointUri;
     private final String additionalConfig;
+    private final String saslLoginCallbackClass;
 
-    public KafkaStreamsConfig(String bootstrapServers, String applicationId, String sourceTopic, String targetTopic, int commitIntervalMs, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath, String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken, String oauthTokenEndpointUri, String additionalConfig) {
+
+    public KafkaStreamsConfig(String bootstrapServers, String applicationId, String sourceTopic, String targetTopic,
+                              int commitIntervalMs, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath,
+                              String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken,
+                              String oauthTokenEndpointUri, String additionalConfig, String saslLoginCallbackClass) {
         this.bootstrapServers = bootstrapServers;
         this.applicationId = applicationId;
         this.sourceTopic = sourceTopic;
@@ -51,6 +56,7 @@ public class KafkaStreamsConfig {
         this.oauthRefreshToken = oauthRefreshToken;
         this.oauthTokenEndpointUri = oauthTokenEndpointUri;
         this.additionalConfig = additionalConfig;
+        this.saslLoginCallbackClass = saslLoginCallbackClass;
     }
 
     public static KafkaStreamsConfig fromEnv() {
@@ -58,19 +64,22 @@ public class KafkaStreamsConfig {
         String sourceTopic = System.getenv("SOURCE_TOPIC");
         String targetTopic = System.getenv("TARGET_TOPIC");
         String applicationId = System.getenv("APPLICATION_ID");
-        int commitIntervalMs = System.getenv("COMMIT_INTERVAL_MS") == null ? DEFAULT_COMMIT_INTERVAL_MS : Integer.valueOf(System.getenv("COMMIT_INTERVAL_MS"));
-        String trustStorePassword = System.getenv("TRUSTSTORE_PASSWORD") == null ? null : System.getenv("TRUSTSTORE_PASSWORD");
-        String trustStorePath = System.getenv("TRUSTSTORE_PATH") == null ? null : System.getenv("TRUSTSTORE_PATH");
-        String keyStorePassword = System.getenv("KEYSTORE_PASSWORD") == null ? null : System.getenv("KEYSTORE_PASSWORD");
-        String keyStorePath = System.getenv("KEYSTORE_PATH") == null ? null : System.getenv("KEYSTORE_PATH");
+        int commitIntervalMs = System.getenv("COMMIT_INTERVAL_MS") == null ? DEFAULT_COMMIT_INTERVAL_MS : Integer.parseInt(System.getenv("COMMIT_INTERVAL_MS"));
+        String trustStorePassword = System.getenv("TRUSTSTORE_PASSWORD");
+        String trustStorePath = System.getenv("TRUSTSTORE_PATH");
+        String keyStorePassword = System.getenv("KEYSTORE_PASSWORD");
+        String keyStorePath = System.getenv("KEYSTORE_PATH");
         String oauthClientId = System.getenv("OAUTH_CLIENT_ID");
         String oauthClientSecret = System.getenv("OAUTH_CLIENT_SECRET");
         String oauthAccessToken = System.getenv("OAUTH_ACCESS_TOKEN");
         String oauthRefreshToken = System.getenv("OAUTH_REFRESH_TOKEN");
         String oauthTokenEndpointUri = System.getenv("OAUTH_TOKEN_ENDPOINT_URI");
         String additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
+        String saslLoginCallbackClass = System.getenv().getOrDefault("SASL_CALLBACK_CLASS", "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler");
 
-        return new KafkaStreamsConfig(bootstrapServers, applicationId, sourceTopic, targetTopic, commitIntervalMs, trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri, additionalConfig);
+        return new KafkaStreamsConfig(bootstrapServers, applicationId, sourceTopic, targetTopic, commitIntervalMs,
+                trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret,
+                oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri, additionalConfig, saslLoginCallbackClass);
     }
 
     public static Properties createProperties(KafkaStreamsConfig config) {
@@ -81,27 +90,6 @@ public class KafkaStreamsConfig {
         props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, config.getCommitInterval());
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
-
-        if (!config.getAdditionalConfig().isEmpty()) {
-            for (String configItem : config.getAdditionalConfig().split("\n")) {
-                String[] configuration = configItem.split("=");
-                props.put(configuration[0], configuration[1]);
-            }
-        }
-
-        if (!config.getAdditionalConfig().isEmpty()) {
-            StringTokenizer tok = new StringTokenizer(config.getAdditionalConfig(), ", \t\n\r");
-            while (tok.hasMoreTokens()) {
-                String record = tok.nextToken();
-                int endIndex = record.indexOf('=');
-                if (endIndex == -1) {
-                    throw new RuntimeException("Failed to parse Map from String");
-                }
-                String key = record.substring(0, endIndex);
-                String value = record.substring(endIndex + 1);
-                props.put(key.trim(), value.trim());
-            }
-        }
 
         if (config.getTrustStorePassword() != null && config.getTrustStorePath() != null)   {
             log.info("Configuring truststore");
@@ -119,14 +107,35 @@ public class KafkaStreamsConfig {
             props.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, config.getKeyStorePath());
         }
 
+        Properties additionalProps = new Properties();
+        if (!config.getAdditionalConfig().isEmpty()) {
+            StringTokenizer tok = new StringTokenizer(config.getAdditionalConfig(), System.lineSeparator());
+            while (tok.hasMoreTokens()) {
+                String record = tok.nextToken();
+                int endIndex = record.indexOf('=');
+                if (endIndex == -1) {
+                    throw new RuntimeException("Failed to parse Map from String");
+                }
+                String key = record.substring(0, endIndex);
+                String value = record.substring(endIndex + 1);
+                additionalProps.put(key.trim(), value.trim());
+            }
+        }
+
         if ((config.getOauthAccessToken() != null)
                 || (config.getOauthTokenEndpointUri() != null && config.getOauthClientId() != null && config.getOauthRefreshToken() != null)
                 || (config.getOauthTokenEndpointUri() != null && config.getOauthClientId() != null && config.getOauthClientSecret() != null))    {
+            log.info("Configuring OAuth");
             props.put(SaslConfigs.SASL_JAAS_CONFIG, "org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;");
             props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL".equals(props.getProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG)) ? "SASL_SSL" : "SASL_PLAINTEXT");
             props.put(SaslConfigs.SASL_MECHANISM, "OAUTHBEARER");
-            props.put(SaslConfigs.SASL_LOGIN_CALLBACK_HANDLER_CLASS, "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler");
+            if (!(additionalProps.containsKey(SaslConfigs.SASL_MECHANISM) && additionalProps.getProperty(SaslConfigs.SASL_MECHANISM).equals("PLAIN"))) {
+                props.put(SaslConfigs.SASL_LOGIN_CALLBACK_HANDLER_CLASS, config.saslLoginCallbackClass);
+            }
         }
+
+        // override properties with defined additional properties
+        props.putAll(additionalProps);
 
         return props;
     }
