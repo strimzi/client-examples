@@ -67,7 +67,6 @@ Producer
 * `HEADERS` - custom headers list separated by commas of `key1=value1, key2=value2`
 * `BLOCKING_PRODUCER` - if it's set, the producer will block another message until ack will be received
 * `MESSAGES_PER_TRANSACTION` - how many messages will be part of one transaction. Transaction config could be set via `ADDITIONAL_CONFIG` variable. Default is 10.
-* `SASL_CALLBACK_CLASS` - sets class for `sasl.login.callback.handler.class`; by default it uses `io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler` if possible
 * `ADDITIONAL_CONFIG` - additional configuration for a producer application. Notice, that you can also override any previously set variable by setting this. The form is `key=value` records separated by new line character
 
 Consumer  
@@ -79,7 +78,6 @@ Consumer
 * `USER_CRT` - the user's certificate
 * `USER_KEY` - the user's private key
 * `LOG_LEVEL` - logging level  
-* `SASL_CALLBACK_CLASS` - sets class for `sasl.login.callback.handler.class`; by default it uses `io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler` if possible
 * `ADDITIONAL_CONFIG` - additional configuration for a consumer application. Notice, that you can also override any previously set variable by setting this. The form is `key=value` records separated by new line character
 
 Streams  
@@ -92,7 +90,6 @@ Streams
 * `USER_CRT` - the user's certificate
 * `USER_KEY` - the user's private key
 * `LOG_LEVEL` - logging level
-* `SASL_CALLBACK_CLASS` - sets class for `sasl.login.callback.handler.class`; by default it uses `io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler` if possible
 * `ADDITIONAL_CONFIG` - additional configuration for a streams application. Notice, that you can also override any previously set variable by setting this. The form is `key=value` records separated by new line character.
 
 ### Tracing

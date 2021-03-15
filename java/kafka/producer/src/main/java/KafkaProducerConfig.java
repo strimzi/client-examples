@@ -35,12 +35,12 @@ public class KafkaProducerConfig {
     private final String oauthRefreshToken;
     private final String oauthTokenEndpointUri;
     private final String additionalConfig;
-    private final String saslLoginCallbackClass;
+    private final String saslLoginCallbackClass = "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler";
 
     public KafkaProducerConfig(String bootstrapServers, String topic, int delay, Long messageCount, String message,
                                String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath,
                                String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken,
-                               String oauthTokenEndpointUri, String acks, String additionalConfig, String headers, String saslLoginCallbackClass) {
+                               String oauthTokenEndpointUri, String acks, String additionalConfig, String headers) {
         this.bootstrapServers = bootstrapServers;
         this.topic = topic;
         this.delay = delay;
@@ -58,7 +58,6 @@ public class KafkaProducerConfig {
         this.acks = acks;
         this.headers = headers;
         this.additionalConfig = additionalConfig;
-        this.saslLoginCallbackClass = saslLoginCallbackClass;
     }
 
     public static KafkaProducerConfig fromEnv() {
@@ -79,11 +78,10 @@ public class KafkaProducerConfig {
         String acks = System.getenv().getOrDefault("PRODUCER_ACKS", "1");
         String headers = System.getenv("HEADERS");
         String additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
-        String saslLoginCallbackClass = System.getenv().getOrDefault("SASL_CALLBACK_CLASS", "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler");
 
         return new KafkaProducerConfig(bootstrapServers, topic, delay, messageCount, message, trustStorePassword, trustStorePath,
                 keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken,
-                oauthTokenEndpointUri, acks, additionalConfig, headers, saslLoginCallbackClass);
+                oauthTokenEndpointUri, acks, additionalConfig, headers);
     }
 
     public static Properties createProperties(KafkaProducerConfig config) {

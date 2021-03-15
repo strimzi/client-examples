@@ -34,12 +34,14 @@ public class KafkaConsumerConfig {
     private final String oauthRefreshToken;
     private final String oauthTokenEndpointUri;
     private final String additionalConfig;
-    private final String saslLoginCallbackClass;
+    private final String saslLoginCallbackClass = "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler";
+    ;
+
 
     public KafkaConsumerConfig(String bootstrapServers, String topic, String groupId, String clientRack, Long messageCount,
                                String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath,
                                String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken,
-                               String oauthTokenEndpointUri, String additionalConfig, String saslLoginCallbackClass) {
+                               String oauthTokenEndpointUri, String additionalConfig) {
         this.bootstrapServers = bootstrapServers;
         this.topic = topic;
         this.groupId = groupId;
@@ -55,7 +57,7 @@ public class KafkaConsumerConfig {
         this.oauthRefreshToken = oauthRefreshToken;
         this.oauthTokenEndpointUri = oauthTokenEndpointUri;
         this.additionalConfig = additionalConfig;
-        this.saslLoginCallbackClass = saslLoginCallbackClass;
+        ;
     }
 
     public static KafkaConsumerConfig fromEnv() {
@@ -74,11 +76,10 @@ public class KafkaConsumerConfig {
         String oauthRefreshToken = System.getenv("OAUTH_REFRESH_TOKEN");
         String oauthTokenEndpointUri = System.getenv("OAUTH_TOKEN_ENDPOINT_URI");
         String additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
-        String saslLoginCallbackClass = System.getenv().getOrDefault("SASL_CALLBACK_CLASS", "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler");
 
         return new KafkaConsumerConfig(bootstrapServers, topic, groupId, clientRack, messageCount, trustStorePassword, trustStorePath,
                 keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri,
-                additionalConfig, saslLoginCallbackClass);
+                additionalConfig);
     }
 
     public static Properties createProperties(KafkaConsumerConfig config) {
