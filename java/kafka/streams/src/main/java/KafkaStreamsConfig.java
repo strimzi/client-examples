@@ -11,7 +11,6 @@ import org.apache.kafka.streams.StreamsConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashMap;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -24,10 +23,9 @@ public class KafkaStreamsConfig {
     private final String sourceTopic;
     private final String targetTopic;
     private final int commitIntervalMs;
-    private final String trustStorePassword;
-    private final String trustStorePath;
-    private final String keyStorePassword;
-    private final String keyStorePath;
+    private final String sslTruststoreCertificates;
+    private final String sslKeystoreKey;
+    private final String sslKeystoreCertificateChain;
     private final String oauthClientId;
     private final String oauthClientSecret;
     private final String oauthAccessToken;
@@ -38,7 +36,7 @@ public class KafkaStreamsConfig {
 
 
     public KafkaStreamsConfig(String bootstrapServers, String applicationId, String sourceTopic, String targetTopic,
-                              int commitIntervalMs, String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath,
+                              int commitIntervalMs, String sslTruststoreCertificates, String sslKeystoreKey, String sslKeystoreCertificateChain,
                               String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken,
                               String oauthTokenEndpointUri, String additionalConfig) {
         this.bootstrapServers = bootstrapServers;
@@ -46,10 +44,9 @@ public class KafkaStreamsConfig {
         this.sourceTopic = sourceTopic;
         this.targetTopic = targetTopic;
         this.commitIntervalMs = commitIntervalMs;
-        this.trustStorePassword = trustStorePassword;
-        this.trustStorePath = trustStorePath;
-        this.keyStorePassword = keyStorePassword;
-        this.keyStorePath = keyStorePath;
+        this.sslTruststoreCertificates = sslTruststoreCertificates;
+        this.sslKeystoreKey = sslKeystoreKey;
+        this.sslKeystoreCertificateChain = sslKeystoreCertificateChain;
         this.oauthClientId = oauthClientId;
         this.oauthClientSecret = oauthClientSecret;
         this.oauthAccessToken = oauthAccessToken;
@@ -64,10 +61,9 @@ public class KafkaStreamsConfig {
         String targetTopic = System.getenv("TARGET_TOPIC");
         String applicationId = System.getenv("APPLICATION_ID");
         int commitIntervalMs = System.getenv("COMMIT_INTERVAL_MS") == null ? DEFAULT_COMMIT_INTERVAL_MS : Integer.parseInt(System.getenv("COMMIT_INTERVAL_MS"));
-        String trustStorePassword = System.getenv("TRUSTSTORE_PASSWORD");
-        String trustStorePath = System.getenv("TRUSTSTORE_PATH");
-        String keyStorePassword = System.getenv("KEYSTORE_PASSWORD");
-        String keyStorePath = System.getenv("KEYSTORE_PATH");
+        String sslTruststoreCertificates = System.getenv("CA_CRT");
+        String sslKeystoreKey = System.getenv("USER_KEY");
+        String sslKeystoreCertificateChain = System.getenv("USER_CRT");
         String oauthClientId = System.getenv("OAUTH_CLIENT_ID");
         String oauthClientSecret = System.getenv("OAUTH_CLIENT_SECRET");
         String oauthAccessToken = System.getenv("OAUTH_ACCESS_TOKEN");
@@ -76,7 +72,7 @@ public class KafkaStreamsConfig {
         String additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
 
         return new KafkaStreamsConfig(bootstrapServers, applicationId, sourceTopic, targetTopic, commitIntervalMs,
-                trustStorePassword, trustStorePath, keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret,
+                sslTruststoreCertificates, sslKeystoreKey, sslKeystoreCertificateChain, oauthClientId, oauthClientSecret,
                 oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri, additionalConfig);
     }
 
@@ -89,20 +85,19 @@ public class KafkaStreamsConfig {
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
 
-        if (config.getTrustStorePassword() != null && config.getTrustStorePath() != null)   {
+        if (config.getSslTruststoreCertificates() != null)   {
             log.info("Configuring truststore");
             props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
-            props.put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, "PKCS12");
-            props.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, config.getTrustStorePassword());
-            props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, config.getTrustStorePath());
+            props.put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, "PEM");
+            props.put(SslConfigs.SSL_TRUSTSTORE_CERTIFICATES_CONFIG, config.getSslTruststoreCertificates());
         }
 
-        if (config.getKeyStorePassword() != null && config.getKeyStorePath() != null)   {
+        if (config.getSslKeystoreCertificateChain() != null && config.getSslKeystoreKey() != null)   {
             log.info("Configuring keystore");
             props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
-            props.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, "PKCS12");
-            props.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, config.getKeyStorePassword());
-            props.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, config.getKeyStorePath());
+            props.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, "PEM");
+            props.put(SslConfigs.SSL_KEYSTORE_CERTIFICATE_CHAIN_CONFIG, config.getSslKeystoreCertificateChain());
+            props.put(SslConfigs.SSL_KEYSTORE_KEY_CONFIG, config.getSslKeystoreKey());
         }
 
         Properties additionalProps = new Properties();
@@ -157,20 +152,16 @@ public class KafkaStreamsConfig {
         return commitIntervalMs;
     }
 
-    public String getTrustStorePassword() {
-        return trustStorePassword;
+    public String getSslTruststoreCertificates() {
+        return sslTruststoreCertificates;
     }
 
-    public String getTrustStorePath() {
-        return trustStorePath;
+    public String getSslKeystoreKey() {
+        return sslKeystoreKey;
     }
 
-    public String getKeyStorePassword() {
-        return keyStorePassword;
-    }
-
-    public String getKeyStorePath() {
-        return keyStorePath;
+    public String getSslKeystoreCertificateChain() {
+        return sslKeystoreCertificateChain;
     }
 
     public String getOauthClientId() {
@@ -205,10 +196,9 @@ public class KafkaStreamsConfig {
             ", sourceTopic='" + sourceTopic + '\'' +
             ", targetTopic='" + targetTopic + '\'' +
             ", commitIntervalMs=" + commitIntervalMs +
-            ", trustStorePassword='" + trustStorePassword + '\'' +
-            ", trustStorePath='" + trustStorePath + '\'' +
-            ", keyStorePassword='" + keyStorePassword + '\'' +
-            ", keyStorePath='" + keyStorePath + '\'' +
+            ", trustStorePassword='" + sslTruststoreCertificates + '\'' +
+            ", trustStorePath='" + sslKeystoreKey + '\'' +
+            ", keyStorePassword='" + sslKeystoreCertificateChain + '\'' +
             ", oauthClientId='" + oauthClientId + '\'' +
             ", oauthClientSecret='" + oauthClientSecret + '\'' +
             ", oauthAccessToken='" + oauthAccessToken + '\'' +

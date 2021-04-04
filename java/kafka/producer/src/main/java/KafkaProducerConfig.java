@@ -25,10 +25,9 @@ public class KafkaProducerConfig {
     private final String message;
     private final String acks;
     private final String headers;
-    private final String trustStorePassword;
-    private final String trustStorePath;
-    private final String keyStorePassword;
-    private final String keyStorePath;
+    private final String sslTruststoreCertificates;
+    private final String sslKeystoreKey;
+    private final String sslKeystoreCertificateChain;
     private final String oauthClientId;
     private final String oauthClientSecret;
     private final String oauthAccessToken;
@@ -38,7 +37,7 @@ public class KafkaProducerConfig {
     private final String saslLoginCallbackClass = "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler";
 
     public KafkaProducerConfig(String bootstrapServers, String topic, int delay, Long messageCount, String message,
-                               String trustStorePassword, String trustStorePath, String keyStorePassword, String keyStorePath,
+                               String sslTruststoreCertificates, String sslKeystoreKey, String sslKeystoreCertificateChain,
                                String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken,
                                String oauthTokenEndpointUri, String acks, String additionalConfig, String headers) {
         this.bootstrapServers = bootstrapServers;
@@ -46,10 +45,9 @@ public class KafkaProducerConfig {
         this.delay = delay;
         this.messageCount = messageCount;
         this.message = message;
-        this.trustStorePassword = trustStorePassword;
-        this.trustStorePath = trustStorePath;
-        this.keyStorePassword = keyStorePassword;
-        this.keyStorePath = keyStorePath;
+        this.sslTruststoreCertificates = sslTruststoreCertificates;
+        this.sslKeystoreKey = sslKeystoreKey;
+        this.sslKeystoreCertificateChain = sslKeystoreCertificateChain;
         this.oauthClientId = oauthClientId;
         this.oauthClientSecret = oauthClientSecret;
         this.oauthAccessToken = oauthAccessToken;
@@ -64,12 +62,11 @@ public class KafkaProducerConfig {
         String bootstrapServers = System.getenv("BOOTSTRAP_SERVERS");
         String topic = System.getenv("TOPIC");
         int delay = Integer.parseInt(System.getenv("DELAY_MS"));
-        Long messageCount = System.getenv("MESSAGE_COUNT") == null ? DEFAULT_MESSAGES_COUNT : Long.valueOf(System.getenv("MESSAGE_COUNT"));
+        Long messageCount = System.getenv("MESSAGE_COUNT") == null ? DEFAULT_MESSAGES_COUNT : Long.parseLong(System.getenv("MESSAGE_COUNT"));
         String message = System.getenv("MESSAGE") == null ? DEFAULT_MESSAGE : System.getenv("MESSAGE");
-        String trustStorePassword = System.getenv("TRUSTSTORE_PASSWORD");
-        String trustStorePath = System.getenv("TRUSTSTORE_PATH");
-        String keyStorePassword = System.getenv("KEYSTORE_PASSWORD");
-        String keyStorePath = System.getenv("KEYSTORE_PATH");
+        String sslTruststoreCertificates = System.getenv("CA_CRT");
+        String sslKeystoreKey = System.getenv("USER_KEY");
+        String sslKeystoreCertificateChain = System.getenv("USER_CRT");
         String oauthClientId = System.getenv("OAUTH_CLIENT_ID");
         String oauthClientSecret = System.getenv("OAUTH_CLIENT_SECRET");
         String oauthAccessToken = System.getenv("OAUTH_ACCESS_TOKEN");
@@ -79,8 +76,8 @@ public class KafkaProducerConfig {
         String headers = System.getenv("HEADERS");
         String additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
 
-        return new KafkaProducerConfig(bootstrapServers, topic, delay, messageCount, message, trustStorePassword, trustStorePath,
-                keyStorePassword, keyStorePath, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken,
+        return new KafkaProducerConfig(bootstrapServers, topic, delay, messageCount, message, sslTruststoreCertificates,
+                sslKeystoreKey, sslKeystoreCertificateChain, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken,
                 oauthTokenEndpointUri, acks, additionalConfig, headers);
     }
 
@@ -91,20 +88,19 @@ public class KafkaProducerConfig {
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
 
-        if (config.getTrustStorePassword() != null && config.getTrustStorePath() != null)   {
+        if (config.getSslTruststoreCertificates() != null)   {
             log.info("Configuring truststore");
             props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
-            props.put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, "PKCS12");
-            props.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, config.getTrustStorePassword());
-            props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, config.getTrustStorePath());
+            props.put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, "PEM");
+            props.put(SslConfigs.SSL_TRUSTSTORE_CERTIFICATES_CONFIG, config.getSslTruststoreCertificates());
         }
 
-        if (config.getKeyStorePassword() != null && config.getKeyStorePath() != null)   {
+        if (config.getSslKeystoreCertificateChain() != null && config.getSslKeystoreKey() != null)   {
             log.info("Configuring keystore");
             props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
-            props.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, "PKCS12");
-            props.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, config.getKeyStorePassword());
-            props.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, config.getKeyStorePath());
+            props.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, "PEM");
+            props.put(SslConfigs.SSL_KEYSTORE_CERTIFICATE_CHAIN_CONFIG, config.getSslKeystoreCertificateChain());
+            props.put(SslConfigs.SSL_KEYSTORE_KEY_CONFIG, config.getSslKeystoreKey());
         }
 
         Properties additionalProps = new Properties();
@@ -163,20 +159,16 @@ public class KafkaProducerConfig {
         return acks;
     }
 
-    public String getTrustStorePassword() {
-        return trustStorePassword;
+    public String getSslTruststoreCertificates() {
+        return sslTruststoreCertificates;
     }
 
-    public String getTrustStorePath() {
-        return trustStorePath;
+    public String getSslKeystoreKey() {
+        return sslKeystoreKey;
     }
 
-    public String getKeyStorePassword() {
-        return keyStorePassword;
-    }
-
-    public String getKeyStorePath() {
-        return keyStorePath;
+    public String getSslKeystoreCertificateChain() {
+        return sslKeystoreCertificateChain;
     }
 
     public String getOauthClientId() {
@@ -217,10 +209,9 @@ public class KafkaProducerConfig {
             ", message='" + message + '\'' +
             ", acks='" + acks + '\'' +
             ", headers='" + headers + '\'' +
-            ", trustStorePassword='" + trustStorePassword + '\'' +
-            ", trustStorePath='" + trustStorePath + '\'' +
-            ", keyStorePassword='" + keyStorePassword + '\'' +
-            ", keyStorePath='" + keyStorePath + '\'' +
+            ", trustStorePassword='" + sslTruststoreCertificates + '\'' +
+            ", trustStorePath='" + sslKeystoreKey + '\'' +
+            ", keyStorePassword='" + sslKeystoreCertificateChain + '\'' +
             ", oauthClientId='" + oauthClientId + '\'' +
             ", oauthClientSecret='" + oauthClientSecret + '\'' +
             ", oauthAccessToken='" + oauthAccessToken + '\'' +
