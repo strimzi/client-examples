@@ -196,9 +196,9 @@ public class KafkaStreamsConfig {
             ", sourceTopic='" + sourceTopic + '\'' +
             ", targetTopic='" + targetTopic + '\'' +
             ", commitIntervalMs=" + commitIntervalMs +
-            ", trustStorePassword='" + sslTruststoreCertificates + '\'' +
-            ", trustStorePath='" + sslKeystoreKey + '\'' +
-            ", keyStorePassword='" + sslKeystoreCertificateChain + '\'' +
+            ", sslTruststoreCertificates='" + sslTruststoreCertificates + '\'' +
+            ", sslKeystoreKey='" + sslKeystoreKey + '\'' +
+            ", sslKeystoreCertificateChain='" + sslKeystoreCertificateChain + '\'' +
             ", oauthClientId='" + oauthClientId + '\'' +
             ", oauthClientSecret='" + oauthClientSecret + '\'' +
             ", oauthAccessToken='" + oauthAccessToken + '\'' +

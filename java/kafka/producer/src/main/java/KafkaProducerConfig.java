@@ -209,9 +209,9 @@ public class KafkaProducerConfig {
             ", message='" + message + '\'' +
             ", acks='" + acks + '\'' +
             ", headers='" + headers + '\'' +
-            ", trustStorePassword='" + sslTruststoreCertificates + '\'' +
-            ", trustStorePath='" + sslKeystoreKey + '\'' +
-            ", keyStorePassword='" + sslKeystoreCertificateChain + '\'' +
+            ", sslTruststoreCertificates='" + sslTruststoreCertificates + '\'' +
+            ", sslKeystoreKey='" + sslKeystoreKey + '\'' +
+            ", sslKeystoreCertificateChain='" + sslKeystoreCertificateChain + '\'' +
             ", oauthClientId='" + oauthClientId + '\'' +
             ", oauthClientSecret='" + oauthClientSecret + '\'' +
             ", oauthAccessToken='" + oauthAccessToken + '\'' +

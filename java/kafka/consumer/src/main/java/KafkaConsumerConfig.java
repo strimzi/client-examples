@@ -211,9 +211,9 @@ public class KafkaConsumerConfig {
             ", enableAutoCommit='" + enableAutoCommit + '\'' +
             ", clientRack='" + clientRack + '\'' +
             ", messageCount=" + messageCount +
-            ", trustStorePassword='" + sslTruststoreCertificates + '\'' +
-            ", trustStorePath='" + sslKeystoreKey + '\'' +
-            ", keyStorePassword='" + sslKeystoreCertificateChain + '\'' +
+            ", sslTruststoreCertificates='" + sslTruststoreCertificates + '\'' +
+            ", sslKeystoreKey='" + sslKeystoreKey + '\'' +
+            ", sslKeystoreCertificateChain='" + sslKeystoreCertificateChain + '\'' +
             ", oauthClientId='" + oauthClientId + '\'' +
             ", oauthClientSecret='" + oauthClientSecret + '\'' +
             ", oauthAccessToken='" + oauthAccessToken + '\'' +
