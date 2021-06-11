@@ -24,13 +24,6 @@
         <strimzi-oauth-callback.version>0.8.0</strimzi-oauth-callback.version>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>oauth-staging</id>
-            <url>https://oss.sonatype.org/content/repositories/iostrimzi-1104</url>
-        </repository>
-    </repositories>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
