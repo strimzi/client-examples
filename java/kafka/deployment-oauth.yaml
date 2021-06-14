@@ -88,7 +88,9 @@ spec:
                 key: clientSecret
           - name: OAUTH_TOKEN_ENDPOINT_URI
             value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
-          - name: OAUTH_CRT
+          - name: OAUTH_SSL_TRUSTSTORE_TYPE
+            value: PEM
+          - name: OAUTH_SSL_TRUSTSTORE_CERTIFICATES
             valueFrom:
               secretKeyRef:
                 name: sso-x509-https-secret
@@ -177,7 +179,9 @@ spec:
                   key: clientSecret
             - name: OAUTH_TOKEN_ENDPOINT_URI
               value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
-            - name: OAUTH_CRT
+            - name: OAUTH_SSL_TRUSTSTORE_TYPE
+              value: PEM
+            - name: OAUTH_SSL_TRUSTSTORE_CERTIFICATES
               valueFrom:
                 secretKeyRef:
                   name: sso-x509-https-secret
@@ -253,7 +257,9 @@ spec:
                   key: clientSecret
             - name: OAUTH_TOKEN_ENDPOINT_URI
               value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
-            - name: OAUTH_CRT
+            - name: OAUTH_SSL_TRUSTSTORE_TYPE
+              value: PEM
+            - name: OAUTH_SSL_TRUSTSTORE_CERTIFICATES
               valueFrom:
                 secretKeyRef:
                   name: sso-x509-https-secret
