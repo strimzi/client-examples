@@ -1,3 +1,8 @@
+[![Build Status](https://dev.azure.com/cncf/strimzi/_apis/build/status/client-examples?branchName=main)](https://dev.azure.com/cncf/strimzi/_build/latest?definitionId=33&branchName=main)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+[![Twitter Follow](https://img.shields.io/twitter/follow/strimziio.svg?style=social&label=Follow&style=for-the-badge)](https://twitter.com/strimziio)
+
+
 # Apache Kafka client examples
 
 This repository contains examples of Apache Kafka clients written using the Apache Kafka Java APIs:
