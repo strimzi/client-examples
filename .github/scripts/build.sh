@@ -2,26 +2,26 @@
 
 set -e
 
-export DOCKER_ORG=${DOCKER_ORG:-strimzi-examples}
+export DOCKER_ORG=${DOCKER_ORG:-tealc}
 export DOCKER_REGISTRY=${DOCKER_REGISTRY:-quay.io}
 export DOCKER_TAG=$COMMIT
 
-echo "Build reason: ${BUILD_REASON}"
-echo "Source branch: ${BRANCH}"
+echo "GITHUB_HEAD_REF: ${GITHUB_HEAD_REF}"
+echo "GITHUB_REF: ${GITHUB_REF}"
 
 make build
 
-if [ "$BUILD_REASON" == "PullRequest" ] ; then
+if [ -z "$GITHUB_HEAD_REF" ] ; then
   make docker_build
   echo "Building Pull Request - nothing to push"
-elif [[ "$BRANCH" != "refs/tags/"* ]] && [ "$BRANCH" != "refs/heads/main" ]; then
+elif [[ "$GITHUB_REF" != "refs/tags/"* ]] && [ "$GITHUB_REF" != "refs/heads/main" ]; then
     make docker_build
     echo "Not in main branch or in release tag - nothing to push"
 else
-    if [ "$BRANCH" == "refs/heads/main" ]; then
+    if [ "$GITHUB_REF" == "refs/heads/main" ]; then
         export DOCKER_TAG="latest"
     else
-        export DOCKER_TAG="${BRANCH#refs/tags/}"
+        export DOCKER_TAG="${$GITHUB_REF#refs/tags/}"
     fi
 
     make docker_build
