@@ -17,7 +17,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <vertx.version>3.7.1</vertx.version>
         <slf4j-simple.version>1.6.2</slf4j-simple.version>
-        <log4j.version>2.13.3</log4j.version>
+        <log4j.version>2.15.0</log4j.version>
         <maven.shade.version>3.2.1</maven.shade.version>
         <jaeger.version>1.0.0</jaeger.version>
         <opentracing.version>0.33.0</opentracing.version>
