@@ -3,9 +3,9 @@
 [![Twitter Follow](https://img.shields.io/twitter/follow/strimziio.svg?style=social&label=Follow&style=for-the-badge)](https://twitter.com/strimziio)
 
 
-# Apache Kafka client examples
+# Client examples
 
-This repository contains examples of Apache Kafka clients written using the Apache Kafka Java APIs:
+This repository contains examples of [Apache Kafka®](https://kafka.apache.org) client applications written using the Apache Kafka Java APIs:
 * Message Producer which periodically produces messages into a topic
 * Streams application which reads messages from a topic, transforms them (reverses the message payload) and sends them to another topic
 * Consumer which is consuming messages from a topic
