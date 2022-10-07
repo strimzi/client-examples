@@ -56,6 +56,16 @@ spec:
             value: const
           - name: JAEGER_SAMPLER_PARAM
             value: "1"
+          - name: OTEL_SERVICE_NAME
+            value: kafka-otel
+          - name: OTEL_TRACES_EXPORTER
+            value: jaeger
+          - name: OTEL_METRICS_EXPORTER
+            value: none
+          - name: OTEL_EXPORTER_JAEGER_ENDPOINT
+            value: http://my-jaeger-collector:14250
+          - name: TRACING_SYSTEM
+            value: "opentelemetry"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -95,6 +105,16 @@ spec:
               value: const
             - name: JAEGER_SAMPLER_PARAM
               value: "1"
+            - name: OTEL_SERVICE_NAME
+              value: kafka-otel
+            - name: OTEL_TRACES_EXPORTER
+              value: jaeger
+            - name: OTEL_METRICS_EXPORTER
+              value: none
+            - name: OTEL_EXPORTER_JAEGER_ENDPOINT
+              value: http://my-jaeger-collector:14250
+            - name: TRACING_SYSTEM
+              value: "opentelemetry"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -134,3 +154,13 @@ spec:
               value: const
             - name: JAEGER_SAMPLER_PARAM
               value: "1"
+            - name: OTEL_SERVICE_NAME
+              value: kafka-otel
+            - name: OTEL_TRACES_EXPORTER
+              value: jaeger
+            - name: OTEL_METRICS_EXPORTER
+              value: none
+            - name: OTEL_EXPORTER_JAEGER_ENDPOINT
+              value: http://my-jaeger-collector:14250
+            - name: TRACING_SYSTEM
+              value: "opentelemetry"

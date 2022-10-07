@@ -5,12 +5,16 @@
 
 import io.jaegertracing.Configuration;
 import io.opentracing.Tracer;
-import io.opentracing.contrib.kafka.streams.TracingKafkaClientSupplier;
 import io.opentracing.util.GlobalTracer;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.KafkaClientSupplier;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
+import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.logging.log4j.Logger;
@@ -40,12 +44,28 @@ public class KafkaStreamsExample {
 
         KafkaStreams streams;
 
-        if (System.getenv("JAEGER_SERVICE_NAME") != null)   {
-            Tracer tracer = Configuration.fromEnv().getTracer();
-            GlobalTracer.registerIfAbsent(tracer);
+        TracingSystem tracingSystem = config.getTracingSystem();
+        if (tracingSystem != TracingSystem.NONE) {
 
-            KafkaClientSupplier supplier = new TracingKafkaClientSupplier(tracer);
-            streams = new KafkaStreams(builder.build(), props, supplier);
+            if (tracingSystem == TracingSystem.JAEGER) {
+                Tracer tracer = Configuration.fromEnv().getTracer();
+                GlobalTracer.registerIfAbsent(tracer);
+
+                KafkaClientSupplier supplier = new  io.opentracing.contrib.kafka.streams.TracingKafkaClientSupplier(tracer);
+                streams = new KafkaStreams(builder.build(), props, supplier);
+            } else if (tracingSystem == TracingSystem.OPENTELEMETRY) {
+
+                props.put(StreamsConfig.CONSUMER_PREFIX + ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+                props.put(StreamsConfig.CONSUMER_PREFIX + ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+                props.put(StreamsConfig.PRODUCER_PREFIX + ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+                props.put(StreamsConfig.PRODUCER_PREFIX + ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+
+                KafkaClientSupplier supplier = new TracingKafkaClientSupplier();
+                streams = new KafkaStreams(builder.build(), props, supplier);
+            } else {
+                log.error("Error: TRACING_SYSTEM {} is not recognized or supported!", config.getTracingSystem());
+                streams = new KafkaStreams(builder.build(), props);
+            }
         } else {
             streams = new KafkaStreams(builder.build(), props);
         }

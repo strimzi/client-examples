@@ -5,7 +5,6 @@
 
 import io.jaegertracing.Configuration;
 import io.opentracing.Tracer;
-import io.opentracing.contrib.kafka.TracingProducerInterceptor;
 import io.opentracing.util.GlobalTracer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -34,11 +33,20 @@ public class KafkaProducerExample {
         Properties props = KafkaProducerConfig.createProperties(config);
         List<Header> headers = null;
 
-        if (System.getenv("JAEGER_SERVICE_NAME") != null)   {
-            Tracer tracer = Configuration.fromEnv().getTracer();
-            GlobalTracer.registerIfAbsent(tracer);
+        TracingSystem tracingSystem = config.getTracingSystem();
+        if (tracingSystem != TracingSystem.NONE) {
 
-            props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, TracingProducerInterceptor.class.getName());
+            if (tracingSystem == TracingSystem.JAEGER) {
+                Tracer tracer = Configuration.fromEnv().getTracer();
+                GlobalTracer.registerIfAbsent(tracer);
+
+                props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentracing.contrib.kafka.TracingProducerInterceptor.class.getName());
+            } else if (tracingSystem == TracingSystem.OPENTELEMETRY) {
+
+                props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentelemetry.instrumentation.kafkaclients.TracingProducerInterceptor.class.getName());
+            } else {
+                log.error("Error: TRACING_SYSTEM {} is not recognized or supported!", config.getTracingSystem());
+            }
         }
 
         if (config.getHeaders() != null) {

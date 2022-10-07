@@ -5,7 +5,6 @@
 
 import io.jaegertracing.Configuration;
 import io.opentracing.Tracer;
-import io.opentracing.contrib.kafka.TracingConsumerInterceptor;
 import io.opentracing.util.GlobalTracer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -30,36 +29,45 @@ public class KafkaConsumerExample {
         Properties props = KafkaConsumerConfig.createProperties(config);
         int receivedMsgs = 0;
 
-        if (System.getenv("JAEGER_SERVICE_NAME") != null)   {
-            Tracer tracer = Configuration.fromEnv().getTracer();
-            GlobalTracer.registerIfAbsent(tracer);
+        TracingSystem tracingSystem = config.getTracingSystem();
+        if (tracingSystem != TracingSystem.NONE) {
+            if (tracingSystem == TracingSystem.JAEGER) {
+                Tracer tracer = Configuration.fromEnv().getTracer();
+                GlobalTracer.registerIfAbsent(tracer);
 
-            props.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, TracingConsumerInterceptor.class.getName());
-        }
+                props.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentracing.contrib.kafka.TracingConsumerInterceptor.class.getName());
+            } else if (tracingSystem == TracingSystem.OPENTELEMETRY) {
 
-        boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
-        KafkaConsumer consumer = new KafkaConsumer(props);
-        consumer.subscribe(Collections.singletonList(config.getTopic()));
+                props.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentelemetry.instrumentation.kafkaclients.TracingConsumerInterceptor.class.getName());
+            } else {
+                log.error("Error: TRACING_SYSTEM {} is not recognized or supported!", config.getTracingSystem());
+            }
 
-        while (receivedMsgs < config.getMessageCount()) {
-            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-            for (ConsumerRecord<String, String> record : records) {
-                log.info("Received message:");
-                log.info("\tpartition: {}", record.partition());
-                log.info("\toffset: {}", record.offset());
-                log.info("\tvalue: {}", record.value());
-                if (record.headers() != null) {
-                    log.info("\theaders: ");
-                    for (Header header : record.headers()) {
-                        log.info("\t\tkey: {}, value: {}", header.key(), new String(header.value()));
+
+            boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
+            KafkaConsumer consumer = new KafkaConsumer(props);
+            consumer.subscribe(Collections.singletonList(config.getTopic()));
+
+            while (receivedMsgs < config.getMessageCount()) {
+                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+                for (ConsumerRecord<String, String> record : records) {
+                    log.info("Received message:");
+                    log.info("\tpartition: {}", record.partition());
+                    log.info("\toffset: {}", record.offset());
+                    log.info("\tvalue: {}", record.value());
+                    if (record.headers() != null) {
+                        log.info("\theaders: ");
+                        for (Header header : record.headers()) {
+                            log.info("\t\tkey: {}, value: {}", header.key(), new String(header.value()));
+                        }
                     }
+                    receivedMsgs++;
                 }
-                receivedMsgs++;
+                if (commit) {
+                    consumer.commitSync();
+                }
             }
-            if (commit) {
-                consumer.commitSync();
-            }
+            log.info("Received {} messages", receivedMsgs);
         }
-        log.info("Received {} messages", receivedMsgs);
     }
 }

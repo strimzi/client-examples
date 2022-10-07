@@ -35,11 +35,12 @@ public class KafkaProducerConfig {
     private final String oauthTokenEndpointUri;
     private final String additionalConfig;
     private final String saslLoginCallbackClass = "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler";
+    private final TracingSystem tracingSystem;
 
     public KafkaProducerConfig(String bootstrapServers, String topic, int delay, Long messageCount, String message,
                                String sslTruststoreCertificates, String sslKeystoreKey, String sslKeystoreCertificateChain,
                                String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken,
-                               String oauthTokenEndpointUri, String acks, String additionalConfig, String headers) {
+                               String oauthTokenEndpointUri, String acks, String additionalConfig, String headers, TracingSystem tracingSystem) {
         this.bootstrapServers = bootstrapServers;
         this.topic = topic;
         this.delay = delay;
@@ -56,6 +57,7 @@ public class KafkaProducerConfig {
         this.acks = acks;
         this.headers = headers;
         this.additionalConfig = additionalConfig;
+        this.tracingSystem = tracingSystem;
     }
 
     public static KafkaProducerConfig fromEnv() {
@@ -75,10 +77,11 @@ public class KafkaProducerConfig {
         String acks = System.getenv().getOrDefault("PRODUCER_ACKS", "1");
         String headers = System.getenv("HEADERS");
         String additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
+        TracingSystem tracingSystem = TracingSystem.forValue(System.getenv("TRACING_SYSTEM"));
 
         return new KafkaProducerConfig(bootstrapServers, topic, delay, messageCount, message, sslTruststoreCertificates,
                 sslKeystoreKey, sslKeystoreCertificateChain, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken,
-                oauthTokenEndpointUri, acks, additionalConfig, headers);
+                oauthTokenEndpointUri, acks, additionalConfig, headers, tracingSystem);
     }
 
     public static Properties createProperties(KafkaProducerConfig config) {
@@ -135,6 +138,7 @@ public class KafkaProducerConfig {
 
         return props;
     }
+
     public String getBootstrapServers() {
         return bootstrapServers;
     }
@@ -199,6 +203,10 @@ public class KafkaProducerConfig {
         return additionalConfig;
     }
 
+    public TracingSystem getTracingSystem() {
+        return tracingSystem;
+    }
+
     @Override
     public String toString() {
         return "KafkaProducerConfig{" +
@@ -218,6 +226,7 @@ public class KafkaProducerConfig {
             ", oauthRefreshToken='" + oauthRefreshToken + '\'' +
             ", oauthTokenEndpointUri='" + oauthTokenEndpointUri + '\'' +
             ", additionalConfig='" + additionalConfig + '\'' +
+            ", tracingSystem='" + tracingSystem + '\'' +
             '}';
     }
 }

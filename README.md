@@ -73,6 +73,7 @@ Producer
 * `BLOCKING_PRODUCER` - if it's set, the producer will block another message until ack will be received
 * `MESSAGES_PER_TRANSACTION` - how many messages will be part of one transaction. Transaction config could be set via `ADDITIONAL_CONFIG` variable. Default is 10.
 * `ADDITIONAL_CONFIG` - additional configuration for a producer application. Notice, that you can also override any previously set variable by setting this. The form is `key=value` records separated by new line character
+* `TRACING_SYSTEM` - if it's set to `jaeger` or `opentelemetry`, this will enable tracing. 
 
 Consumer  
 * `BOOTSTRAP_SERVERS` - comma-separated host and port pairs that is a list of Kafka broker addresses. The form of pair is `host:port`, e.g. `my-cluster-kafka-bootstrap:9092` 
@@ -84,6 +85,7 @@ Consumer
 * `USER_KEY` - the user's private key
 * `LOG_LEVEL` - logging level  
 * `ADDITIONAL_CONFIG` - additional configuration for a consumer application. Notice, that you can also override any previously set variable by setting this. The form is `key=value` records separated by new line character
+* `TRACING_SYSTEM` - if it's set to `jaeger` or `opentelemetry`, this will enable tracing.
 
 Streams  
 * `BOOTSTRAP_SERVERS` - comma-separated host and port pairs that is a list of Kafka broker addresses. The form of pair is `host:port`, e.g. `my-cluster-kafka-bootstrap:9092`
@@ -96,10 +98,12 @@ Streams
 * `USER_KEY` - the user's private key
 * `LOG_LEVEL` - logging level
 * `ADDITIONAL_CONFIG` - additional configuration for a streams application. Notice, that you can also override any previously set variable by setting this. The form is `key=value` records separated by new line character.
+* `TRACING_SYSTEM` - if it's set to `jaeger` or `opentelemetry`, this will enable tracing.
 
 ### Tracing
 
-The examples support tracing using the [OpenTracing Apache Kafka Instrumentation](https://github.com/opentracing-contrib/java-kafka-client) and the [Jaeger project](https://www.jaegertracing.io/).
+The examples support tracing using the [OpenTracing Apache Kafka Instrumentation](https://github.com/opentracing-contrib/java-kafka-client), 
+[OpenTelemetry Java Instrumentation](https://github.com/open-telemetry/opentelemetry-java-instrumentation) and the [Jaeger project](https://www.jaegertracing.io/).
 To enable tracing, configure the Jaeger Tracer using [environment variables](https://github.com/jaegertracing/jaeger-client-java/tree/master/jaeger-core#configuration-via-environment).
 
 You can also use the provided example in [`deployment-tracing.yaml`](./java/kafka/deployment-tracing.yaml).
