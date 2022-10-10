@@ -43,7 +43,6 @@ public class KafkaConsumerExample {
                 log.error("Error: TRACING_SYSTEM {} is not recognized or supported!", config.getTracingSystem());
             }
 
-
             boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
             KafkaConsumer consumer = new KafkaConsumer(props);
             consumer.subscribe(Collections.singletonList(config.getTopic()));
