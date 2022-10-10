@@ -46,7 +46,6 @@ public class KafkaStreamsExample {
 
         TracingSystem tracingSystem = config.getTracingSystem();
         if (tracingSystem != TracingSystem.NONE) {
-
             if (tracingSystem == TracingSystem.JAEGER) {
                 Tracer tracer = Configuration.fromEnv().getTracer();
                 GlobalTracer.registerIfAbsent(tracer);
@@ -54,7 +53,6 @@ public class KafkaStreamsExample {
                 KafkaClientSupplier supplier = new  io.opentracing.contrib.kafka.streams.TracingKafkaClientSupplier(tracer);
                 streams = new KafkaStreams(builder.build(), props, supplier);
             } else if (tracingSystem == TracingSystem.OPENTELEMETRY) {
-
                 props.put(StreamsConfig.CONSUMER_PREFIX + ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
                 props.put(StreamsConfig.CONSUMER_PREFIX + ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
                 props.put(StreamsConfig.PRODUCER_PREFIX + ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());

@@ -37,12 +37,11 @@ public class KafkaConsumerExample {
 
                 props.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentracing.contrib.kafka.TracingConsumerInterceptor.class.getName());
             } else if (tracingSystem == TracingSystem.OPENTELEMETRY) {
-
                 props.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentelemetry.instrumentation.kafkaclients.TracingConsumerInterceptor.class.getName());
             } else {
                 log.error("Error: TRACING_SYSTEM {} is not recognized or supported!", config.getTracingSystem());
             }
-
+        }
             boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
             KafkaConsumer consumer = new KafkaConsumer(props);
             consumer.subscribe(Collections.singletonList(config.getTopic()));
@@ -69,4 +68,4 @@ public class KafkaConsumerExample {
             log.info("Received {} messages", receivedMsgs);
         }
     }
-}
+

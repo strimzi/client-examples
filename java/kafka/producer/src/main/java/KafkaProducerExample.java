@@ -35,7 +35,6 @@ public class KafkaProducerExample {
 
         TracingSystem tracingSystem = config.getTracingSystem();
         if (tracingSystem != TracingSystem.NONE) {
-
             if (tracingSystem == TracingSystem.JAEGER) {
                 Tracer tracer = Configuration.fromEnv().getTracer();
                 GlobalTracer.registerIfAbsent(tracer);
