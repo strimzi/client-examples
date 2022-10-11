@@ -42,30 +42,30 @@ public class KafkaConsumerExample {
                 log.error("Error: TRACING_SYSTEM {} is not recognized or supported!", config.getTracingSystem());
             }
         }
-            boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
-            KafkaConsumer consumer = new KafkaConsumer(props);
-            consumer.subscribe(Collections.singletonList(config.getTopic()));
+        boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
+        KafkaConsumer consumer = new KafkaConsumer(props);
+        consumer.subscribe(Collections.singletonList(config.getTopic()));
 
-            while (receivedMsgs < config.getMessageCount()) {
-                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-                for (ConsumerRecord<String, String> record : records) {
-                    log.info("Received message:");
-                    log.info("\tpartition: {}", record.partition());
-                    log.info("\toffset: {}", record.offset());
-                    log.info("\tvalue: {}", record.value());
-                    if (record.headers() != null) {
-                        log.info("\theaders: ");
-                        for (Header header : record.headers()) {
-                            log.info("\t\tkey: {}, value: {}", header.key(), new String(header.value()));
-                        }
+        while (receivedMsgs < config.getMessageCount()) {
+            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+            for (ConsumerRecord<String, String> record : records) {
+                log.info("Received message:");
+                log.info("\tpartition: {}", record.partition());
+                log.info("\toffset: {}", record.offset());
+                log.info("\tvalue: {}", record.value());
+                if (record.headers() != null) {
+                    log.info("\theaders: ");
+                    for (Header header : record.headers()) {
+                        log.info("\t\tkey: {}, value: {}", header.key(), new String(header.value()));
                     }
-                    receivedMsgs++;
                 }
-                if (commit) {
-                    consumer.commitSync();
-                }
+                receivedMsgs++;
             }
-            log.info("Received {} messages", receivedMsgs);
+            if (commit) {
+                consumer.commitSync();
+            }
         }
+        log.info("Received {} messages", receivedMsgs);
     }
+}
 
