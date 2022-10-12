@@ -4,6 +4,7 @@
  */
 
 import io.jaegertracing.Configuration;
+import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk;
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -41,7 +42,7 @@ public class KafkaProducerExample {
 
                 props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentracing.contrib.kafka.TracingProducerInterceptor.class.getName());
             } else if (tracingSystem == TracingSystem.OPENTELEMETRY) {
-
+                AutoConfiguredOpenTelemetrySdk.initialize();
                 props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentelemetry.instrumentation.kafkaclients.TracingProducerInterceptor.class.getName());
             } else {
                 log.error("Error: TRACING_SYSTEM {} is not recognized or supported!", config.getTracingSystem());

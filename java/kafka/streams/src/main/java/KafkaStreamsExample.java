@@ -53,10 +53,8 @@ public class KafkaStreamsExample {
                 KafkaClientSupplier supplier = new  io.opentracing.contrib.kafka.streams.TracingKafkaClientSupplier(tracer);
                 streams = new KafkaStreams(builder.build(), props, supplier);
             } else if (tracingSystem == TracingSystem.OPENTELEMETRY) {
-                props.put(StreamsConfig.CONSUMER_PREFIX + ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-                props.put(StreamsConfig.CONSUMER_PREFIX + ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-                props.put(StreamsConfig.PRODUCER_PREFIX + ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-                props.put(StreamsConfig.PRODUCER_PREFIX + ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+                props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+                props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
 
                 KafkaClientSupplier supplier = new TracingKafkaClientSupplier();
                 streams = new KafkaStreams(builder.build(), props, supplier);

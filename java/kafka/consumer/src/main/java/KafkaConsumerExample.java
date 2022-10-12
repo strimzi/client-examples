@@ -4,6 +4,7 @@
  */
 
 import io.jaegertracing.Configuration;
+import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk;
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -37,6 +38,7 @@ public class KafkaConsumerExample {
 
                 props.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentracing.contrib.kafka.TracingConsumerInterceptor.class.getName());
             } else if (tracingSystem == TracingSystem.OPENTELEMETRY) {
+                AutoConfiguredOpenTelemetrySdk.initialize();
                 props.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentelemetry.instrumentation.kafkaclients.TracingConsumerInterceptor.class.getName());
             } else {
                 log.error("Error: TRACING_SYSTEM {} is not recognized or supported!", config.getTracingSystem());
@@ -68,4 +70,3 @@ public class KafkaConsumerExample {
         log.info("Received {} messages", receivedMsgs);
     }
 }
-
