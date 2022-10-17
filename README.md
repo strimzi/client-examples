@@ -106,4 +106,5 @@ The examples support tracing using the [OpenTracing Apache Kafka Instrumentation
 [OpenTelemetry Java Instrumentation](https://github.com/open-telemetry/opentelemetry-java-instrumentation) and the [Jaeger project](https://www.jaegertracing.io/).
 To enable tracing, configure the Jaeger Tracer using [environment variables](https://github.com/jaegertracing/jaeger-client-java/tree/master/jaeger-core#configuration-via-environment).
 
-You can also use the provided example in [`deployment-tracing.yaml`](./java/kafka/deployment-tracing.yaml).
+To run Jaeger Tracing, you can also use the provided example in [`deployment-tracing-jaeger.yaml`](./java/kafka/deployment-tracing-jaeger.yaml).
+To run Opentelemetry Tracing, you can also use the provided example in [`deployment-tracing-opentelemetry.yaml`](./java/kafka/deployment-tracing-opentelemetry.yaml).

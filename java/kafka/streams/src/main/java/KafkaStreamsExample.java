@@ -3,14 +3,7 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import io.jaegertracing.Configuration;
-import io.opentracing.Tracer;
-import io.opentracing.util.GlobalTracer;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.KafkaClientSupplier;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -47,10 +40,8 @@ public class KafkaStreamsExample {
         TracingSystem tracingSystem = config.getTracingSystem();
         if (tracingSystem != TracingSystem.NONE) {
             if (tracingSystem == TracingSystem.JAEGER) {
-                Tracer tracer = Configuration.fromEnv().getTracer();
-                GlobalTracer.registerIfAbsent(tracer);
 
-                KafkaClientSupplier supplier = new  io.opentracing.contrib.kafka.streams.TracingKafkaClientSupplier(tracer);
+                KafkaClientSupplier supplier = new  io.opentracing.contrib.kafka.streams.TracingKafkaClientSupplier(TracingInitializer.jaegerInitialize());
                 streams = new KafkaStreams(builder.build(), props, supplier);
             } else if (tracingSystem == TracingSystem.OPENTELEMETRY) {
                 props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
