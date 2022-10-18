@@ -33,12 +33,12 @@ public class KafkaStreamsConfig {
     private final String oauthTokenEndpointUri;
     private final String additionalConfig;
     private final String saslLoginCallbackClass = "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler";
-
+    private final TracingSystem tracingSystem;
 
     public KafkaStreamsConfig(String bootstrapServers, String applicationId, String sourceTopic, String targetTopic,
                               int commitIntervalMs, String sslTruststoreCertificates, String sslKeystoreKey, String sslKeystoreCertificateChain,
                               String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken,
-                              String oauthTokenEndpointUri, String additionalConfig) {
+                              String oauthTokenEndpointUri, String additionalConfig, TracingSystem tracingSystem) {
         this.bootstrapServers = bootstrapServers;
         this.applicationId = applicationId;
         this.sourceTopic = sourceTopic;
@@ -53,6 +53,7 @@ public class KafkaStreamsConfig {
         this.oauthRefreshToken = oauthRefreshToken;
         this.oauthTokenEndpointUri = oauthTokenEndpointUri;
         this.additionalConfig = additionalConfig;
+        this.tracingSystem = tracingSystem;
     }
 
     public static KafkaStreamsConfig fromEnv() {
@@ -70,10 +71,11 @@ public class KafkaStreamsConfig {
         String oauthRefreshToken = System.getenv("OAUTH_REFRESH_TOKEN");
         String oauthTokenEndpointUri = System.getenv("OAUTH_TOKEN_ENDPOINT_URI");
         String additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
+        TracingSystem tracingSystem = TracingSystem.forValue(System.getenv("TRACING_SYSTEM"));
 
         return new KafkaStreamsConfig(bootstrapServers, applicationId, sourceTopic, targetTopic, commitIntervalMs,
                 sslTruststoreCertificates, sslKeystoreKey, sslKeystoreCertificateChain, oauthClientId, oauthClientSecret,
-                oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri, additionalConfig);
+                oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri, additionalConfig, tracingSystem);
     }
 
     public static Properties createProperties(KafkaStreamsConfig config) {
@@ -188,6 +190,8 @@ public class KafkaStreamsConfig {
         return additionalConfig;
     }
 
+    public TracingSystem getTracingSystem() { return tracingSystem;  }
+
     @Override
     public String toString() {
         return "KafkaStreamsConfig{" +
@@ -205,6 +209,7 @@ public class KafkaStreamsConfig {
             ", oauthRefreshToken='" + oauthRefreshToken + '\'' +
             ", oauthTokenEndpointUri='" + oauthTokenEndpointUri + '\'' +
             ", additionalConfig='" + additionalConfig + '\'' +
+            ", tracingSystem='" + tracingSystem + '\'' +
             '}';
     }
 }

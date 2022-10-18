@@ -20,12 +20,19 @@
         <slf4j-simple.version>1.6.2</slf4j-simple.version>
         <kafka.version>2.8.0</kafka.version>
         <opentracing-kafka.version>0.1.15</opentracing-kafka.version>
+        <opentelemetry-alpha.version>1.18.0-alpha</opentelemetry-alpha.version>
+        <opentelemetry.version>1.18.0</opentelemetry.version>
         <jaeger.version>1.1.0</jaeger.version>
         <strimzi-oauth-callback.version>0.8.1</strimzi-oauth-callback.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>strimzi.io</groupId>
+                <artifactId>common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-api</artifactId>
@@ -67,6 +74,27 @@
                 <version>${opentracing-kafka.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-api</artifactId>
+                <version>${opentelemetry.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-exporter-jaeger</artifactId>
+                <version>${opentelemetry.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry.instrumentation</groupId>
+                <artifactId>opentelemetry-kafka-clients-2.6</artifactId>
+                <version>${opentelemetry-alpha.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-sdk-extension-autoconfigure</artifactId>
+                <version>${opentelemetry-alpha.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>io.strimzi</groupId>
                 <artifactId>kafka-oauth-client</artifactId>
                 <version>${strimzi-oauth-callback.version}</version>
@@ -75,6 +103,7 @@
     </dependencyManagement>
 
     <modules>
+        <module>common</module>
         <module>consumer</module>
         <module>producer</module>
         <module>streams</module>

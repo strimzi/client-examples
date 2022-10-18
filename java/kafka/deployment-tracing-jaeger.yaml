@@ -56,6 +56,8 @@ spec:
             value: const
           - name: JAEGER_SAMPLER_PARAM
             value: "1"
+          - name: TRACING_SYSTEM
+            value: jaeger
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -95,6 +97,8 @@ spec:
               value: const
             - name: JAEGER_SAMPLER_PARAM
               value: "1"
+            - name: TRACING_SYSTEM
+              value: jaeger
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -134,3 +138,5 @@ spec:
               value: const
             - name: JAEGER_SAMPLER_PARAM
               value: "1"
+            - name: TRACING_SYSTEM
+              value: jaeger
