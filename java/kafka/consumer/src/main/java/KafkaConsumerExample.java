@@ -3,10 +3,6 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import io.jaegertracing.Configuration;
-import io.opentracing.Tracer;
-import io.opentracing.contrib.kafka.TracingConsumerInterceptor;
-import io.opentracing.util.GlobalTracer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -30,11 +26,19 @@ public class KafkaConsumerExample {
         Properties props = KafkaConsumerConfig.createProperties(config);
         int receivedMsgs = 0;
 
-        if (System.getenv("JAEGER_SERVICE_NAME") != null)   {
-            Tracer tracer = Configuration.fromEnv().getTracer();
-            GlobalTracer.registerIfAbsent(tracer);
+        TracingSystem tracingSystem = config.getTracingSystem();
+        if (tracingSystem != TracingSystem.NONE) {
+            if (tracingSystem == TracingSystem.JAEGER) {
+                TracingInitializer.jaegerInitialize();
 
-            props.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, TracingConsumerInterceptor.class.getName());
+                props.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentracing.contrib.kafka.TracingConsumerInterceptor.class.getName());
+            } else if (tracingSystem == TracingSystem.OPENTELEMETRY) {
+                TracingInitializer.otelInitialize();
+
+                props.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentelemetry.instrumentation.kafkaclients.TracingConsumerInterceptor.class.getName());
+            } else {
+                log.error("Error: TRACING_SYSTEM {} is not recognized or supported!", tracingSystem);
+            }
         }
 
         boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());

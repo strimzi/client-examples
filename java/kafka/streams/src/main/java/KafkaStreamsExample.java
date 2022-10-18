@@ -3,14 +3,11 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import io.jaegertracing.Configuration;
-import io.opentracing.Tracer;
-import io.opentracing.contrib.kafka.streams.TracingKafkaClientSupplier;
-import io.opentracing.util.GlobalTracer;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaClientSupplier;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
+import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.logging.log4j.Logger;
@@ -40,12 +37,22 @@ public class KafkaStreamsExample {
 
         KafkaStreams streams;
 
-        if (System.getenv("JAEGER_SERVICE_NAME") != null)   {
-            Tracer tracer = Configuration.fromEnv().getTracer();
-            GlobalTracer.registerIfAbsent(tracer);
+        TracingSystem tracingSystem = config.getTracingSystem();
+        if (tracingSystem != TracingSystem.NONE) {
+            if (tracingSystem == TracingSystem.JAEGER) {
 
-            KafkaClientSupplier supplier = new TracingKafkaClientSupplier(tracer);
-            streams = new KafkaStreams(builder.build(), props, supplier);
+                KafkaClientSupplier supplier = new  io.opentracing.contrib.kafka.streams.TracingKafkaClientSupplier(TracingInitializer.jaegerInitialize());
+                streams = new KafkaStreams(builder.build(), props, supplier);
+            } else if (tracingSystem == TracingSystem.OPENTELEMETRY) {
+                props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+                props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+
+                KafkaClientSupplier supplier = new TracingKafkaClientSupplier();
+                streams = new KafkaStreams(builder.build(), props, supplier);
+            } else {
+                log.error("Error: TRACING_SYSTEM {} is not recognized or supported!", config.getTracingSystem());
+                streams = new KafkaStreams(builder.build(), props);
+            }
         } else {
             streams = new KafkaStreams(builder.build(), props);
         }

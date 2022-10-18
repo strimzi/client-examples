@@ -34,12 +34,12 @@ public class KafkaConsumerConfig {
     private final String oauthTokenEndpointUri;
     private final String additionalConfig;
     private final String saslLoginCallbackClass = "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler";
-
+    private final TracingSystem tracingSystem;
 
     public KafkaConsumerConfig(String bootstrapServers, String topic, String groupId, String clientRack, Long messageCount,
                                String sslTruststoreCertificates, String sslKeystoreKey, String sslKeystoreCertificateChain,
                                String oauthClientId, String oauthClientSecret, String oauthAccessToken, String oauthRefreshToken,
-                               String oauthTokenEndpointUri, String additionalConfig) {
+                               String oauthTokenEndpointUri, String additionalConfig, TracingSystem tracingSystem) {
         this.bootstrapServers = bootstrapServers;
         this.topic = topic;
         this.groupId = groupId;
@@ -54,6 +54,7 @@ public class KafkaConsumerConfig {
         this.oauthRefreshToken = oauthRefreshToken;
         this.oauthTokenEndpointUri = oauthTokenEndpointUri;
         this.additionalConfig = additionalConfig;
+        this.tracingSystem = tracingSystem;
     }
 
     public static KafkaConsumerConfig fromEnv() {
@@ -71,10 +72,11 @@ public class KafkaConsumerConfig {
         String oauthRefreshToken = System.getenv("OAUTH_REFRESH_TOKEN");
         String oauthTokenEndpointUri = System.getenv("OAUTH_TOKEN_ENDPOINT_URI");
         String additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
+        TracingSystem tracingSystem = TracingSystem.forValue(System.getenv("TRACING_SYSTEM"));
 
         return new KafkaConsumerConfig(bootstrapServers, topic, groupId, clientRack, messageCount, sslTruststoreCertificates, sslKeystoreKey,
                 sslKeystoreCertificateChain, oauthClientId, oauthClientSecret, oauthAccessToken, oauthRefreshToken, oauthTokenEndpointUri,
-                additionalConfig);
+                additionalConfig, tracingSystem);
     }
 
     public static Properties createProperties(KafkaConsumerConfig config) {
@@ -201,6 +203,8 @@ public class KafkaConsumerConfig {
         return additionalConfig;
     }
 
+    public TracingSystem getTracingSystem() { return tracingSystem; }
+
     @Override
     public String toString() {
         return "KafkaConsumerConfig{" +
@@ -220,6 +224,7 @@ public class KafkaConsumerConfig {
             ", oauthRefreshToken='" + oauthRefreshToken + '\'' +
             ", oauthTokenEndpointUri='" + oauthTokenEndpointUri + '\'' +
             ", additionalConfig='" + additionalConfig + '\'' +
+            ", tracingSystem='" + tracingSystem + '\'' +
             '}';
     }
 }
