@@ -109,4 +109,4 @@ To enable tracing, configure the Jaeger Tracer using [environment variables](htt
 To run Jaeger Tracing, you can also use the provided example in [`deployment-tracing-jaeger.yaml`](./java/kafka/deployment-tracing-jaeger.yaml).
 To run Opentelemetry Tracing, you can also use the provided example in [`deployment-tracing-opentelemetry.yaml`](./java/kafka/deployment-tracing-opentelemetry.yaml).
 
-Jaeger / OpenTracing tracing is supported only in consumers / producers because OpenTracing support for Kafka Streams API is not compatible with latest Kafka version.
+Jaeger / OpenTracing tracing is supported only in consumers / producers because OpenTracing support for Kafka Streams API is not compatible with the latest Kafka versions.
