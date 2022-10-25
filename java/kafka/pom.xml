@@ -18,7 +18,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <log4j.version>2.17.1</log4j.version>
         <slf4j-simple.version>1.6.2</slf4j-simple.version>
-        <kafka.version>2.8.0</kafka.version>
+        <kafka.version>3.3.1</kafka.version>
         <opentracing-kafka.version>0.1.15</opentracing-kafka.version>
         <opentelemetry-alpha.version>1.18.0-alpha</opentelemetry-alpha.version>
         <opentelemetry.version>1.18.0</opentelemetry.version>

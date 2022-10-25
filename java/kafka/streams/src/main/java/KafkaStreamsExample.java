@@ -39,11 +39,7 @@ public class KafkaStreamsExample {
 
         TracingSystem tracingSystem = config.getTracingSystem();
         if (tracingSystem != TracingSystem.NONE) {
-            if (tracingSystem == TracingSystem.JAEGER) {
-
-                KafkaClientSupplier supplier = new  io.opentracing.contrib.kafka.streams.TracingKafkaClientSupplier(TracingInitializer.jaegerInitialize());
-                streams = new KafkaStreams(builder.build(), props, supplier);
-            } else if (tracingSystem == TracingSystem.OPENTELEMETRY) {
+            if (tracingSystem == TracingSystem.OPENTELEMETRY) {
                 props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
                 props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
 
