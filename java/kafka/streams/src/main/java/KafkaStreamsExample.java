@@ -46,7 +46,7 @@ public class KafkaStreamsExample {
                 KafkaClientSupplier supplier = new TracingKafkaClientSupplier();
                 streams = new KafkaStreams(builder.build(), props, supplier);
             } else {
-                throw new RuntimeException("Error: TRACING_SYSTEM jaeger is not recognized or supported!");
+                throw new RuntimeException("Error: TRACING_SYSTEM " + tracingSystem + " is not recognized or supported!");
             }
         } else {
             streams = new KafkaStreams(builder.build(), props);
