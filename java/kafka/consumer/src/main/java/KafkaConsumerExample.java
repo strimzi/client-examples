@@ -42,7 +42,7 @@ public class KafkaConsumerExample {
         }
 
         boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
-        KafkaConsumer consumer = new KafkaConsumer(props);
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
         consumer.subscribe(Collections.singletonList(config.getTopic()));
 
         while (receivedMsgs < config.getMessageCount()) {

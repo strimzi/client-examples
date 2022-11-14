@@ -3,11 +3,11 @@ FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
 USER root
 
 RUN microdnf update \
-    && microdnf install java-11-openjdk-headless shadow-utils \
+    && microdnf install java-17-openjdk-headless shadow-utils \
     && microdnf clean all
 
 # Set JAVA_HOME env var
-ENV JAVA_HOME /usr/lib/jvm/jre-11
+ENV JAVA_HOME /usr/lib/jvm/jre-17
 
 # Add strimzi user with UID 1001
 # The user is in the group 0 to have access to the mounted volumes and storage
