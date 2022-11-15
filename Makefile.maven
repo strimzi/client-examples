@@ -4,8 +4,8 @@
 
 java_build:
 	echo "Building JAR file ..."
-	mvn package
+	mvn $(MVN_ARGS) package
 
 java_clean:
 	echo "Cleaning Maven build ..."
-	mvn clean
+	mvn $(MVN_ARGS) clean
