@@ -54,7 +54,7 @@ public class KafkaProducerExample {
             }
         }
 
-        KafkaProducer producer = new KafkaProducer(props);
+        KafkaProducer<String, String> producer = new KafkaProducer<>(props);
         log.info("Sending {} messages ...", config.getMessageCount());
 
         boolean blockProducer = System.getenv("BLOCKING_PRODUCER") != null;
@@ -71,7 +71,7 @@ public class KafkaProducerExample {
                 producer.beginTransaction();
             }
             log.info("Sending messages \"" + config.getMessage() + " - {}\"{}", i, config.getHeaders() == null ? "" : " - with headers - " + config.getHeaders());
-            Future<RecordMetadata> recordMetadataFuture = producer.send(new ProducerRecord(config.getTopic(), null, null, null, "\"" + config.getMessage() + " - " + i + "\"", headers));
+            Future<RecordMetadata> recordMetadataFuture = producer.send(new ProducerRecord<>(config.getTopic(), null, null, null, "\"" + config.getMessage() + " - " + i + "\"", headers));
             if(blockProducer) {
                 try {
                     recordMetadataFuture.get();
@@ -81,7 +81,7 @@ public class KafkaProducerExample {
                     log.warn("Message {} wasn't sent properly!", i, e.getCause());
                 }
             } else {
-                // Increment number of sent messages for non blocking producer
+                // Increment number of sent messages for non-blocking producer
                 numSent.incrementAndGet();
             }
             if (transactionalProducer && ((i + 1) % msgPerTx == 0)) {

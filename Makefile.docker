@@ -19,7 +19,7 @@ docker_build:
 	echo "Building Docker image ..."
 	mkdir -p scripts
 	cp ../../../scripts/run.sh ./scripts/run.sh
-	docker build --build-arg version=$(DOCKER_VERSION_ARG) -t strimzi/$(PROJECT_NAME):$(DOCKER_TAG) $(DOCKERFILE_DIR)
+	docker build $(DOCKER_PLATFORM) --build-arg version=$(DOCKER_VERSION_ARG) -t strimzi/$(PROJECT_NAME):$(DOCKER_TAG) $(DOCKERFILE_DIR)
 	rm -rf ./scripts
 
 docker_tag:
