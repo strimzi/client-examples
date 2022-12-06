@@ -76,16 +76,13 @@ Producer
 * `TRACING_SYSTEM` - if it's set to `jaeger` or `opentelemetry`, this will enable tracing. 
 
 Consumer  
-* `BOOTSTRAP_SERVERS` - comma-separated host and port pairs that is a list of Kafka broker addresses. The form of pair is `host:port`, e.g. `my-cluster-kafka-bootstrap:9092` 
-* `TOPIC` - name of topic which consumer subscribes  
-* `GROUP_ID` - specifies the consumer group id for the consumer
-* `MESSAGE_COUNT` - the number of messages the consumer should receive
-* `CA_CRT` - the certificate of the CA which signed the brokers' TLS certificates, for adding to the client's trust store
-* `USER_CRT` - the user's certificate
-* `USER_KEY` - the user's private key
-* `LOG_LEVEL` - logging level  
+* `KAFKA_BOOTSTRAP_SERVERS` - comma-separated host and port pairs that is a list of Kafka broker addresses. The form of pair is `host:port`, e.g. `my-cluster-kafka-bootstrap:9092` 
+* `STRIMZI_TOPIC` - name of topic which consumer subscribes  
+* `KAFKA_GROUP_ID` - specifies the consumer group id for the consumer
+* `STRIMZI_MESSAGE_COUNT` - the number of messages the consumer should receive
+* `STRIMZI_LOG_LEVEL` - logging level  
 * `ADDITIONAL_CONFIG` - additional configuration for a consumer application. Notice, that you can also override any previously set variable by setting this. The form is `key=value` records separated by new line character
-* `TRACING_SYSTEM` - if it's set to `jaeger` or `opentelemetry`, this will enable tracing.
+* `STRIMZI_TRACING_SYSTEM` - if it's set to `jaeger` or `opentelemetry`, this will enable tracing.
 
 Streams  
 * `BOOTSTRAP_SERVERS` - comma-separated host and port pairs that is a list of Kafka broker addresses. The form of pair is `host:port`, e.g. `my-cluster-kafka-bootstrap:9092`
