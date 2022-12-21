@@ -36,7 +36,6 @@ public class KafkaConsumerConfig {
     }
 
     public static String convertEnvVarToPropertyKey(String envVar) {
-        System.out.println("ENV_VAR is " + envVar);
         return envVar.substring(envVar.indexOf("_") + 1).toLowerCase().replace("_", ".");
     }
 
