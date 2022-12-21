@@ -57,7 +57,7 @@ To run the OAuth example, you will need to have your Kafka cluster configured wi
 ## Configuration
 
 Although this Hello World is simple example it is fully configurable.
-Below are listed and described environmental variables. 
+Below are listed and described environment variables. 
 Regarding Consumer Only (until later updates): below are listed and described environmental variables that are NOT Kafka-specific but must be used. 
 These environmental variables should be prefixed with `STRIMZI_`, e.g. `STRIMZI_TOPIC`. 
 Any Kafka configuration option can be given as an environmental variable and should be prefixed with `KAFKA_` using `_` instead of `.` , e.g. `bootstrap.servers` -> `KAFKA_BOOTSTRAP_SERVERS`.
