@@ -121,7 +121,7 @@ spec:
             value: my-topic-reversed
           - name: KAFKA_GROUP_ID
             value: java-kafka-consumer
-          - name: STRIMZI_ LOG_LEVEL
+          - name: STRIMZI_LOG_LEVEL
             value: "INFO"
           - name: STRIMZI_MESSAGE_COUNT
             value: "1000000"
