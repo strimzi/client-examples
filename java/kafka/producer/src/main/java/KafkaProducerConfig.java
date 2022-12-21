@@ -210,23 +210,23 @@ public class KafkaProducerConfig {
     @Override
     public String toString() {
         return "KafkaProducerConfig{" +
-                "bootstrapServers='" + bootstrapServers + '\'' +
-                ", topic='" + topic + '\'' +
-                ", delay=" + delay +
-                ", messageCount=" + messageCount +
-                ", message='" + message + '\'' +
-                ", acks='" + acks + '\'' +
-                ", headers='" + headers + '\'' +
-                ", sslTruststoreCertificates='" + sslTruststoreCertificates + '\'' +
-                ", sslKeystoreKey='" + sslKeystoreKey + '\'' +
-                ", sslKeystoreCertificateChain='" + sslKeystoreCertificateChain + '\'' +
-                ", oauthClientId='" + oauthClientId + '\'' +
-                ", oauthClientSecret='" + oauthClientSecret + '\'' +
-                ", oauthAccessToken='" + oauthAccessToken + '\'' +
-                ", oauthRefreshToken='" + oauthRefreshToken + '\'' +
-                ", oauthTokenEndpointUri='" + oauthTokenEndpointUri + '\'' +
-                ", additionalConfig='" + additionalConfig + '\'' +
-                ", tracingSystem='" + tracingSystem + '\'' +
-                '}';
+            "bootstrapServers='" + bootstrapServers + '\'' +
+            ", topic='" + topic + '\'' +
+            ", delay=" + delay +
+            ", messageCount=" + messageCount +
+            ", message='" + message + '\'' +
+            ", acks='" + acks + '\'' +
+            ", headers='" + headers + '\'' +
+            ", sslTruststoreCertificates='" + sslTruststoreCertificates + '\'' +
+            ", sslKeystoreKey='" + sslKeystoreKey + '\'' +
+            ", sslKeystoreCertificateChain='" + sslKeystoreCertificateChain + '\'' +
+            ", oauthClientId='" + oauthClientId + '\'' +
+            ", oauthClientSecret='" + oauthClientSecret + '\'' +
+            ", oauthAccessToken='" + oauthAccessToken + '\'' +
+            ", oauthRefreshToken='" + oauthRefreshToken + '\'' +
+            ", oauthTokenEndpointUri='" + oauthTokenEndpointUri + '\'' +
+            ", additionalConfig='" + additionalConfig + '\'' +
+            ", tracingSystem='" + tracingSystem + '\'' +
+            '}';
     }
 }

@@ -218,28 +218,28 @@ spec:
       - name: java-kafka-consumer
         image: quay.io/strimzi-examples/java-kafka-consumer:latest
         env:
-          - name: CA_CRT
+          - name: KAFKA_TRUSTSTORE_CERTIFICATE
             valueFrom:
               secretKeyRef:
                 name: my-cluster-cluster-ca-cert
                 key: ca.crt
-          - name: USER_CRT
+          - name: KAFKA_KEYSTORE_CERTIFICATE_CHAIN
             valueFrom:
               secretKeyRef:
                 name: java-kafka-consumer
                 key: user.crt
-          - name: USER_KEY
+          - name: KAFKA_KEYSTORE_CERTIFICATE_CHAIN
             valueFrom:
               secretKeyRef:
                 name: java-kafka-consumer
                 key: user.key
-          - name: BOOTSTRAP_SERVERS
+          - name: KAFKA_BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9093
-          - name: TOPIC
+          - name: STRIMZI_TOPIC
             value: my-topic-reversed
-          - name: GROUP_ID
+          - name: STRIMZI_GROUP_ID
             value: java-kafka-consumer
-          - name: LOG_LEVEL
+          - name: STRIMZI_LOG_LEVEL
             value: "INFO"
-          - name: MESSAGE_COUNT
+          - name: STRIMZI_MESSAGE_COUNT
             value: "1000000"

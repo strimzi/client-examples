@@ -46,8 +46,8 @@ public class KafkaStreamsExample {
                 KafkaClientSupplier supplier = new TracingKafkaClientSupplier();
                 streams = new KafkaStreams(builder.build(), props, supplier);
             } else {
-                throw new RuntimeException("Error: TRACING_SYSTEM " + tracingSystem + " is not recognized or supported!");
-            }
+                log.error("Error: TRACING_SYSTEM {} is not recognized or supported!", config.getTracingSystem());
+                streams = new KafkaStreams(builder.build(), props);   }
         } else {
             streams = new KafkaStreams(builder.build(), props);
         }

@@ -3,7 +3,7 @@ kind: KafkaTopic
 metadata:
   name: my-topic
   labels:
-      strimzi.io/cluster: my-cluster
+    strimzi.io/cluster: my-cluster
 spec:
   replicas: 3
   partitions: 12
@@ -35,29 +35,29 @@ spec:
         app: java-kafka-producer
     spec:
       containers:
-      - name: java-kafka-producer
-        image: quay.io/strimzi-examples/java-kafka-producer:latest
-        env:
-          - name: BOOTSTRAP_SERVERS
-            value: my-cluster-kafka-bootstrap:9092
-          - name: TOPIC
-            value: my-topic
-          - name: DELAY_MS
-            value: "1000"
-          - name: LOG_LEVEL
-            value: "INFO"
-          - name: MESSAGE_COUNT
-            value: "1000000"
-          - name: JAEGER_SERVICE_NAME
-            value: java-kafka-producer
-          - name: JAEGER_AGENT_HOST
-            value: my-jaeger-agent
-          - name: JAEGER_SAMPLER_TYPE
-            value: const
-          - name: JAEGER_SAMPLER_PARAM
-            value: "1"
-          - name: TRACING_SYSTEM
-            value: jaeger
+        - name: java-kafka-producer
+          image: quay.io/strimzi-examples/java-kafka-producer:latest
+          env:
+            - name: BOOTSTRAP_SERVERS
+              value: my-cluster-kafka-bootstrap:9092
+            - name: TOPIC
+              value: my-topic
+            - name: DELAY_MS
+              value: "1000"
+            - name: LOG_LEVEL
+              value: "INFO"
+            - name: MESSAGE_COUNT
+              value: "1000000"
+            - name: JAEGER_SERVICE_NAME
+              value: java-kafka-producer
+            - name: JAEGER_AGENT_HOST
+              value: my-jaeger-agent
+            - name: JAEGER_SAMPLER_TYPE
+              value: const
+            - name: JAEGER_SAMPLER_PARAM
+              value: "1"
+            - name: TRACING_SYSTEM
+              value: jaeger
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -79,15 +79,15 @@ spec:
         - name: java-kafka-consumer
           image: quay.io/strimzi-examples/java-kafka-consumer:latest
           env:
-            - name: BOOTSTRAP_SERVERS
+            - name: KAFKA_BOOTSTRAP_SERVERS
               value: my-cluster-kafka-bootstrap:9092
-            - name: TOPIC
+            - name: STRIMZI_TOPIC
               value: my-topic-reversed
-            - name: GROUP_ID
+            - name: KAFKA_GROUP_ID
               value: java-kafka-consumer
-            - name: LOG_LEVEL
+            - name: STRIMZI_LOG_LEVEL
               value: "INFO"
-            - name: MESSAGE_COUNT
+            - name: STRIMZI_MESSAGE_COUNT
               value: "1000000"
             - name: JAEGER_SERVICE_NAME
               value: java-kafka-consumer
