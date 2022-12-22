@@ -36,7 +36,7 @@ public class KafkaConsumerConfig {
         return new KafkaConsumerConfig(topic, messageCount, tracingSystem, properties);
     }
 
-    public static String convertEnvVarToPropertyKey(String envVar) {
+    private static String convertEnvVarToPropertyKey(String envVar) {
         return envVar.substring(envVar.indexOf("_") + 1).toLowerCase().replace("_", ".");
     }
 

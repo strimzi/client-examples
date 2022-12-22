@@ -56,11 +56,7 @@ To run the OAuth example, you will need to have your Kafka cluster configured wi
 
 ## Configuration
 
-Although this Hello World is simple example it is fully configurable.
-Below are listed and described environment variables. 
-Regarding Consumer Only (until later updates): below are listed and described environment variables that are NOT Kafka-specific but must be used. 
-These environment variables should be prefixed with `STRIMZI_`, e.g. `STRIMZI_TOPIC`. 
-Any Kafka configuration option can be given as an environment variable and should be prefixed with `KAFKA_` using `_` instead of `.` , e.g. `bootstrap.servers` -> `KAFKA_BOOTSTRAP_SERVERS`.
+Below are listed and described the available environment variables that can be used for configuration.
 
 Producer  
 * `BOOTSTRAP_SERVERS` - comma-separated host and port pairs that is a list of Kafka broker addresses. The form of pair is `host:port`, e.g. `my-cluster-kafka-bootstrap:9092` 
@@ -83,6 +79,10 @@ Consumer
 * `STRIMZI_MESSAGE_COUNT` - the number of messages the consumer should receive
 * `STRIMZI_LOG_LEVEL` - logging level  
 * `STRIMZI_TRACING_SYSTEM` - if it's set to `jaeger` or `opentelemetry`, this will enable tracing.
+
+Additionally, any Kafka Consumer API configuration option can be passed as an environmental variable.
+It should be prefixed with `KAFKA_` and use `_` instead of `.`.
+For example environment variable `KAFKA_BOOTSTRAP_SERVERS` will be used as the `bootstrap.servers` configuration option in the Kafka Consumer API.
 
 Streams  
 * `BOOTSTRAP_SERVERS` - comma-separated host and port pairs that is a list of Kafka broker addresses. The form of pair is `host:port`, e.g. `my-cluster-kafka-bootstrap:9092`
