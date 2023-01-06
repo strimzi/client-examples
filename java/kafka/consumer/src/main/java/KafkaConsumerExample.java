@@ -15,6 +15,8 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
 
+import static org.apache.kafka.clients.consumer.ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG;
+
 public class KafkaConsumerExample {
     private static final Logger log = LogManager.getLogger(KafkaConsumerExample.class);
 
@@ -23,7 +25,7 @@ public class KafkaConsumerExample {
 
         log.info(KafkaConsumerConfig.class.getName() + ": {}", config.toString());
 
-        Properties props = KafkaConsumerConfig.createProperties(config);
+        Properties props = config.getProperties();
         int receivedMsgs = 0;
 
         TracingSystem tracingSystem = config.getTracingSystem();
@@ -41,7 +43,7 @@ public class KafkaConsumerExample {
             }
         }
 
-        boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
+        boolean commit = !Boolean.parseBoolean(props.getProperty(ENABLE_AUTO_COMMIT_CONFIG));
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
         consumer.subscribe(Collections.singletonList(config.getTopic()));
 
