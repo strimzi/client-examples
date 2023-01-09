@@ -247,7 +247,7 @@ spec:
               value: java-kafka-consumer
             - name: STRIMZI_LOG_LEVEL
               value: "INFO"
-            - name: STRIMZI_MESSAGE_COUqNT
+            - name: STRIMZI_MESSAGE_COUNT
               value: "1000000"
             - name: KAFKA_KEY_DESERIALIZER
               value: "org.apache.kafka.common.serialization.StringDeserializer"
