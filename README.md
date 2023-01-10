@@ -80,7 +80,7 @@ Consumer
 * `STRIMZI_LOG_LEVEL` - logging level  
 * `STRIMZI_TRACING_SYSTEM` - if it's set to `jaeger` or `opentelemetry`, this will enable tracing.
 
-Additionally, any Kafka Consumer API configuration option can be passed as an environmental variable.
+Additionally, any Kafka Consumer API configuration option can be passed as an environment variable.
 It should be prefixed with `KAFKA_` and use `_` instead of `.`.
 For example environment variable `KAFKA_BOOTSTRAP_SERVERS` will be used as the `bootstrap.servers` configuration option in the Kafka Consumer API.
 
