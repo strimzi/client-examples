@@ -215,31 +215,41 @@ spec:
         app: java-kafka-consumer
     spec:
       containers:
-      - name: java-kafka-consumer
-        image: quay.io/strimzi-examples/java-kafka-consumer:latest
-        env:
-          - name: CA_CRT
-            valueFrom:
-              secretKeyRef:
-                name: my-cluster-cluster-ca-cert
-                key: ca.crt
-          - name: USER_CRT
-            valueFrom:
-              secretKeyRef:
-                name: java-kafka-consumer
-                key: user.crt
-          - name: USER_KEY
-            valueFrom:
-              secretKeyRef:
-                name: java-kafka-consumer
-                key: user.key
-          - name: BOOTSTRAP_SERVERS
-            value: my-cluster-kafka-bootstrap:9093
-          - name: TOPIC
-            value: my-topic-reversed
-          - name: GROUP_ID
-            value: java-kafka-consumer
-          - name: LOG_LEVEL
-            value: "INFO"
-          - name: MESSAGE_COUNT
-            value: "1000000"
+        - name: java-kafka-consumer
+          image: quay.io/strimzi-examples/java-kafka-consumer:latest
+          env:
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: SSL
+            - name: KAFKA_SSL_TRUSTSTORE_CERTIFICATES
+              valueFrom:
+                secretKeyRef:
+                  name: my-cluster-cluster-ca-cert
+                  key: ca.crt
+            - name: KAFKA_SSL_TRUSTSTORE_TYPE
+              value: PEM
+            - name: KAFKA_SSL_KEYSTORE_CERTIFICATE_CHAIN
+              valueFrom:
+                secretKeyRef:
+                  name: java-kafka-consumer
+                  key: user.crt
+            - name: KAFKA_SSL_KEYSTORE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: java-kafka-consumer
+                  key: user.key
+            - name: KAFKA_SSL_KEYSTORE_TYPE
+              value: PEM
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: my-cluster-kafka-bootstrap:9093
+            - name: STRIMZI_TOPIC
+              value: my-topic-reversed
+            - name: KAFKA_GROUP_ID
+              value: java-kafka-consumer
+            - name: STRIMZI_LOG_LEVEL
+              value: "INFO"
+            - name: STRIMZI_MESSAGE_COUNT
+              value: "1000000"
+            - name: KAFKA_KEY_DESERIALIZER
+              value: "org.apache.kafka.common.serialization.StringDeserializer"
+            - name: KAFKA_VALUE_DESERIALIZER
+              value: "org.apache.kafka.common.serialization.StringDeserializer"

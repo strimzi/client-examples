@@ -238,28 +238,32 @@ spec:
         - name: java-kafka-consumer
           image: quay.io/strimzi-examples/java-kafka-consumer:latest
           env:
-            - name: BOOTSTRAP_SERVERS
+            - name: KAFKA_BOOTSTRAP_SERVERS
               value: my-cluster-kafka-bootstrap:9092
-            - name: TOPIC
+            - name: STRIMZI_TOPIC
               value: my-topic-reversed
-            - name: GROUP_ID
+            - name: KAFKA_GROUP_ID
               value: java-kafka-consumer
-            - name: LOG_LEVEL
+            - name: STRIMZI_LOG_LEVEL
               value: "INFO"
-            - name: MESSAGE_COUNT
+            - name: STRIMZI_MESSAGE_COUNT
               value: "1000000"
-            - name: OAUTH_CLIENT_ID
+            - name: KAFKA_KEY_DESERIALIZER
+              value: "org.apache.kafka.common.serialization.StringDeserializer"
+            - name: KAFKA_VALUE_DESERIALIZER
+              value: "org.apache.kafka.common.serialization.StringDeserializer"
+            - name: KAFKA_OAUTH_CLIENT_ID
               value: java-kafka-consumer
-            - name: OAUTH_CLIENT_SECRET
+            - name: KAFKA_OAUTH_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: java-kafka-consumer-oauth
                   key: clientSecret
             - name: OAUTH_TOKEN_ENDPOINT_URI
               value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
-            - name: OAUTH_SSL_TRUSTSTORE_TYPE
+            - name: KAFKA_OAUTH_SSL_TRUSTSTORE_TYPE
               value: PEM
-            - name: OAUTH_SSL_TRUSTSTORE_CERTIFICATES
+            - name: KAFKA_OAUTH_SSL_TRUSTSTORE_CERTIFICATES
               valueFrom:
                 secretKeyRef:
                   name: sso-x509-https-secret
