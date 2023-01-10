@@ -56,4 +56,14 @@ public class KafkaConsumerConfig {
     public Properties getProperties() {
         return properties;
     }
+
+    @Override
+    public String toString() {
+        return "KafkaConsumerConfig{" +
+            ", topic='" + topic + '\'' +
+            ", messageCount=" + messageCount +
+            ", tracingSystem='" + tracingSystem + '\'' +
+            ", properties ='" + properties + '\'' +
+            '}';
+    }
 }
