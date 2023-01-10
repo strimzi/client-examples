@@ -19,7 +19,7 @@ spec:
         image: quay.io/strimzi-examples/java-kafka-streams:latest
         env:
           - name: BOOTSTRAP_SERVERS
-            value: my-source-cluster-kafka-bootstrap:9092
+            value: my-cluster-kafka-bootstrap:9092
           - name: APPLICATION_ID
             value: java-kafka-streams
           - name: SOURCE_TOPIC
