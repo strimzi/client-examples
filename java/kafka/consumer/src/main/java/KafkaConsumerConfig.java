@@ -6,7 +6,6 @@
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 
 public class KafkaConsumerConfig {
     private static final long DEFAULT_MESSAGES_COUNT = 10;
