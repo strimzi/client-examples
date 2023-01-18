@@ -38,21 +38,29 @@ spec:
       - name: java-kafka-producer
         image: quay.io/strimzi-examples/java-kafka-producer:latest
         env:
-          - name: CA_CRT
+          - name: KAFKA_SSL_TRUSTSTORE_CERTIFICATES
             valueFrom:
               secretKeyRef:
                 name: my-cluster-cluster-ca-cert
                 key: ca.crt
-          - name: BOOTSTRAP_SERVERS
+          - name: KAFKA_SECURITY_PROTOCOL
+            value: SSL
+          - name: KAFKA_SSL_TRUSTSTORE_TYPE
+            value: PEM
+          - name: KAFKA_BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9093
-          - name: TOPIC
+          - name: STRIMZI_TOPIC
             value: my-topic
-          - name: DELAY_MS
+          - name: STRIMZI_DELAY_MS
             value: "1000"
-          - name: LOG_LEVEL
+          - name: STRIMZI_LOG_LEVEL
             value: "INFO"
-          - name: MESSAGE_COUNT
+          - name: STRIMZI_MESSAGE_COUNT
             value: "1000000"
+          - name: KAFKA_KEY_SERIALIZER
+            value: "org.apache.kafka.common.serialization.StringSerializer"
+          - name: KAFKA_VALUE_SERIALIZER
+            value: "org.apache.kafka.common.serialization.StringSerializer"
 ---
 apiVersion: apps/v1
 kind: Deployment
