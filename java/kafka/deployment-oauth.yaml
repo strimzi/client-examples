@@ -69,16 +69,20 @@ spec:
       - name: java-kafka-producer
         image: quay.io/strimzi-examples/java-kafka-producer:latest
         env:
-          - name: BOOTSTRAP_SERVERS
+          - name: KAFKA_BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9092
-          - name: TOPIC
+          - name: STRIMZI_TOPIC
             value: my-topic
-          - name: DELAY_MS
+          - name: STRIMZI_DELAY_MS
             value: "1000"
-          - name: LOG_LEVEL
+          - name: STRIMZI_LOG_LEVEL
             value: "INFO"
-          - name: MESSAGE_COUNT
+          - name: STRIMZI_MESSAGE_COUNT
             value: "1000000"
+          - name: KAFKA_KEY_SERIALIZER
+            value: "org.apache.kafka.common.serialization.StringSerializer"
+          - name: KAFKA_VALUE_SERIALIZER
+            value: "org.apache.kafka.common.serialization.StringSerializer"
           - name: OAUTH_CLIENT_ID
             value: java-kafka-producer
           - name: OAUTH_CLIENT_SECRET

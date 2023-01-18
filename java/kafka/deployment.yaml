@@ -38,16 +38,20 @@ spec:
       - name: java-kafka-producer
         image: quay.io/strimzi-examples/java-kafka-producer:latest
         env:
-          - name: BOOTSTRAP_SERVERS
+          - name: KAFKA_BOOTSTRAP_SERVERS
             value: my-cluster-kafka-bootstrap:9092
-          - name: TOPIC
+          - name: STRIMZI_TOPIC
             value: my-topic
-          - name: DELAY_MS
+          - name: STRIMZI_DELAY_MS
             value: "1000"
-          - name: LOG_LEVEL
+          - name: STRIMZI_LOG_LEVEL
             value: "INFO"
-          - name: MESSAGE_COUNT
+          - name: STRIMZI_MESSAGE_COUNT
             value: "1000000"
+          - name: KAFKA_KEY_SERIALIZER
+            value: "org.apache.kafka.common.serialization.StringSerializer"
+          - name: KAFKA_VALUE_SERIALIZER
+            value: "org.apache.kafka.common.serialization.StringSerializer"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -66,19 +70,19 @@ spec:
         app: java-kafka-streams
     spec:
       containers:
-        - name: java-kafka-streams
-          image: quay.io/strimzi-examples/java-kafka-streams:latest
-          env:
-            - name: BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9092
-            - name: APPLICATION_ID
-              value: java-kafka-streams
-            - name: SOURCE_TOPIC
-              value: my-topic
-            - name: TARGET_TOPIC
-              value: my-topic-reversed
-            - name: LOG_LEVEL
-              value: "INFO"
+      - name: java-kafka-streams
+        image: quay.io/strimzi-examples/java-kafka-streams:latest
+        env:
+          - name: BOOTSTRAP_SERVERS
+            value: my-cluster-kafka-bootstrap:9092
+          - name: APPLICATION_ID
+            value: java-kafka-streams
+          - name: SOURCE_TOPIC
+            value: my-topic
+          - name: TARGET_TOPIC
+            value: my-topic-reversed
+          - name: LOG_LEVEL
+            value: "INFO"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -97,20 +101,20 @@ spec:
         app: java-kafka-consumer
     spec:
       containers:
-        - name: java-kafka-consumer
-          image: quay.io/strimzi-examples/java-kafka-consumer:latest
-          env:
-            - name: KAFKA_BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9092
-            - name: STRIMZI_TOPIC
-              value: my-topic-reversed
-            - name: KAFKA_GROUP_ID
-              value: java-kafka-consumer
-            - name: STRIMZI_LOG_LEVEL
-              value: "INFO"
-            - name: STRIMZI_MESSAGE_COUNT
-              value: "1000000"
-            - name: KAFKA_KEY_DESERIALIZER
-              value: "org.apache.kafka.common.serialization.StringDeserializer"
-            - name: KAFKA_VALUE_DESERIALIZER
-              value: "org.apache.kafka.common.serialization.StringDeserializer"
+      - name: java-kafka-consumer
+        image: quay.io/strimzi-examples/java-kafka-consumer:latest
+        env:
+          - name: KAFKA_BOOTSTRAP_SERVERS
+            value: my-cluster-kafka-bootstrap:9092
+          - name: STRIMZI_TOPIC
+            value: my-topic-reversed
+          - name: KAFKA_GROUP_ID
+            value: java-kafka-consumer
+          - name: STRIMZI_LOG_LEVEL
+            value: "INFO"
+          - name: STRIMZI_MESSAGE_COUNT
+            value: "1000000"
+          - name: KAFKA_KEY_DESERIALIZER
+            value: "org.apache.kafka.common.serialization.StringDeserializer"
+          - name: KAFKA_VALUE_DESERIALIZER
+            value: "org.apache.kafka.common.serialization.StringDeserializer"

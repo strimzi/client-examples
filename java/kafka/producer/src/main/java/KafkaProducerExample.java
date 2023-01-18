@@ -19,6 +19,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static org.apache.kafka.clients.producer.ProducerConfig.TRANSACTIONAL_ID_CONFIG;
+
+
 public class KafkaProducerExample {
     private static final Logger log = LogManager.getLogger(KafkaProducerExample.class);
 
@@ -27,13 +30,13 @@ public class KafkaProducerExample {
 
         log.info(KafkaProducerConfig.class.getName() + ": {}", config.toString());
 
-        Properties props = KafkaProducerConfig.createProperties(config);
+        Properties props = config.getProperties();
         List<Header> headers = null;
 
         TracingSystem tracingSystem = config.getTracingSystem();
         if (tracingSystem != TracingSystem.NONE) {
             if (tracingSystem == TracingSystem.JAEGER) {
-               TracingInitializer.jaegerInitialize();
+                TracingInitializer.jaegerInitialize();
 
                 props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentracing.contrib.kafka.TracingProducerInterceptor.class.getName());
             } else if (tracingSystem == TracingSystem.OPENTELEMETRY) {
@@ -57,8 +60,9 @@ public class KafkaProducerExample {
         KafkaProducer<String, String> producer = new KafkaProducer<>(props);
         log.info("Sending {} messages ...", config.getMessageCount());
 
+        // Address
         boolean blockProducer = System.getenv("BLOCKING_PRODUCER") != null;
-        boolean transactionalProducer = config.getAdditionalConfig().contains("transactional.id");
+        boolean transactionalProducer = Boolean.parseBoolean(props.getProperty(TRANSACTIONAL_ID_CONFIG));
         int msgPerTx = Integer.parseInt(System.getenv().getOrDefault("MESSAGES_PER_TRANSACTION", "10"));
         if(transactionalProducer) {
             log.info("Using transactional producer. Initializing the transactions ...");
@@ -81,14 +85,13 @@ public class KafkaProducerExample {
                     log.warn("Message {} wasn't sent properly!", i, e.getCause());
                 }
             } else {
-                // Increment number of sent messages for non-blocking producer
+                // Increment number of sent messages for non blocking producer
                 numSent.incrementAndGet();
             }
             if (transactionalProducer && ((i + 1) % msgPerTx == 0)) {
                 log.info("Committing the transaction. Messages sent: {}", i);
                 producer.commitTransaction();
             }
-
             Thread.sleep(config.getDelay());
         }
 
