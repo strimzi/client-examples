@@ -93,7 +93,7 @@ spec:
                   name: java-kafka-producer
                   key: secret
             - name: OAUTH_TOKEN_ENDPOINT_URI
-              value: https://keycloak:8443/auth/realms/kafka-authz/protocol/openid-connect/token
+              value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
             - name: OAUTH_SSL_TRUSTSTORE_TYPE
               value: PEM
             - name: OAUTH_SSL_TRUSTSTORE_CERTIFICATES
