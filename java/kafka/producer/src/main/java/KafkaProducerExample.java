@@ -19,8 +19,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.apache.kafka.clients.producer.ProducerConfig.TRANSACTIONAL_ID_CONFIG;
-
 public class KafkaProducerExample {
     private static final Logger log = LogManager.getLogger(KafkaProducerExample.class);
 
@@ -43,7 +41,7 @@ public class KafkaProducerExample {
 
                 props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentelemetry.instrumentation.kafkaclients.TracingProducerInterceptor.class.getName());
             } else {
-                log.error("Error: TRACING_SYSTEM {} is not recognized or supported!", config.getTracingSystem());
+                log.error("Error: STRIMZI_TRACING_SYSTEM {} is not recognized or supported!", config.getTracingSystem());
             }
         }
 
@@ -57,10 +55,9 @@ public class KafkaProducerExample {
         }
 
         KafkaProducer<String, String> producer = new KafkaProducer<>(props);
-        log.info("Sending {} messages ...", config.getMessageCount());
 
         boolean blockProducer = System.getenv("BLOCKING_PRODUCER") != null;
-        boolean transactionalProducer = Boolean.parseBoolean(props.getProperty(TRANSACTIONAL_ID_CONFIG));
+        boolean transactionalProducer = System.getenv("KAFKA_TRANSACTIONAL_ID") != null;
         int msgPerTx = Integer.parseInt(System.getenv().getOrDefault("MESSAGES_PER_TRANSACTION", "10"));
         if(transactionalProducer) {
             log.info("Using transactional producer. Initializing the transactions ...");

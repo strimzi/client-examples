@@ -60,7 +60,7 @@ spec:
               value: none
             - name: OTEL_EXPORTER_JAEGER_ENDPOINT
               value: http://my-jaeger-collector:14250
-            - name: TRACING_SYSTEM
+            - name: STRIMZI_TRACING_SYSTEM
               value: opentelemetry
 ---
 apiVersion: apps/v1
@@ -146,5 +146,5 @@ spec:
               value: none
             - name: OTEL_EXPORTER_JAEGER_ENDPOINT
               value: http://my-jaeger-collector:14250
-            - name: TRACING_SYSTEM
+            - name: STRIMZI_TRACING_SYSTEM
               value: opentelemetry

@@ -28,7 +28,7 @@ spec:
             value: "INFO"
           - name: STRIMZI_MESSAGE_COUNT
             value: "1000000"
-          - name: STRIMZI_PRODUCER_ACKS
+          - name: KAFKA_ACKS
             value: "all"
           - name: KAFKA_KEY_SERIALIZER
             value: "org.apache.kafka.common.serialization.StringSerializer"

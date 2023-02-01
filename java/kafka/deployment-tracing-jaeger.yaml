@@ -60,7 +60,7 @@ spec:
             value: const
           - name: JAEGER_SAMPLER_PARAM
             value: "1"
-          - name: TRACING_SYSTEM
+          - name: STRIMZI_TRACING_SYSTEM
             value: jaeger
 ---
 apiVersion: apps/v1
@@ -101,7 +101,7 @@ spec:
               value: const
             - name: JAEGER_SAMPLER_PARAM
               value: "1"
-            - name: TRACING_SYSTEM
+            - name: STRIMZI_TRACING_SYSTEM
               value: jaeger
             - name: KAFKA_KEY_DESERIALIZER
               value: "org.apache.kafka.common.serialization.StringDeserializer"
