@@ -60,44 +60,44 @@ spec:
         app: java-kafka-producer
     spec:
       containers:
-      - name: java-kafka-producer
-        image: quay.io/strimzi-examples/java-kafka-producer:latest
-        env:
-          - name: KAFKA_SECURITY_PROTOCOL
-            value: SSL
-          - name: KAFKA_SSL_TRUSTSTORE_CERTIFICATES
-            valueFrom:
-              secretKeyRef:
-                name: my-cluster-cluster-ca-cert
-                key: ca.crt
-          - name: KAFKA_SSL_TRUSTSTORE_TYPE
-            value: PEM
-          - name: KAFKA_SSL_KEYSTORE_CERTIFICATE_CHAIN
-            valueFrom:
-              secretKeyRef:
-                name: java-kafka-producer
-                key: user.crt
-          - name: KAFKA_SSL_KEYSTORE_KEY
-            valueFrom:
-              secretKeyRef:
-                name: java-kafka-producer
-                key: user.key
-          - name: KAFKA_SSL_KEYSTORE_TYPE
-            value: PEM
-          - name: KAFKA_BOOTSTRAP_SERVERS
-            value: my-cluster-kafka-bootstrap:9093
-          - name: STRIMZI_TOPIC
-            value: my-topic
-          - name: STRIMZI_DELAY_MS
-            value: "1000"
-          - name: STRIMZI_LOG_LEVEL
-            value: "INFO"
-          - name: STRIMZI_MESSAGE_COUNT
-            value: "1000000"
-          - name: KAFKA_KEY_SERIALIZER
-            value: "org.apache.kafka.common.serialization.StringSerializer"
-          - name: KAFKA_VALUE_SERIALIZER
-            value: "org.apache.kafka.common.serialization.StringSerializer"
+        - name: java-kafka-producer
+          image: quay.io/strimzi-examples/java-kafka-producer:latest
+          env:
+            - name: STRIMZI_TOPIC
+              value: my-topic
+            - name: STRIMZI_DELAY_MS
+              value: "1000"
+            - name: STRIMZI_LOG_LEVEL
+              value: "INFO"
+            - name: STRIMZI_MESSAGE_COUNT
+              value: "1000000"
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: my-cluster-kafka-bootstrap:9093
+            - name: KAFKA_KEY_SERIALIZER
+              value: "org.apache.kafka.common.serialization.StringSerializer"
+            - name: KAFKA_VALUE_SERIALIZER
+              value: "org.apache.kafka.common.serialization.StringSerializer"
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: SSL
+            - name: KAFKA_SSL_TRUSTSTORE_CERTIFICATES
+              valueFrom:
+                secretKeyRef:
+                  name: my-cluster-cluster-ca-cert
+                  key: ca.crt
+            - name: KAFKA_SSL_TRUSTSTORE_TYPE
+              value: PEM
+            - name: KAFKA_SSL_KEYSTORE_CERTIFICATE_CHAIN
+              valueFrom:
+                secretKeyRef:
+                  name: java-kafka-producer
+                  key: user.crt
+            - name: KAFKA_SSL_KEYSTORE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: java-kafka-producer
+                  key: user.key
+            - name: KAFKA_SSL_KEYSTORE_TYPE
+              value: PEM
 ---
 apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaUser

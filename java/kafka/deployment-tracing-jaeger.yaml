@@ -35,33 +35,33 @@ spec:
         app: java-kafka-producer
     spec:
       containers:
-      - name: java-kafka-producer
-        image: quay.io/strimzi-examples/java-kafka-producer:latest
-        env:
-          - name: KAFKA_BOOTSTRAP_SERVERS
-            value: my-cluster-kafka-bootstrap:9092
-          - name: STRIMZI_TOPIC
-            value: my-topic
-          - name: STRIMZI_DELAY_MS
-            value: "1000"
-          - name: STRIMZI_LOG_LEVEL
-            value: "INFO"
-          - name: STRIMZI_MESSAGE_COUNT
-            value: "1000000"
-          - name: KAFKA_KEY_SERIALIZER
-            value: "org.apache.kafka.common.serialization.StringSerializer"
-          - name: KAFKA_VALUE_SERIALIZER
-            value: "org.apache.kafka.common.serialization.StringSerializer"
-          - name: JAEGER_SERVICE_NAME
-            value: java-kafka-producer
-          - name: JAEGER_AGENT_HOST
-            value: my-jaeger-agent
-          - name: JAEGER_SAMPLER_TYPE
-            value: const
-          - name: JAEGER_SAMPLER_PARAM
-            value: "1"
-          - name: STRIMZI_TRACING_SYSTEM
-            value: jaeger
+        - name: java-kafka-producer
+          image: quay.io/strimzi-examples/java-kafka-producer:latest
+          env:
+            - name: STRIMZI_TOPIC
+              value: my-topic
+            - name: STRIMZI_DELAY_MS
+              value: "1000"
+            - name: STRIMZI_LOG_LEVEL
+              value: "INFO"
+            - name: STRIMZI_MESSAGE_COUNT
+              value: "1000000"
+            - name: STRIMZI_TRACING_SYSTEM
+              value: jaeger
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: my-cluster-kafka-bootstrap:9092
+            - name: KAFKA_KEY_SERIALIZER
+              value: "org.apache.kafka.common.serialization.StringSerializer"
+            - name: KAFKA_VALUE_SERIALIZER
+              value: "org.apache.kafka.common.serialization.StringSerializer"
+            - name: JAEGER_SERVICE_NAME
+              value: java-kafka-producer
+            - name: JAEGER_AGENT_HOST
+              value: my-jaeger-agent
+            - name: JAEGER_SAMPLER_TYPE
+              value: const
+            - name: JAEGER_SAMPLER_PARAM
+              value: "1"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -83,16 +83,22 @@ spec:
         - name: java-kafka-consumer
           image: quay.io/strimzi-examples/java-kafka-consumer:latest
           env:
-            - name: KAFKA_BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9092
-            - name: STRIMZI_TOPIC
-              value: my-topic-reversed
-            - name: KAFKA_GROUP_ID
-              value: java-kafka-consumer
             - name: STRIMZI_LOG_LEVEL
               value: "INFO"
             - name: STRIMZI_MESSAGE_COUNT
               value: "1000000"
+            - name: STRIMZI_TOPIC
+              value: my-topic-reversed
+            - name: STRIMZI_TRACING_SYSTEM
+              value: jaeger
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: my-cluster-kafka-bootstrap:9092
+            - name: KAFKA_GROUP_ID
+              value: java-kafka-consumer
+            - name: KAFKA_KEY_DESERIALIZER
+              value: "org.apache.kafka.common.serialization.StringDeserializer"
+            - name: KAFKA_VALUE_DESERIALIZER
+              value: "org.apache.kafka.common.serialization.StringDeserializer"
             - name: JAEGER_SERVICE_NAME
               value: java-kafka-consumer
             - name: JAEGER_AGENT_HOST
@@ -101,9 +107,3 @@ spec:
               value: const
             - name: JAEGER_SAMPLER_PARAM
               value: "1"
-            - name: STRIMZI_TRACING_SYSTEM
-              value: jaeger
-            - name: KAFKA_KEY_DESERIALIZER
-              value: "org.apache.kafka.common.serialization.StringDeserializer"
-            - name: KAFKA_VALUE_DESERIALIZER
-              value: "org.apache.kafka.common.serialization.StringDeserializer"
