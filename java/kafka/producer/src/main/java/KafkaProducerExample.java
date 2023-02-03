@@ -56,38 +56,12 @@ public class KafkaProducerExample {
 
         KafkaProducer<String, String> producer = new KafkaProducer<>(props);
 
-        boolean blockProducer = System.getenv("BLOCKING_PRODUCER") != null;
-        boolean transactionalProducer = System.getenv("KAFKA_TRANSACTIONAL_ID") != null;
-        int msgPerTx = Integer.parseInt(System.getenv().getOrDefault("MESSAGES_PER_TRANSACTION", "10"));
-        if(transactionalProducer) {
-            log.info("Using transactional producer. Initializing the transactions ...");
-            producer.initTransactions();
-        }
         AtomicLong numSent = new AtomicLong(0);
         for (long i = 0; i < config.getMessageCount(); i++) {
-            if (transactionalProducer && i % msgPerTx == 0) {
-                log.info("Beginning new transaction. Messages sent: {}", i);
-                producer.beginTransaction();
-            }
-            log.info("Sending messages \"" + config.getMessage() + " - {}\"{}", i, config.getHeaders() == null ? "" : " - with headers - " + config.getHeaders());
-            Future<RecordMetadata> recordMetadataFuture = producer.send(new ProducerRecord<>(config.getTopic(), null, null, null, "\"" + config.getMessage() + " - " + i + "\"", headers));
-            if(blockProducer) {
-                try {
-                    recordMetadataFuture.get();
-                    // Increment number of sent messages only if ack is received by producer
-                    numSent.incrementAndGet();
-                } catch (ExecutionException e) {
-                    log.warn("Message {} wasn't sent properly!", i, e.getCause());
-                }
-            } else {
-                // Increment number of sent messages for non-blocking producer
-                numSent.incrementAndGet();
-            }
-            if (transactionalProducer && ((i + 1) % msgPerTx == 0)) {
-                log.info("Committing the transaction. Messages sent: {}", i);
-                producer.commitTransaction();
-            }
 
+            log.info("Sending messages \"" + config.getMessage() + " - {}\"{}", i, config.getHeaders() == null ? "" : " - with headers - " + config.getHeaders());
+            producer.send(new ProducerRecord<>(config.getTopic(), null, null, null, "\"" + config.getMessage() + " - " + i + "\"", headers));
+            numSent.incrementAndGet();
             Thread.sleep(config.getDelay());
         }
 
