@@ -2,6 +2,7 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
+
 public class HttpProducerConfig {
 
     private static final String DEFAULT_HOSTNAME = "localhost";
@@ -15,18 +16,15 @@ public class HttpProducerConfig {
     private final long messageCount;
     private final int delay;
     private final String message;
-    private final String headers;
 
-
-    private HttpProducerConfig(String hostName, int port, String topic, Long messageCount,
-                               int delay, String message, String headers) {
+    private HttpProducerConfig(String hostName, int port, String topic,
+                               Long messageCount, int delay, String message) {
         this.hostName = hostName;
         this.port = port;
         this.topic = topic;
         this.messageCount = messageCount;
         this.delay = delay;
         this.message = message;
-        this.headers = headers;
     }
 
     public static HttpProducerConfig fromEnv() {
@@ -36,8 +34,7 @@ public class HttpProducerConfig {
         Long messageCount = System.getenv("STRIMZI_MESSAGE_COUNT") == null ? DEFAULT_MESSAGES_COUNT : Long.parseLong(System.getenv("STRIMZI_MESSAGE_COUNT"));
         int delay = Integer.parseInt(System.getenv("STRIMZI_DELAY_MS"));
         String message = System.getenv("STRIMZI_MESSAGE") == null ? DEFAULT_MESSAGE : System.getenv("STRIMZI_MESSAGE");
-        String headers = System.getenv("STRIMZI_HEADERS");
-        return new HttpProducerConfig(hostName, port, topic, messageCount, delay, message, headers);
+        return new HttpProducerConfig(hostName, port, topic, messageCount, delay, message);
     }
 
     public String getHostName() {
@@ -64,10 +61,6 @@ public class HttpProducerConfig {
         return message;
     }
 
-    public String getHeaders() {
-        return headers;
-    }
-
     @Override
     public String toString() {
         return "HttpProducerConfig{" +
@@ -77,7 +70,6 @@ public class HttpProducerConfig {
                 ", messageCount=" + messageCount +
                 ", delay=" + delay +
                 ", message=" + message +
-                ", headers=" + headers +
                 "}";
     }
 }
