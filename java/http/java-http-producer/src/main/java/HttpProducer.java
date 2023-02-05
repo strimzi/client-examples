@@ -28,17 +28,17 @@ public class HttpProducer {
 
     private URI sendEndpoint;
 
+    public static void main(String[] args) throws InterruptedException, URISyntaxException {
+        HttpProducerConfig config = HttpProducerConfig.fromEnv();
+        HttpProducer httpProducer = new HttpProducer(config);
+        httpProducer.run();
+    }
+
     public HttpProducer(HttpProducerConfig config) throws URISyntaxException {
         this.config = config;
         this.executorService = Executors.newSingleThreadScheduledExecutor();
         this.httpClient = HttpClient.newHttpClient();
         this.sendEndpoint = new URI("http://" + this.config.getHostName() + ":" + this.config.getPort() + "/topics/" + this.config.getTopic());
-    }
-
-    public static void main(String[] args) throws InterruptedException, URISyntaxException {
-        HttpProducerConfig config = HttpProducerConfig.fromEnv();
-        HttpProducer httpProducer = new HttpProducer(config);
-        httpProducer.run();
     }
 
     public void run() throws InterruptedException {

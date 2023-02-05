@@ -6,6 +6,9 @@ public class HttpConsumerConfig {
 
     private static final String DEFAULT_HOSTNAME = "localhost";
     private static final int DEFAULT_PORT = 8080;
+    private static final String DEFAULT_GROUPID = "my-group";
+    private static final String DEFAULT_CLIENTID = "my-consumer";
+
     private static final long DEFAULT_MESSAGES_COUNT = 10;
     private static final int DEFAULT_POLL_INTERVAL = 1000;
     private static final int DEFAULT_POLL_TIMEOUT = 100;
@@ -14,16 +17,18 @@ public class HttpConsumerConfig {
     private final int port;
     private final String topic;
     private final String groupId;
+    private final String clientId;
     private final long messageCount;
     private final int pollInterval;
     private final int pollTimeout;
 
-    private HttpConsumerConfig(String hostName, int port, String topic, String groupId,
+    private HttpConsumerConfig(String hostName, int port, String topic, String groupId, String clientId,
                                long messageCount, int pollInterval, int pollTimeout) {
         this.hostName = hostName;
         this.port = port;
         this.topic = topic;
         this.groupId = groupId;
+        this.clientId = clientId;
         this.messageCount = messageCount;
         this.pollInterval = pollInterval;
         this.pollTimeout = pollTimeout;
@@ -33,11 +38,12 @@ public class HttpConsumerConfig {
         String hostName = System.getenv("STRIMZI_HOSTNAME") == null ? DEFAULT_HOSTNAME : System.getenv("STRIMZI_HOSTNAME");
         int port = System.getenv("STRIMZI_PORT") == null ? DEFAULT_PORT : Integer.parseInt(System.getenv("STRIMZI_PORT"));
         String topic = System.getenv("STRIMZI_TOPIC");
-        String groupId = System.getenv("STRIMZI_GROUP_ID");
+        String groupId = System.getenv("STRIMZI_GROUP_ID") == null ? DEFAULT_GROUPID : System.getenv("STRIMZI_GROUP_ID");
+        String clientId = System.getenv("STRIMZI_CLIENT_ID") == null ? DEFAULT_CLIENTID : System.getenv("STRIMZI_CLIENT_ID");
         Long messageCount = System.getenv("STRIMZI_MESSAGE_COUNT") == null ? DEFAULT_MESSAGES_COUNT : Long.parseLong(System.getenv("STRIMZI_MESSAGE_COUNT"));
         int pollInterval = System.getenv("STRIMZI_POLL_INTERVAL") == null ? DEFAULT_POLL_INTERVAL : Integer.parseInt(System.getenv("STRIMZI_POLL_INTERVAL"));
         int pollTimeout = System.getenv("STRIMZI_POLL_TIMEOUT") == null ? DEFAULT_POLL_TIMEOUT : Integer.parseInt(System.getenv("STRIMZI_POLL_TIMEOUT"));
-        return new HttpConsumerConfig(hostName, port, topic, groupId, messageCount, pollInterval, pollTimeout);
+        return new HttpConsumerConfig(hostName, port, topic, groupId, clientId, messageCount, pollInterval, pollTimeout);
     }
 
     public String getHostName() {
@@ -54,6 +60,10 @@ public class HttpConsumerConfig {
 
     public String getGroupId() {
         return groupId;
+    }
+
+    public String getClientId() {
+        return clientId;
     }
 
     public long getMessageCount() {
@@ -75,6 +85,7 @@ public class HttpConsumerConfig {
                 ", port=" + port +
                 ", topic=" + topic +
                 ", groupId=" + groupId +
+                ", clientId=" + clientId +
                 ", messageCount=" + messageCount +
                 ", pollInterval=" + pollInterval +
                 ", pollTimeout=" + pollTimeout +
