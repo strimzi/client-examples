@@ -38,16 +38,22 @@ spec:
         - name: java-kafka-producer
           image: quay.io/strimzi-examples/java-kafka-producer:latest
           env:
-            - name: BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9092
-            - name: TOPIC
+            - name: STRIMZI_TOPIC
               value: my-topic
-            - name: DELAY_MS
+            - name: STRIMZI_DELAY_MS
               value: "1000"
-            - name: LOG_LEVEL
+            - name: STRIMZI_LOG_LEVEL
               value: "INFO"
-            - name: MESSAGE_COUNT
+            - name: STRIMZI_MESSAGE_COUNT
               value: "1000000"
+            - name: STRIMZI_TRACING_SYSTEM
+              value: opentelemetry
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: my-cluster-kafka-bootstrap:9092
+            - name: KAFKA_KEY_SERIALIZER
+              value: "org.apache.kafka.common.serialization.StringSerializer"
+            - name: KAFKA_VALUE_SERIALIZER
+              value: "org.apache.kafka.common.serialization.StringSerializer"
             - name: OTEL_SERVICE_NAME
               value: kafka-otel
             - name: OTEL_TRACES_EXPORTER
@@ -56,8 +62,6 @@ spec:
               value: none
             - name: OTEL_EXPORTER_JAEGER_ENDPOINT
               value: http://my-jaeger-collector:14250
-            - name: TRACING_SYSTEM
-              value: opentelemetry
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -142,5 +146,5 @@ spec:
               value: none
             - name: OTEL_EXPORTER_JAEGER_ENDPOINT
               value: http://my-jaeger-collector:14250
-            - name: TRACING_SYSTEM
+            - name: STRIMZI_TRACING_SYSTEM
               value: opentelemetry
