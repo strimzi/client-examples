@@ -18,29 +18,6 @@ spec:
   replicas: 3
   partitions: 12
 ---
-apiVersion: kafka.strimzi.io/v1beta1
-kind: KafkaUser
-metadata:
-  name: service-account-java-kafka-producer
-  labels:
-    strimzi.io/cluster: my-cluster
-spec:
-  authorization:
-    type: simple
-    acls:
-      - resource:
-          type: topic
-          name: my-topic
-        operation: Write
-      - resource:
-          type: topic
-          name: my-topic
-        operation: Create
-      - resource:
-          type: topic
-          name: my-topic
-        operation: Describe
----
 apiVersion: v1
 kind: Secret
 metadata:
@@ -66,35 +43,54 @@ spec:
         app: java-kafka-producer
     spec:
       containers:
-      - name: java-kafka-producer
-        image: quay.io/strimzi-examples/java-kafka-producer:latest
-        env:
-          - name: BOOTSTRAP_SERVERS
-            value: my-cluster-kafka-bootstrap:9092
-          - name: TOPIC
-            value: my-topic
-          - name: DELAY_MS
-            value: "1000"
-          - name: LOG_LEVEL
-            value: "INFO"
-          - name: MESSAGE_COUNT
-            value: "1000000"
-          - name: OAUTH_CLIENT_ID
-            value: java-kafka-producer
-          - name: OAUTH_CLIENT_SECRET
-            valueFrom:
-              secretKeyRef:
-                name: java-kafka-producer-oauth
-                key: clientSecret
-          - name: OAUTH_TOKEN_ENDPOINT_URI
-            value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
-          - name: OAUTH_SSL_TRUSTSTORE_TYPE
-            value: PEM
-          - name: OAUTH_SSL_TRUSTSTORE_CERTIFICATES
-            valueFrom:
-              secretKeyRef:
-                name: sso-x509-https-secret
-                key: tls.crt
+        - name: java-kafka-producer
+          image: quay.io/strimzi-examples/java-kafka-producer:latest
+          env:
+            - name: STRIMZI_TOPIC
+              value: my-topic
+            - name: STRIMZI_DELAY_MS
+              value: "1000"
+            - name: STRIMZI_LOG_LEVEL
+              value: "INFO"
+            - name: STRIMZI_MESSAGE_COUNT
+              value: "1000000"
+            - name: OAUTH_CLIENT_ID
+              value: java-kafka-producer
+            - name: OAUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: java-kafka-producer-oauth
+                  key: secret
+            - name: OAUTH_TOKEN_ENDPOINT_URI
+              value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
+            - name: OAUTH_SSL_TRUSTSTORE_TYPE
+              value: PEM
+            - name: OAUTH_SSL_TRUSTSTORE_CERTIFICATES
+              valueFrom:
+                secretKeyRef:
+                  name: sso-x509-https-secret
+                  key: tls.crt
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: my-cluster-kafka-bootstrap:9093
+            - name: KAFKA_KEY_SERIALIZER
+              value: "org.apache.kafka.common.serialization.StringSerializer"
+            - name: KAFKA_VALUE_SERIALIZER
+              value: "org.apache.kafka.common.serialization.StringSerializer"
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: "SASL_SSL"
+            - name: KAFKA_SASL_JAAS_CONFIG
+              value: "org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;"
+            - name: KAFKA_SASL_MECHANISM
+              value: OAUTHBEARER
+            - name: KAFKA_SASL_LOGIN_CALLBACK_HANDLER_CLASS
+              value: "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler"
+            - name: KAFKA_SSL_TRUSTSTORE_TYPE
+              value: PEM
+            - name: KAFKA_SSL_TRUSTSTORE_CERTIFICATES
+              valueFrom:
+                secretKeyRef:
+                  name: my-cluster-cluster-ca-cert
+                  key: ca.crt
 ---
 apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaUser

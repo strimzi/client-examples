@@ -27,13 +27,13 @@ public class KafkaProducerExample {
 
         log.info(KafkaProducerConfig.class.getName() + ": {}", config.toString());
 
-        Properties props = KafkaProducerConfig.createProperties(config);
+        Properties props = config.getProperties();
         List<Header> headers = null;
 
         TracingSystem tracingSystem = config.getTracingSystem();
         if (tracingSystem != TracingSystem.NONE) {
             if (tracingSystem == TracingSystem.JAEGER) {
-               TracingInitializer.jaegerInitialize();
+                TracingInitializer.jaegerInitialize();
 
                 props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentracing.contrib.kafka.TracingProducerInterceptor.class.getName());
             } else if (tracingSystem == TracingSystem.OPENTELEMETRY) {
@@ -41,7 +41,7 @@ public class KafkaProducerExample {
 
                 props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentelemetry.instrumentation.kafkaclients.TracingProducerInterceptor.class.getName());
             } else {
-                log.error("Error: TRACING_SYSTEM {} is not recognized or supported!", config.getTracingSystem());
+                log.error("Error: STRIMZI_TRACING_SYSTEM {} is not recognized or supported!", config.getTracingSystem());
             }
         }
 
@@ -55,40 +55,13 @@ public class KafkaProducerExample {
         }
 
         KafkaProducer<String, String> producer = new KafkaProducer<>(props);
-        log.info("Sending {} messages ...", config.getMessageCount());
 
-        boolean blockProducer = System.getenv("BLOCKING_PRODUCER") != null;
-        boolean transactionalProducer = config.getAdditionalConfig().contains("transactional.id");
-        int msgPerTx = Integer.parseInt(System.getenv().getOrDefault("MESSAGES_PER_TRANSACTION", "10"));
-        if(transactionalProducer) {
-            log.info("Using transactional producer. Initializing the transactions ...");
-            producer.initTransactions();
-        }
         AtomicLong numSent = new AtomicLong(0);
         for (long i = 0; i < config.getMessageCount(); i++) {
-            if (transactionalProducer && i % msgPerTx == 0) {
-                log.info("Beginning new transaction. Messages sent: {}", i);
-                producer.beginTransaction();
-            }
-            log.info("Sending messages \"" + config.getMessage() + " - {}\"{}", i, config.getHeaders() == null ? "" : " - with headers - " + config.getHeaders());
-            Future<RecordMetadata> recordMetadataFuture = producer.send(new ProducerRecord<>(config.getTopic(), null, null, null, "\"" + config.getMessage() + " - " + i + "\"", headers));
-            if(blockProducer) {
-                try {
-                    recordMetadataFuture.get();
-                    // Increment number of sent messages only if ack is received by producer
-                    numSent.incrementAndGet();
-                } catch (ExecutionException e) {
-                    log.warn("Message {} wasn't sent properly!", i, e.getCause());
-                }
-            } else {
-                // Increment number of sent messages for non-blocking producer
-                numSent.incrementAndGet();
-            }
-            if (transactionalProducer && ((i + 1) % msgPerTx == 0)) {
-                log.info("Committing the transaction. Messages sent: {}", i);
-                producer.commitTransaction();
-            }
 
+            log.info("Sending messages \"" + config.getMessage() + " - {}\"{}", i, config.getHeaders() == null ? "" : " - with headers - " + config.getHeaders());
+            producer.send(new ProducerRecord<>(config.getTopic(), null, null, null, "\"" + config.getMessage() + " - " + i + "\"", headers));
+            numSent.incrementAndGet();
             Thread.sleep(config.getDelay());
         }
 

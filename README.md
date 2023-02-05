@@ -59,20 +59,13 @@ To run the OAuth example, you will need to have your Kafka cluster configured wi
 Below are listed and described the available environment variables that can be used for configuration.
 
 Producer  
-* `BOOTSTRAP_SERVERS` - comma-separated host and port pairs that is a list of Kafka broker addresses. The form of pair is `host:port`, e.g. `my-cluster-kafka-bootstrap:9092` 
-* `TOPIC` - the topic the producer will send to  
-* `DELAY_MS` - the delay, in ms, between messages  
-* `MESSAGE_COUNT` - the number of messages the producer should send  
-* `CA_CRT` - the certificate of the CA which signed the brokers' TLS certificates, for adding to the client's trust store
-* `USER_CRT` - the user's certificate
-* `USER_KEY` - the user's private key
-* `LOG_LEVEL` - logging level  
-* `PRODUCER_ACKS` - acknowledgement level
-* `HEADERS` - custom headers list separated by commas of `key1=value1, key2=value2`
-* `BLOCKING_PRODUCER` - if it's set, the producer will block another message until ack will be received
-* `MESSAGES_PER_TRANSACTION` - how many messages will be part of one transaction. Transaction config could be set via `ADDITIONAL_CONFIG` variable. Default is 10.
-* `ADDITIONAL_CONFIG` - additional configuration for a producer application. Notice, that you can also override any previously set variable by setting this. The form is `key=value` records separated by new line character
-* `TRACING_SYSTEM` - if it's set to `jaeger` or `opentelemetry`, this will enable tracing. 
+* `STRIMZI_TOPIC` - the topic the producer will send to  
+* `STRIMZI_DELAY_MS` - the delay, in ms, between messages  
+* `STRIMZI_MESSAGE_COUNT` - the number of messages the producer should send
+* `STRIMZI_MESSAGE` - the message the producer will send
+* `STRIMZI_LOG_LEVEL` - logging level  
+* `STRIMZI_HEADERS` - custom headers list separated by commas of `key1=value1, key2=value2`
+* `STRIMZI_TRACING_SYSTEM` - if it's set to `jaeger` or `opentelemetry`, this will enable tracing. 
 
 Consumer  
 * `STRIMZI_TOPIC` - name of topic which consumer subscribes  
@@ -80,7 +73,7 @@ Consumer
 * `STRIMZI_LOG_LEVEL` - logging level  
 * `STRIMZI_TRACING_SYSTEM` - if it's set to `jaeger` or `opentelemetry`, this will enable tracing.
 
-Additionally, any Kafka Consumer API configuration option can be passed as an environment variable.
+Additionally, any Kafka Consumer API or Kafka Producer API configuration option can be passed as an environment variable.
 It should be prefixed with `KAFKA_` and use `_` instead of `.`.
 For example environment variable `KAFKA_BOOTSTRAP_SERVERS` will be used as the `bootstrap.servers` configuration option in the Kafka Consumer API.
 
