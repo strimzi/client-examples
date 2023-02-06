@@ -1,4 +1,4 @@
-PROJECT_NAME=java-kafka-common
+PROJECT_NAME=java-common
 
 all: java_install
 build: java_install
@@ -12,8 +12,8 @@ docker_push:
 
 java_install:
 	echo "Installing root pom ..."
-	mvn install -f ../../../pom.xml
+	mvn install -f ../../pom.xml
 
-include ../../../Makefile.maven
+include ../../Makefile.maven
 
 .PHONY: all build clean

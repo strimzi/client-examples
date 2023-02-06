@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>strimzi.io</groupId>
-        <artifactId>java-kafka-examples</artifactId>
+        <artifactId>java-examples</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
