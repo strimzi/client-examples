@@ -18,16 +18,16 @@ spec:
       - name: java-kafka-consumer
         image: quay.io/strimzi-examples/java-kafka-consumer:latest
         env:
-          - name: KAFKA_BOOTSTRAP_SERVERS
-            value: my-cluster-kafka-bootstrap:9092
           - name: STRIMZI_TOPIC
             value: my-topic
-          - name: KAFKA_GROUP_ID
-            value: my-java-kafka-consumer
           - name: STRIMZI_LOG_LEVEL
             value: "INFO"
           - name: STRIMZI_MESSAGE_COUNT
             value: "1000000"
+          - name: KAFKA_BOOTSTRAP_SERVERS
+            value: my-cluster-kafka-bootstrap:9092
+          - name: KAFKA_GROUP_ID
+            value: my-java-kafka-consumer
           - name: KAFKA_KEY_DESERIALIZER
             value: "org.apache.kafka.common.serialization.StringDeserializer"
           - name: KAFKA_VALUE_DESERIALIZER

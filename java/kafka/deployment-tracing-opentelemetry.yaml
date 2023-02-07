@@ -124,16 +124,18 @@ spec:
         - name: java-kafka-consumer
           image: quay.io/strimzi-examples/java-kafka-consumer:latest
           env:
-            - name: KAFKA_BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9092
             - name: STRIMZI_TOPIC
               value: my-topic-reversed
-            - name: KAFKA_GROUP_ID
-              value: java-kafka-consumer
             - name: STRIMZI_LOG_LEVEL
               value: "INFO"
             - name: STRIMZI_MESSAGE_COUNT
               value: "1000000"
+            - name: STRIMZI_TRACING_SYSTEM
+              value: opentelemetry
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: my-cluster-kafka-bootstrap:9092
+            - name: KAFKA_GROUP_ID
+              value: java-kafka-consumer
             - name: KAFKA_KEY_DESERIALIZER
               value: "org.apache.kafka.common.serialization.StringDeserializer"
             - name: KAFKA_VALUE_DESERIALIZER
@@ -146,5 +148,3 @@ spec:
               value: none
             - name: OTEL_EXPORTER_JAEGER_ENDPOINT
               value: http://my-jaeger-collector:14250
-            - name: STRIMZI_TRACING_SYSTEM
-              value: opentelemetry

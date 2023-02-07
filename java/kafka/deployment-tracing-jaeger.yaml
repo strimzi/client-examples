@@ -83,12 +83,12 @@ spec:
         - name: java-kafka-consumer
           image: quay.io/strimzi-examples/java-kafka-consumer:latest
           env:
+            - name: STRIMZI_TOPIC
+              value: my-topic-reversed
             - name: STRIMZI_LOG_LEVEL
               value: "INFO"
             - name: STRIMZI_MESSAGE_COUNT
               value: "1000000"
-            - name: STRIMZI_TOPIC
-              value: my-topic-reversed
             - name: STRIMZI_TRACING_SYSTEM
               value: jaeger
             - name: KAFKA_BOOTSTRAP_SERVERS

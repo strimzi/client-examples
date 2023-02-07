@@ -61,7 +61,6 @@ spec:
               value: SSL
             - name: KAFKA_SSL_TRUSTSTORE_TYPE
               value: PEM
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -119,26 +118,26 @@ spec:
         - name: java-kafka-consumer
           image: quay.io/strimzi-examples/java-kafka-consumer:latest
           env:
-            - name: KAFKA_SSL_TRUSTSTORE_CERTIFICATES
-              valueFrom:
-                secretKeyRef:
-                  name: my-cluster-cluster-ca-cert
-                  key: ca.crt
-            - name: KAFKA_SECURITY_PROTOCOL
-              value: SSL
-            - name: KAFKA_SSL_TRUSTSTORE_TYPE
-              value: PEM
-            - name: KAFKA_BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9093
             - name: STRIMZI_TOPIC
               value: my-topic-reversed
-            - name: KAFKA_GROUP_ID
-              value: java-kafka-consumer
             - name: STRIMZI_LOG_LEVEL
               value: "INFO"
             - name: STRIMZI_MESSAGE_COUNT
               value: "1000000"
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: my-cluster-kafka-bootstrap:9093
+            - name: KAFKA_GROUP_ID
+              value: java-kafka-consumer
             - name: KAFKA_KEY_DESERIALIZER
               value: "org.apache.kafka.common.serialization.StringDeserializer"
             - name: KAFKA_VALUE_DESERIALIZER
               value: "org.apache.kafka.common.serialization.StringDeserializer"
+            - name: KAFKA_SSL_TRUSTSTORE_CERTIFICATES
+              valueFrom:
+                secretKeyRef:
+                  name: my-cluster-cluster-ca-cert
+                   key: ca.crt
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: SSL
+            - name: KAFKA_SSL_TRUSTSTORE_TYPE
+              value: PEM
