@@ -183,29 +183,6 @@ spec:
                   name: sso-x509-https-secret
                   key: tls.crt
 ---
-apiVersion: kafka.strimzi.io/v1beta1
-kind: KafkaUser
-metadata:
-  name: service-account-java-kafka-consumer
-  labels:
-    strimzi.io/cluster: my-cluster
-spec:
-  authorization:
-    type: simple
-    acls:
-      - resource:
-          type: topic
-          name: my-topic-reversed
-        operation: Read
-      - resource:
-          type: topic
-          name: my-topic-reversed
-        operation: Describe
-      - resource:
-          type: group
-          name: java-kafka-consumer
-        operation: Read
----
 apiVersion: v1
 kind: Secret
 metadata:
@@ -234,33 +211,48 @@ spec:
         - name: java-kafka-consumer
           image: quay.io/strimzi-examples/java-kafka-consumer:latest
           env:
-            - name: KAFKA_BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9092
             - name: STRIMZI_TOPIC
               value: my-topic-reversed
-            - name: KAFKA_GROUP_ID
-              value: java-kafka-consumer
             - name: STRIMZI_LOG_LEVEL
               value: "INFO"
             - name: STRIMZI_MESSAGE_COUNT
               value: "1000000"
-            - name: KAFKA_KEY_DESERIALIZER
-              value: "org.apache.kafka.common.serialization.StringDeserializer"
-            - name: KAFKA_VALUE_DESERIALIZER
-              value: "org.apache.kafka.common.serialization.StringDeserializer"
-            - name: KAFKA_OAUTH_CLIENT_ID
+            - name: OAUTH_CLIENT_ID
               value: java-kafka-consumer
-            - name: KAFKA_OAUTH_CLIENT_SECRET
+            - name: OAUTH_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: java-kafka-consumer-oauth
-                  key: clientSecret
+                  key: secret
             - name: OAUTH_TOKEN_ENDPOINT_URI
               value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
-            - name: KAFKA_OAUTH_SSL_TRUSTSTORE_TYPE
+            - name: OAUTH_SSL_TRUSTSTORE_TYPE
               value: PEM
-            - name: KAFKA_OAUTH_SSL_TRUSTSTORE_CERTIFICATES
+            - name: OAUTH_SSL_TRUSTSTORE_CERTIFICATES
               valueFrom:
                 secretKeyRef:
                   name: sso-x509-https-secret
                   key: tls.crt
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: my-cluster-kafka-bootstrap:9093
+            - name: KAFKA_GROUP_ID
+              value: java-kafka-consumer
+            - name: KAFKA_KEY_DESERIALIZER
+              value: "org.apache.kafka.common.serialization.StringDeserializer"
+            - name: KAFKA_VALUE_DESERIALIZER
+              value: "org.apache.kafka.common.serialization.StringDeserializer"
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: "SASL_SSL"
+            - name: KAFKA_SASL_JAAS_CONFIG
+              value: "org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;"
+            - name: KAFKA_SASL_MECHANISM
+              value: OAUTHBEARER
+            - name: KAFKA_SASL_LOGIN_CALLBACK_HANDLER_CLASS
+              value: "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler"
+            - name: KAFKA_SSL_TRUSTSTORE_TYPE
+              value: PEM
+            - name: KAFKA_SSL_TRUSTSTORE_CERTIFICATES
+              valueFrom:
+                secretKeyRef:
+                  name: my-cluster-cluster-ca-cert
+                  key: ca.crt
