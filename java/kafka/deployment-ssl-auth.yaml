@@ -185,12 +185,12 @@ spec:
             - name: KAFKA_SSL_KEYSTORE_CERTIFICATE_CHAIN
               valueFrom:
                 secretKeyRef:
-                  name: java-kafka-producer
+                  name: java-kafka-streams
                   key: user.crt
             - name: KAFKA_SSL_KEYSTORE_KEY
               valueFrom:
                 secretKeyRef:
-                  name: java-kafka-producer
+                  name: java-kafka-streams
                   key: user.key
             - name: KAFKA_SSL_KEYSTORE_TYPE
               value: PEM
