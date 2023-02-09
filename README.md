@@ -73,22 +73,14 @@ Consumer
 * `STRIMZI_LOG_LEVEL` - logging level  
 * `STRIMZI_TRACING_SYSTEM` - if it's set to `jaeger` or `opentelemetry`, this will enable tracing.
 
+Streams  
+* `STRIMZI_SOURCE_TOPIC` - name of topic which will be used as the source of messages
+* `STRIMZI_TARGET_TOPIC` - name of topic where the transformed images are sent
+* `STRIMZI_TRACING_SYSTEM` - if it's set to `jaeger` or `opentelemetry`, this will enable tracing.
+
 Additionally, any Kafka Consumer API or Kafka Producer API configuration option can be passed as an environment variable.
 It should be prefixed with `KAFKA_` and use `_` instead of `.`.
 For example environment variable `KAFKA_BOOTSTRAP_SERVERS` will be used as the `bootstrap.servers` configuration option in the Kafka Consumer API.
-
-Streams  
-* `BOOTSTRAP_SERVERS` - comma-separated host and port pairs that is a list of Kafka broker addresses. The form of pair is `host:port`, e.g. `my-cluster-kafka-bootstrap:9092`
-* `APPLICATION_ID` - The Kafka Streams application ID
-* `SOURCE_TOPIC` - name of topic which will be used as the source of messages
-* `TARGET_TOPIC` - name of topic where the transformed images are sent
-* `COMMIT_INTERVAL_MS` - the interval for the Kafka Streams consumer part committing the offsets
-* `CA_CRT` - the certificate of the CA which signed the brokers' TLS certificates, for adding to the client's trust store
-* `USER_CRT` - the user's certificate
-* `USER_KEY` - the user's private key
-* `LOG_LEVEL` - logging level
-* `ADDITIONAL_CONFIG` - additional configuration for a streams application. Notice, that you can also override any previously set variable by setting this. The form is `key=value` records separated by new line character.
-* `TRACING_SYSTEM` - if it's set to `jaeger` or `opentelemetry`, this will enable tracing.
 
 ### Tracing
 
