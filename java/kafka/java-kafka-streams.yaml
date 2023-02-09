@@ -21,7 +21,7 @@ spec:
           - name: STRIMZI_SOURCE_TOPIC
             value: my-topic
           - name: STRIMZI_TARGET_TOPIC
-            value: my-topic-reversed
+            value: cipot-ym
           - name: STRIMZI_LOG_LEVEL
             value: "INFO"
           - name: KAFKA_BOOTSTRAP_SERVERS
