@@ -103,10 +103,10 @@ spec:
                 secretKeyRef:
                   name: my-cluster-cluster-ca-cert
                   key: ca.crt
-            - name: KAFKA_SECURITY_PROTOCOL
-              value: SSL
             - name: KAFKA_SSL_TRUSTSTORE_TYPE
               value: PEM
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: SSL
 ---
 apiVersion: apps/v1
 kind: Deployment

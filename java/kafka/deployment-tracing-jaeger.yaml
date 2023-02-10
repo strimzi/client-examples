@@ -67,53 +67,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: java-kafka-streams
-  name: java-kafka-streams
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: java-kafka-streams
-  template:
-    metadata:
-      labels:
-        app: java-kafka-streams
-    spec:
-      containers:
-        - name: java-kafka-streams
-          image: quay.io/strimzi-examples/java-kafka-streams:latest
-          env:
-            - name: STRIMZI_SOURCE_TOPIC
-              value: my-topic
-            - name: STRIMZI_TARGET_TOPIC
-              value: my-topic-reversed
-            - name: STRIMZI_LOG_LEVEL
-              value: "INFO"
-            - name: STRIMZI_TRACING_SYSTEM
-              value: jaeger
-            - name: KAFKA_BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9092
-            - name: KAFKA_APPLICATION_ID
-              value: java-kafka-streams
-            - name: KAFKA_DEFAULT_COMMIT_INTERVAL_MS
-              value: "5000"
-            - name: KAFKA_DEFAULT_KEY_SERDE
-              value: "org.apache.kafka.common.serialization.Serdes$StringSerde"
-            - name: KAFKA_DEFAULT_VALUE_SERDE
-              value: "org.apache.kafka.common.serialization.Serdes$StringSerde"
-            - name: JAEGER_SERVICE_NAME
-              value: java-kafka-streams
-            - name: JAEGER_AGENT_HOST
-              value: my-jaeger-agent
-            - name: JAEGER_SAMPLER_TYPE
-              value: const
-            - name: JAEGER_SAMPLER_PARAM
-              value: "1"
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
     app: java-kafka-consumer
   name: java-kafka-consumer
 spec:
