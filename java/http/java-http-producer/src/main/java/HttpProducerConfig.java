@@ -10,6 +10,8 @@ public class HttpProducerConfig {
     private static final long DEFAULT_MESSAGES_COUNT = 10;
     private static final String DEFAULT_MESSAGE = "Hello world";
 
+    private static final int DEFAULT_DELAY_MS = 1000;
+
     private final String hostName;
     private final int port;
     private final String topic;
@@ -32,7 +34,7 @@ public class HttpProducerConfig {
         int port = System.getenv("STRIMZI_PORT") == null ? DEFAULT_PORT : Integer.parseInt(System.getenv("STRIMZI_PORT"));
         String topic = System.getenv("STRIMZI_TOPIC");
         Long messageCount = System.getenv("STRIMZI_MESSAGE_COUNT") == null ? DEFAULT_MESSAGES_COUNT : Long.parseLong(System.getenv("STRIMZI_MESSAGE_COUNT"));
-        int delay = Integer.parseInt(System.getenv("STRIMZI_DELAY_MS"));
+        int delay = System.getenv("STRIMZI_DELAY_MS") == null ? DEFAULT_DELAY_MS : Integer.parseInt(System.getenv("STRIMZI_DELAY_MS"));
         String message = System.getenv("STRIMZI_MESSAGE") == null ? DEFAULT_MESSAGE : System.getenv("STRIMZI_MESSAGE");
         return new HttpProducerConfig(hostName, port, topic, messageCount, delay, message);
     }
