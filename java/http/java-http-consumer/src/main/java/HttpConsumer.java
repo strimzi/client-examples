@@ -7,6 +7,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanBuilder;
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.StatusCode;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
+import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,7 +33,6 @@ import java.util.concurrent.TimeUnit;
 public class HttpConsumer {
 
     private static final Logger log = LogManager.getLogger(HttpConsumer.class);
-
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final HttpConsumerConfig config;
@@ -32,12 +41,22 @@ public class HttpConsumer {
     private URI consumerEndpoint;
     private int messageReceived = 0;
     private ScheduledExecutorService executorService;
+    private Tracer tracer;
 
 
     public static void main(String[] args) throws URISyntaxException, IOException, InterruptedException {
         HttpConsumerConfig config = HttpConsumerConfig.fromEnv();
-        HttpConsumer consumer = new HttpConsumer(config);
 
+        TracingSystem tracingSystem = config.getTracingSystem();
+        if (tracingSystem != TracingSystem.NONE) {
+            if (tracingSystem == TracingSystem.OPENTELEMETRY) {
+                TracingInitializer.otelInitialize();
+            } else {
+                log.error("Error: STRIMZI_TRACING_SYSTEM {} is not recognized or supported!", config.getTracingSystem());
+            }
+        }
+
+        HttpConsumer consumer = new HttpConsumer(config);
         try {
             consumer.createConsumer();
             consumer.subscribe();
@@ -52,6 +71,9 @@ public class HttpConsumer {
         this.executorService = Executors.newSingleThreadScheduledExecutor();
         this.httpClient = HttpClient.newHttpClient();
         this.createConsumerEndpoint = new URI("http://" + this.config.getHostName() + ":" + this.config.getPort() + "/consumers/" + this.config.getGroupId());
+        this.tracer = this.config.getTracingSystem().equals(TracingSystem.NONE) ?
+                OpenTelemetry.noop().getTracer("client-examples") :
+                GlobalOpenTelemetry.getTracer("client-examples");
     }
 
     public void createConsumer() throws IOException, InterruptedException, URISyntaxException {
@@ -113,19 +135,36 @@ public class HttpConsumer {
         try {
             log.info("Polling for records ...");
             URI recordsEndpoint = new URI(this.consumerEndpoint.toString() + "/records?timeout=" + this.config.getPollTimeout());
-            HttpRequest request = HttpRequest.newBuilder()
+
+            SpanBuilder spanBuilder = this.tracer.spanBuilder("consume-messages");
+            spanBuilder.setSpanKind(SpanKind.CLIENT);
+            spanBuilder.setAttribute(SemanticAttributes.HTTP_METHOD, "GET");
+            spanBuilder.setAttribute(SemanticAttributes.HTTP_URL, recordsEndpoint.toString());
+            Span span = spanBuilder.startSpan();
+
+            HttpRequest.Builder builder = HttpRequest.newBuilder()
                     .uri(recordsEndpoint)
                     .headers("Accept", "application/vnd.kafka.json.v2+json")
-                    .GET()
-                    .build();
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                    .GET();
 
-            ArrayNode records = (ArrayNode) MAPPER.readTree(response.body());
-            log.info("... got {} records", records.size());
+            try (Scope ignored = span.makeCurrent()) {
+                GlobalOpenTelemetry.getPropagators().getTextMapPropagator().inject(Context.current(), builder, HttpRequest.Builder::setHeader);
+                HttpRequest request = builder.build();
 
-            for (JsonNode record : records) {
-                log.info("Record {}", record);
-                this.messageReceived++;
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+                ArrayNode records = (ArrayNode) MAPPER.readTree(response.body());
+                log.info("... got {} records", records.size());
+
+                for (JsonNode record : records) {
+                    log.info("Record {}", record);
+                    this.messageReceived++;
+                }
+
+                span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, response.statusCode());
+                span.setStatus(response.statusCode() == 200 ? StatusCode.OK : StatusCode.ERROR);
+            } finally {
+                span.end();
             }
         } catch (URISyntaxException | IOException | InterruptedException e) {
             throw new RuntimeException(e);
