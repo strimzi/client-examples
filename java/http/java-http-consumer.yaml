@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: java-http-consumer
+  name: java-http-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-http-consumer
+  template:
+    metadata:
+      labels:
+        app: java-http-consumer
+    spec:
+      containers:
+      - name: java-http-consumer
+        image: quay.io/strimzi-examples/java-http-consumer:latest
+        env:
+          - name: HOSTNAME
+            value: my-bridge-bridge-service
+          - name: PORT
+            value: "8080"
+          - name: TOPIC
+            value: my-topic
+          - name: CLIENTID
+            value: "my-consumer"
+          - name: GROUPID
+            value: "my-group"
+          - name: POLL_INTERVAL
+            value: "1000"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
