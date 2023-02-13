@@ -84,7 +84,7 @@ spec:
           image: quay.io/strimzi-examples/java-kafka-consumer:latest
           env:
             - name: STRIMZI_TOPIC
-              value: my-topic-reversed
+              value: my-topic
             - name: STRIMZI_LOG_LEVEL
               value: "INFO"
             - name: STRIMZI_MESSAGE_COUNT
