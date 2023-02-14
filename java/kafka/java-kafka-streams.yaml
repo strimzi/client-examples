@@ -26,7 +26,7 @@ spec:
             value: my-topic
           - name: TARGET_TOPIC
             value: cipot-ym
-          - name: LOG_LEVEL
+          - name: LOG_LEVELgit checkout
             value: "INFO"
           - name: ADDITIONAL_CONFIG
             value: |
