@@ -81,7 +81,7 @@ spec:
     spec:
       containers:
         - name: java-kafka-streams
-          image: docker.io/owenerz/java-kafka-streams:latest
+          image: quay.io/strimzi-examples/java-kafka-streams:latest
           env:
             - name: STRIMZI_SOURCE_TOPIC
               value: my-topic
