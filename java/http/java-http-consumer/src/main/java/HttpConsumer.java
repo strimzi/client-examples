@@ -79,6 +79,7 @@ public class HttpConsumer {
     public void createConsumer() throws IOException, InterruptedException, URISyntaxException {
         String consumerInfo = "{\"name\":\"" + this.config.getClientId() + "\",\"format\":\"json\",\"auto.offset.reset\":\"earliest\"}";
         log.info("Creating consumer = {}", consumerInfo);
+        this.consumerEndpoint = new URI("http://" + this.config.getHostName() + ":" + this.config.getPort() + "/consumers/" + this.config.getGroupId() + "/instances/" + this.config.getClientId());
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(this.createConsumerEndpoint)
@@ -89,8 +90,6 @@ public class HttpConsumer {
 
         if (response.statusCode() == HttpResponseStatus.OK.code()) {
             log.info("Consumer successfully created {}", response.body());
-            JsonNode json = MAPPER.readTree(response.body());
-            this.consumerEndpoint = new URI(json.get("base_uri").asText());
         } else {
             throw new RuntimeException(String.format("Failed to create consumer. Status code: %s, response: %s", response.statusCode(), response.body()));
         }
