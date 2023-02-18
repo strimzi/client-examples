@@ -18,13 +18,13 @@ spec:
       - name: java-http-producer
         image: quay.io/strimzi-examples/java-http-producer:latest
         env:
-          - name: HOSTNAME
+          - name: STRIMZI_HOSTNAME
             value: my-bridge-bridge-service
-          - name: PORT
+          - name: STRIMZI_PORT
             value: "8080"
-          - name: TOPIC
+          - name: STRIMZI_TOPIC
             value: my-topic
-          - name: SEND_INTERVAL
+          - name: STRIMZI_SEND_INTERVAL
             value: "1000"
         resources:
           requests:

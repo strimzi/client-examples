@@ -18,14 +18,16 @@ spec:
       - name: java-http-producer
         image: quay.io/strimzi-examples/java-http-producer:latest
         env:
-          - name: HOSTNAME
+          - name: STRIMZI_HOSTNAME
             value: my-bridge-bridge-service
-          - name: PORT
+          - name: STRIMZI_PORT
             value: "8080"
-          - name: TOPIC
+          - name: STRIMZI_TOPIC
             value: my-topic
-          - name: SEND_INTERVAL
+          - name: STRIMZI_SEND_INTERVAL
             value: "1000"
+          - name: STRIMZI_TRACING_SYSTEM
+            value: "opentelemetry"
           - name: OTEL_SERVICE_NAME
             value: http-otel
           - name: OTEL_EXPORTER_OTLP_ENDPOINT
@@ -58,16 +60,18 @@ spec:
       - name: java-http-consumer
         image: quay.io/strimzi-examples/java-http-consumer:latest
         env:
-          - name: HOSTNAME
+          - name: STRIMZI_HOSTNAME
             value: my-bridge-bridge-service
-          - name: PORT
+          - name: STRIMZI_PORT
             value: "8080"
-          - name: TOPIC
+          - name: STRIMZI_TOPIC
             value: my-topic
-          - name: GROUPID
+          - name: STRIMZI_GROUPID
             value: "my-group"
-          - name: POLL_INTERVAL
+          - name: STRIMZI_POLL_INTERVAL
             value: "1000"
+          - name: STRIMZI_TRACING_SYSTEM
+            value: "opentelemetry"
           - name: OTEL_SERVICE_NAME
             value: http-otel
           - name: OTEL_EXPORTER_OTLP_ENDPOINT
