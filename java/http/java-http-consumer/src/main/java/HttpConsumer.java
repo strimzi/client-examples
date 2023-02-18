@@ -90,6 +90,11 @@ public class HttpConsumer {
 
         if (response.statusCode() == HttpResponseStatus.OK.code()) {
             log.info("Consumer successfully created {}", response.body());
+            JsonNode json = MAPPER.readTree(response.body());
+            URI baseURI = new URI(json.get("base_uri").asText());
+            if (!this.consumerEndpoint.equals(baseURI)) {
+                throw new RuntimeException(String.format("Expected consumer endpoint %s different from the returned base_uri %s", this.consumerEndpoint, baseURI));
+            }
         } else {
             throw new RuntimeException(String.format("Failed to create consumer. Status code: %s, response: %s", response.statusCode(), response.body()));
         }
