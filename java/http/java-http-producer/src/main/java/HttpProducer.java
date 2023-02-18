@@ -65,16 +65,14 @@ public class HttpProducer {
 
     public void run() throws InterruptedException {
         log.info("Scheduling periodic send: {} messages every {} ms ...", this.config.getMessageCount(), this.config.getDelay());
-        this.executorService.schedule(this::scheduledSend, this.config.getDelay(), TimeUnit.MILLISECONDS);
+        this.executorService.scheduleAtFixedRate(this::scheduledSend, 0, this.config.getDelay(), TimeUnit.MILLISECONDS);
         this.executorService.awaitTermination(this.config.getDelay() * this.config.getMessageCount() + 60_000L, TimeUnit.MILLISECONDS);
         log.info("... {} messages sent", this.messageSent);
     }
 
     private void scheduledSend() {
         this.send();
-        if (this.messageSent < this.config.getMessageCount()) {
-            this.executorService.schedule(this::scheduledSend, this.config.getDelay(), TimeUnit.MILLISECONDS);
-        } else {
+        if (this.messageSent == this.config.getMessageCount()) {
             this.executorService.shutdown();
         }
     }
