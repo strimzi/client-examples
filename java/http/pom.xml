@@ -6,16 +6,14 @@
 
     <parent>
         <groupId>strimzi.io</groupId>
-        <artifactId>client-examples</artifactId>
+        <artifactId>java-examples</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>java-examples</artifactId>
+    <artifactId>java-http-examples</artifactId>
     <packaging>pom</packaging>
-
     <modules>
-        <module>common</module>
-        <module>kafka</module>
-        <module>http</module>
+        <module>java-http-producer</module>
+        <module>java-http-consumer</module>
     </modules>
 </project>
