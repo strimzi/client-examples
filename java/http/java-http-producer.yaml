@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: java-http-producer
+  name: java-http-producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-http-producer
+  template:
+    metadata:
+      labels:
+        app: java-http-producer
+    spec:
+      containers:
+      - name: java-http-producer
+        image: quay.io/strimzi-examples/java-http-producer:latest
+        env:
+          - name: STRIMZI_HOSTNAME
+            value: my-bridge-bridge-service
+          - name: STRIMZI_PORT
+            value: "8080"
+          - name: STRIMZI_TOPIC
+            value: my-topic
+          - name: STRIMZI_SEND_INTERVAL
+            value: "1000"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
