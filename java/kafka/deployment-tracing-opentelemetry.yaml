@@ -59,7 +59,7 @@ spec:
             - name: OTEL_METRICS_EXPORTER
               value: none
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://my-otlp-collector:4317
+              value: http://my-otlp-endpoint:4317
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -104,7 +104,7 @@ spec:
             - name: OTEL_METRICS_EXPORTER
               value: none
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://my-otlp-collector:4317
+              value: http://my-otlp-endpoint:4317
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -147,4 +147,4 @@ spec:
             - name: OTEL_METRICS_EXPORTER
               value: none
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://my-otlp-collector:4317
+              value: http://my-otlp-endpoint:4317
