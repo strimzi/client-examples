@@ -56,12 +56,10 @@ spec:
               value: "org.apache.kafka.common.serialization.StringSerializer"
             - name: OTEL_SERVICE_NAME
               value: kafka-otel
-            - name: OTEL_TRACES_EXPORTER
-              value: jaeger
             - name: OTEL_METRICS_EXPORTER
               value: none
-            - name: OTEL_EXPORTER_JAEGER_ENDPOINT
-              value: http://my-jaeger-collector:14250
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://my-jaeger-collector:4317
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -103,12 +101,10 @@ spec:
               value: "org.apache.kafka.common.serialization.Serdes$StringSerde"
             - name: OTEL_SERVICE_NAME
               value: kafka-otel
-            - name: OTEL_TRACES_EXPORTER
-              value: jaeger
             - name: OTEL_METRICS_EXPORTER
               value: none
-            - name: OTEL_EXPORTER_JAEGER_ENDPOINT
-              value: http://my-jaeger-collector:14250
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://my-jaeger-collector:4317
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -148,9 +144,7 @@ spec:
               value: "org.apache.kafka.common.serialization.StringDeserializer"
             - name: OTEL_SERVICE_NAME
               value: kafka-otel
-            - name: OTEL_TRACES_EXPORTER
-              value: jaeger
             - name: OTEL_METRICS_EXPORTER
               value: none
-            - name: OTEL_EXPORTER_JAEGER_ENDPOINT
-              value: http://my-jaeger-collector:14250
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://my-jaeger-collector:4317
