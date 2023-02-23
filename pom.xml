@@ -143,11 +143,6 @@
             </dependency>
             <dependency>
                 <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-exporter-jaeger</artifactId>
-                <version>${opentelemetry.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.opentelemetry</groupId>
                 <artifactId>opentelemetry-exporter-otlp</artifactId>
                 <version>${opentelemetry.version}</version>
             </dependency>
@@ -178,7 +173,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
     <build>
         <pluginManagement>
             <plugins>
