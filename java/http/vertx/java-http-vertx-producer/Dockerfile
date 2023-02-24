@@ -17,12 +17,10 @@ ARG version=latest
 ENV VERSION ${version}
 
 COPY ./scripts/ /bin
-COPY ./src/main/resources/log4j2.properties /bin/log4j2.properties
+COPY src/main/resources/log4j2.properties /bin/log4j2.properties
 
-COPY ./scripts/ /bin
-
-ADD target/java-http-vertx-consumer.jar /
+ADD target/java-http-vertx-producer.jar /
 
 USER 1001
 
-CMD ["/bin/run.sh", "/java-http-vertx-consumer.jar"]
+CMD ["/bin/run.sh", "/java-http-vertx-producer.jar"]
