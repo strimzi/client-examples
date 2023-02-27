@@ -33,12 +33,8 @@ public class KafkaStreamsConfig {
                 .entrySet()
                 .stream()
                 .filter(mapEntry -> mapEntry.getKey().startsWith(KAFKA_PREFIX))
-                .collect(Collectors.toMap(mapEntry -> convertEnvVarToPropertyKey(mapEntry.getKey()), Map.Entry::getValue)));
+                .collect(Collectors.toMap(mapEntry -> ConvertEnvToPropKey.convertEnvVarToPropertyKey(mapEntry.getKey()), Map.Entry::getValue)));
         return new KafkaStreamsConfig( sourceTopic, targetTopic, tracingSystem, properties);
-    }
-
-    private static String convertEnvVarToPropertyKey(String envVar) {
-        return envVar.substring(envVar.indexOf("_") + 1).toLowerCase().replace("_", ".");
     }
 
     public String getSourceTopic() {
