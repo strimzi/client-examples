@@ -45,7 +45,7 @@ public class KafkaProducerConfig {
                 .entrySet()
                 .stream()
                 .filter(mapEntry -> mapEntry.getKey().startsWith(KAFKA_PREFIX))
-                .collect(Collectors.toMap(mapEntry -> ConvertEnvToPropKey.convertEnvVarToPropertyKey(mapEntry.getKey()), Map.Entry::getValue)));
+                .collect(Collectors.toMap(mapEntry -> ConfigUtil.convertEnvVarToPropertyKey(mapEntry.getKey()), Map.Entry::getValue)));
         return new KafkaProducerConfig(topic, messageCount, delay, message, headers, tracingSystem, properties);
     }
 
