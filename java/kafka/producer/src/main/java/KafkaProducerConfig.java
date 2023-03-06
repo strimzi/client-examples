@@ -3,6 +3,8 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
+import io.strimzi.common.ConfigUtil;
+
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -45,12 +47,8 @@ public class KafkaProducerConfig {
                 .entrySet()
                 .stream()
                 .filter(mapEntry -> mapEntry.getKey().startsWith(KAFKA_PREFIX))
-                .collect(Collectors.toMap(mapEntry -> convertEnvVarToPropertyKey(mapEntry.getKey()), Map.Entry::getValue)));
+                .collect(Collectors.toMap(mapEntry -> ConfigUtil.convertEnvVarToPropertyKey(mapEntry.getKey()), Map.Entry::getValue)));
         return new KafkaProducerConfig(topic, messageCount, delay, message, headers, tracingSystem, properties);
-    }
-
-    private static String convertEnvVarToPropertyKey(String envVar) {
-        return envVar.substring(envVar.indexOf("_") + 1).toLowerCase().replace("_", ".");
     }
 
     public String getTopic() {
