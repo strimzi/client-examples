@@ -2,6 +2,8 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
+import io.strimzi.common.TracingSystem;
+
 public class HttpConsumerConfig {
 
     private static final String DEFAULT_HOSTNAME = "localhost";

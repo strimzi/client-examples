@@ -2,7 +2,9 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
+package io.strimzi.kafka.streams;
 
+import io.strimzi.common.TracingSystem;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaClientSupplier;
 import org.apache.kafka.streams.KafkaStreams;
