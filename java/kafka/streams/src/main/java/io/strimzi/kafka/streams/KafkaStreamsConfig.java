@@ -3,31 +3,35 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
+package io.strimzi.kafka.streams;
+
 import io.strimzi.common.ConfigUtil;
+import io.strimzi.common.TracingSystem;
 
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-public class KafkaConsumerConfig {
-    private static final long DEFAULT_MESSAGES_COUNT = 10;
+public class KafkaStreamsConfig {
+
     private static final String KAFKA_PREFIX = "KAFKA_";
 
-    private final String topic;
-    private final Long messageCount;
+    private final String sourceTopic;
+    private final String targetTopic;
     private final TracingSystem tracingSystem;
     private final Properties properties;
 
-    public KafkaConsumerConfig(String topic, Long messageCount, TracingSystem tracingSystem, Properties properties) {
-        this.topic = topic;
-        this.messageCount = messageCount;
+    public KafkaStreamsConfig(String sourceTopic, String targetTopic,
+                              TracingSystem tracingSystem, Properties properties) {
+        this.sourceTopic = sourceTopic;
+        this.targetTopic = targetTopic;
         this.tracingSystem = tracingSystem;
         this.properties = properties;
     }
 
-    public static KafkaConsumerConfig fromEnv() {
-        String topic = System.getenv("STRIMZI_TOPIC");
-        Long messageCount = System.getenv("STRIMZI_MESSAGE_COUNT") == null ? DEFAULT_MESSAGES_COUNT : Long.parseLong(System.getenv("STRIMZI_MESSAGE_COUNT"));
+    public static KafkaStreamsConfig fromEnv() {
+        String sourceTopic = System.getenv("STRIMZI_SOURCE_TOPIC");
+        String targetTopic = System.getenv("STRIMZI_TARGET_TOPIC");
         TracingSystem tracingSystem = TracingSystem.forValue(System.getenv().getOrDefault("STRIMZI_TRACING_SYSTEM", ""));
         Properties properties = new Properties();
         properties.putAll(System.getenv()
@@ -35,17 +39,15 @@ public class KafkaConsumerConfig {
                 .stream()
                 .filter(mapEntry -> mapEntry.getKey().startsWith(KAFKA_PREFIX))
                 .collect(Collectors.toMap(mapEntry -> ConfigUtil.convertEnvVarToPropertyKey(mapEntry.getKey()), Map.Entry::getValue)));
-        return new KafkaConsumerConfig(topic, messageCount, tracingSystem, properties);
+        return new KafkaStreamsConfig( sourceTopic, targetTopic, tracingSystem, properties);
     }
 
-    public String getTopic() {
-        return topic;
+    public String getSourceTopic() {
+        return sourceTopic;
     }
-
-    public Long getMessageCount() {
-        return messageCount;
+    public String getTargetTopic() {
+        return targetTopic;
     }
-
     public TracingSystem getTracingSystem() {
         return tracingSystem;
     }
@@ -56,11 +58,11 @@ public class KafkaConsumerConfig {
 
     @Override
     public String toString() {
-        return "KafkaConsumerConfig{" +
-            ", topic='" + topic + '\'' +
-            ", messageCount=" + messageCount +
-            ", tracingSystem='" + tracingSystem + '\'' +
-            ", properties ='" + properties + '\'' +
-            '}';
+        return "KafkaStreamsConfig{" +
+                ", sourceTopic='" + sourceTopic + '\'' +
+                ", targetTopic='" + targetTopic + '\'' +
+                ", tracingSystem='" + tracingSystem + '\'' +
+                ", properties ='" + properties + '\'' +
+                '}';
     }
 }
