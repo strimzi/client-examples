@@ -1,7 +1,9 @@
-package io.strimzi.common;/*
+/*
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
+
+package io.strimzi.common;
 
 import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk;
 import io.opentracing.Tracer;
