@@ -4,6 +4,9 @@
  */
 package io.strimzi.common;
 
+/**
+ * Provides enums to specify which system will be called to initialise tracing
+ */
 public enum TracingSystem {
     JAEGER,
     OPENTELEMETRY,
