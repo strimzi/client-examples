@@ -18,7 +18,6 @@ public class TracingInitializer {
      * and registering the tracer as a global tracer
      *
      * @return a Jaeger Tracer object that is initialised from the environment variables
-     * using the fromEnv method
      */
     public static Tracer jaegerInitialize() {
         Tracer tracer = Configuration.fromEnv().getTracer();
