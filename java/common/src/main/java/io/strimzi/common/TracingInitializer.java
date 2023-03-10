@@ -14,9 +14,11 @@ import io.jaegertracing.Configuration;
  */
 public class TracingInitializer {
     /**
-     Initializes Jaeger Tracing by loading the configuration from the environment
-     and registering the tracer as a global tracer
-     @return the initialized Jaeger Tracer object
+     * Initializes Jaeger Tracing by loading the configuration from the environment
+     * and registering the tracer as a global tracer
+     *
+     * @return a Jaeger Tracer object that is initialised from the environment variables
+     * using the fromEnv method
      */
     public static Tracer jaegerInitialize() {
         Tracer tracer = Configuration.fromEnv().getTracer();
@@ -25,9 +27,11 @@ public class TracingInitializer {
     }
 
     /**
-     Initializes OpenTelemetry Tracing by loading the configuration from the environment
-     and registering the tracer as a global tracer
-     @return the initialized OpenTelemetry Tracer object
+     * Initializes OpenTelemetry Tracing by loading the configuration from the environment
+     * and registering the tracer as a global tracer
+     * It sets up the global OpenTelemetry variable with a default SDK instance.
+     *
+     * @see AutoConfiguredOpenTelemetrySdk
      */
     public static void otelInitialize() {
         AutoConfiguredOpenTelemetrySdk.initialize();
