@@ -37,4 +37,3 @@ def from_env():
         if k.startswith('KAFKA_'):
             DEFAULT_PROPERTIES[convertEnvVarToPropertyKey(k)] = v
     return KafkaConsumerConfig(topic, message_count, DEFAULT_PROPERTIES)
-
