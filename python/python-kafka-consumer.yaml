@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: python-kafka-consumer
+  name: python-kafka-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-kafka-consumer
+  template:
+    metadata:
+      labels:
+        app: python-kafka-consumer
+    spec:
+      containers:
+        - name: python-kafka-consumer
+          image: docker.io/owenerz/python-kafka-consumer:latest
+          env:
+            - name: STRIMZI_TOPIC
+              value: my-topic
+#            - name: STRIMZI_DELAY.MS
+#              value: "1000"
+#            - name: STRIMZI_LOG.LEVEL
+#              value: "INFO"
+#            - name: STRIMZI_MESSAGE.COUNT
+#              value: "1000000"
+            - name: KAFKA_BOOTSTRAP.SERVERS
+              value: my-cluster-kafka-bootstrap:9092

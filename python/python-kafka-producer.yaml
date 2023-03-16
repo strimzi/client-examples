@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: python-kafka-producer
+  name: python-kafka-producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-kafka-producer
+  template:
+    metadata:
+      labels:
+        app: python-kafka-producer
+    spec:
+      containers:
+        - name: python-kafka-producer
+          image: docker.io/owenerz/python-kafka-producer:latest
+          env:
+            - name: STRIMZI_TOPIC
+              value: my-topic
+#            - name: STRIMZI_DELAY.MS
+#              value: "1000"
+#            - name: STRIMZI_LOG.LEVEL
+#              value: "INFO"
+#            - name: STRIMZI_MESSAGE.COUNT
+#              value: "1000000"
+            - name: KAFKA_BOOTSTRAP.SERVERS
+              value: my-cluster-kafka-bootstrap:9092
+
