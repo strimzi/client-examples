@@ -20,12 +20,6 @@ spec:
           env:
             - name: STRIMZI_TOPIC
               value: my-topic
-#            - name: STRIMZI_DELAY.MS
-#              value: "1000"
-#            - name: STRIMZI_LOG.LEVEL
-#              value: "INFO"
-#            - name: STRIMZI_MESSAGE.COUNT
-#              value: "1000000"
             - name: KAFKA_BOOTSTRAP.SERVERS
               value: my-cluster-kafka-bootstrap:9092
 

@@ -1,14 +1,14 @@
 import os
 
-KAFKA_PREFIX = "KAFKA_"
-STRIMZI_PREFIX = "STRIMZI"
+KAFKA_PREFIX = 'KAFKA_'
+STRIMZI_PREFIX = 'STRIMZI'
 
 # Strimzi environment variables declaration
-TOPIC = "STRIMZI_TOPIC"
-MESSAGE = "STRIMZI_MESSAGE"
+TOPIC = 'STRIMZI_TOPIC'
+MESSAGE = 'STRIMZI_MESSAGE'
 
 # default values for Strimzi environment variables
-DEFAULT_TOPIC = "my-topic"
+DEFAULT_TOPIC = 'my-topic'
 DEFAULT_MESSAGE = 'Hello to the World'
 
 
