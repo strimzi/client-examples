@@ -51,7 +51,7 @@ spec:
     spec:
       containers:
         - name: python-kafka-consumer
-          image: docker.io/owenerz/python-kafka-producer:latest
+          image: docker.io/owenerz/python-kafka-consumer:latest
           env:
             - name: STRIMZI_TOPIC
               value: my-topic

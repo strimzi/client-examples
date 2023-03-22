@@ -18,7 +18,7 @@ DEFAULT_PROPERTIES = {
 
 
 def convertEnvVarToPropertyKey(e):
-    return e[e.index('_') + 1:].lower()
+    return e[e.index('_') + 1:].lower().replace('_', '.')
 
 
 class KafkaConsumerConfig:

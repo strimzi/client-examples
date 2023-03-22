@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/python-38:latest
+FROM registry.access.redhat.com/ubi8/python-39:latest
 
 USER root
 
@@ -17,4 +17,4 @@ RUN pip3 install -r requirements.txt
 
 USER 1002
 
-CMD ["python3", "/kafka_consumer.py"]
+CMD ["python3", "/opt/app-root/src/kafka_consumer.py"]

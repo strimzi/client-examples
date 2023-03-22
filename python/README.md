@@ -43,7 +43,7 @@ This deploys the producer and consumer and also creates the topics they are usin
 
 If you built your own version of these examples, remember to update the `image` field with the path where the image was pushed during the build and it's available (i.e. `<my-docker-org>/python-kafka-consumer:latest`).
 
-When using [`python-deployment.yaml`](./python/kafka/deployment.yaml) file for deployment you can start observing the sending messages in producer container's log and the receiving of messages in consumer container's log.
+When using [`python-kafka-deployment.yaml`](./python/python-kafka-deployment.yaml) file for deployment you can start observing the sending messages in producer container's log and the receiving of messages in consumer container's log.
 
 ## Configuration
 
