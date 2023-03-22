@@ -3,7 +3,7 @@ kind: KafkaTopic
 metadata:
   name: my-topic
   labels:
-      strimzi.io/cluster: my-cluster
+    strimzi.io/cluster: my-cluster
 spec:
   replicas: 3
   partitions: 12
@@ -33,15 +33,10 @@ spec:
       - resource:
           type: topic
           name: my-topic
-        operation: Write
-      - resource:
-          type: topic
-          name: my-topic
-        operation: Create
-      - resource:
-          type: topic
-          name: my-topic
-        operation: Describe
+        operations:
+          - Write
+          - Create
+          - Describe
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -114,28 +109,22 @@ spec:
       - resource:
           type: topic
           name: my-topic
-        operation: Read
-      - resource:
-          type: topic
-          name: my-topic
-        operation: Describe
+        operations:
+          - Read
+          - Describe
       - resource:
           type: group
           name: java-kafka-streams
           patternType: prefix
-        operation: Read
+        operations:
+          - Read
       - resource:
           type: topic
           name: my-topic-reversed
-        operation: Write
-      - resource:
-          type: topic
-          name: my-topic-reversed
-        operation: Create
-      - resource:
-          type: topic
-          name: my-topic-reversed
-        operation: Describe
+        operations:
+          - Write
+          - Create
+          - Describe
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -210,15 +199,14 @@ spec:
       - resource:
           type: topic
           name: my-topic-reversed
-        operation: Read
-      - resource:
-          type: topic
-          name: my-topic-reversed
-        operation: Describe
+        operations:
+          - Read
+          - Describe
       - resource:
           type: group
           name: java-kafka-consumer
-        operation: Read
+        operations:
+          - Read
 ---
 apiVersion: apps/v1
 kind: Deployment
