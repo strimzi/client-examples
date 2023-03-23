@@ -11,4 +11,4 @@ ADD requirements.txt $HOME
 
 RUN pip3 install -r requirements.txt
 
-CMD ["python3", "/opt/app-root/src/kafka_producer.py"]
+CMD ["python3", "kafka_producer.py"]

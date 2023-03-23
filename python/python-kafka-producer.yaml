@@ -24,5 +24,3 @@ spec:
               value: "1000"
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: my-cluster-kafka-bootstrap:9092
-
-

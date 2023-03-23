@@ -13,7 +13,7 @@ DEFAULT_TOPIC = 'my-topic'
 DEFAULT_PROPERTIES = {
     'bootstrap.servers': 'localhost:9092',
     'group.id': 'my-kafka-consumer',
-    'client.id': 'my-kafka-client'
+    'client.id': 'my-consumer'
 }
 
 
