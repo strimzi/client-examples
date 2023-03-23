@@ -6,7 +6,6 @@ from kafka_producer_config import from_env
 if __name__ == '__main__':
     config = from_env()
 
-
     producer = Producer(
         config.properties
     )

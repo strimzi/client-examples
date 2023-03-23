@@ -1,7 +1,7 @@
 import os
 
+# Used in fromEnv() to find evnVar starting with KAFKA_
 KAFKA_PREFIX = 'KAFKA_'
-STRIMZI_PREFIX = 'STRIMZI'
 
 # Strimzi environment variables declaration
 TOPIC = 'STRIMZI_TOPIC'
@@ -17,6 +17,7 @@ DEFAULT_PROPERTIES = {
 }
 
 
+# Converts env var names to variable names that are compliant with Kafka properties file format
 def convertEnvVarToPropertyKey(e):
     return e[e.index('_') + 1:].lower().replace('_', '.')
 

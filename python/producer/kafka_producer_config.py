@@ -1,5 +1,6 @@
 import os
 
+# Used in fromEnv() to find evnVar starting with KAFKA_
 KAFKA_PREFIX = 'KAFKA_'
 
 # Strimzi environment variables declaration
