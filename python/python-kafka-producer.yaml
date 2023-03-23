@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: python-kafka-producer
-          image: docker.io/owenerz/python-kafka-producer:latest
+          image: quay.io/strimzi-examples/python-kafka-producer:latest
           env:
             - name: STRIMZI_TOPIC
               value: my-topic
