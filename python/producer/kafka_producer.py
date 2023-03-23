@@ -6,6 +6,7 @@ from kafka_producer_config import from_env
 if __name__ == '__main__':
     config = from_env()
 
+
     producer = Producer(
         config.properties
     )
@@ -15,4 +16,5 @@ if __name__ == '__main__':
         producer.produce(config.topic, producer_message)
         producer.flush()
         print(f'Producing message @ {datetime.now()} | Message = {str(producer_message)}')
-        time.sleep(1)
+        time.sleep(config.delay)
+

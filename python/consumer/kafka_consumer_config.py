@@ -30,6 +30,6 @@ class KafkaConsumerConfig:
 def from_env():
     topic = os.getenv(TOPIC, DEFAULT_TOPIC)
     for k, v in os.environ.items():
-        if k.startswith('KAFKA_'):
+        if k.startswith(KAFKA_PREFIX):
             DEFAULT_PROPERTIES[convertEnvVarToPropertyKey(k)] = v
     return KafkaConsumerConfig(topic, DEFAULT_PROPERTIES)

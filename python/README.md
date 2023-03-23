@@ -1,8 +1,3 @@
-[![Build Status](https://dev.azure.com/cncf/strimzi/_apis/build/status/client-examples?branchName=main)](https://dev.azure.com/cncf/strimzi/_build/latest?definitionId=33&branchName=main)
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
-[![Twitter Follow](https://img.shields.io/twitter/follow/strimziio?style=social)](https://twitter.com/strimziio)
-
-
 # Python Client 
 
 This repository contains examples of [Apache Kafka®](https://kafka.apache.org) client applications written using the Confluent-Kafka Python client library.
