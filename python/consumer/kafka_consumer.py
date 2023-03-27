@@ -11,7 +11,7 @@ if __name__ == '__main__':
     consumer.subscribe([config.topic])
 
     while True:
-        message = consumer.poll(timeout=1.0)
+        message = consumer.poll(timeout=config.delay)
         if message is None:
             print("Waiting...")
         else:

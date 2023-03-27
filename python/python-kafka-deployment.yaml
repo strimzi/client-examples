@@ -57,5 +57,7 @@ spec:
           env:
             - name: STRIMZI_TOPIC
               value: my-topic
+            - name: STRIMZI_DELAY_MS
+              value: "2000"
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: my-cluster-kafka-bootstrap:9092
