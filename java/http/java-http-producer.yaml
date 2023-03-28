@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: java-http-producer
-        image: quay.io/strimzi-examples/java-http-producer:latest
+        image: docker.io/owenerz/java-http-producer:latest
         env:
           - name: STRIMZI_HOSTNAME
             value: my-bridge-bridge-service

@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: java-http-consumer
-        image: quay.io/strimzi-examples/java-http-consumer:latest
+        image: docker.io/owenerz/java-http-consumer:latest
         env:
           - name: STRIMZI_HOSTNAME
             value: my-bridge-bridge-service
