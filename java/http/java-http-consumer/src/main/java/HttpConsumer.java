@@ -31,7 +31,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-
 public class HttpConsumer {
 
     private static final Logger log = LogManager.getLogger(HttpConsumer.class);
@@ -130,7 +129,7 @@ public class HttpConsumer {
 
     private void scheduledPoll() {
         this.poll();
-        if (this.messageReceived > this.config.getMessageCount()) {
+        if (this.messageReceived >= this.config.getMessageCount()) {
             this.executorService.shutdown();
         }
     }

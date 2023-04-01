@@ -30,6 +30,8 @@ spec:
             value: "my-group"
           - name: STRIMZI_POLL_INTERVAL
             value: "1000"
+          - name: STRIMZI_MESSAGE_COUNT
+            value: "1000000"
         resources:
           requests:
             memory: "256Mi"
