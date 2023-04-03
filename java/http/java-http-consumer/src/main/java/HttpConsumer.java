@@ -129,7 +129,7 @@ public class HttpConsumer {
 
     private void scheduledPoll() {
         this.poll();
-        if (this.messageReceived >= this.config.getMessageCount()) {
+        if (this.messageReceived > this.config.getMessageCount()) {
             this.executorService.shutdown();
         }
     }
