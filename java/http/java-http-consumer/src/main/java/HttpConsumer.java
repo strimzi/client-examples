@@ -123,14 +123,16 @@ public class HttpConsumer {
     public void run() throws InterruptedException {
         log.info("Scheduling periodic poll every {} ms waiting for {} ...", this.config.getPollInterval(), this.config.getMessageCount());
         this.executorService.scheduleAtFixedRate(this::scheduledPoll, 0, this.config.getPollInterval(), TimeUnit.MILLISECONDS);
-        this.executorService.awaitTermination(this.config.getPollInterval() * this.config.getMessageCount() + 60_000L, TimeUnit.MILLISECONDS);
+        this.executorService.awaitTermination(this.config.getPollInterval() * Long.MAX_VALUE + 60_000L, TimeUnit.MILLISECONDS);
         log.info("... {} messages received", this.messageReceived);
     }
 
     private void scheduledPoll() {
         this.poll();
-        if (this.messageReceived > this.config.getMessageCount()) {
-            this.executorService.shutdown();
+        if (this.config.getMessageCount() > HttpConsumerConfig.DEFAULT_MESSAGES_COUNT) {
+            if (this.messageReceived > this.config.getMessageCount()) {
+                this.executorService.shutdown();
+            }
         }
     }
 

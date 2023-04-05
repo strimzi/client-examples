@@ -12,7 +12,7 @@ public class HttpConsumerConfig {
     private static final String DEFAULT_GROUPID = "my-group";
     private static final String DEFAULT_CLIENTID = "my-consumer";
 
-    private static final long DEFAULT_MESSAGES_COUNT = 10;
+    public static final long DEFAULT_MESSAGES_COUNT = -1;
     private static final int DEFAULT_POLL_INTERVAL = 1000;
     private static final int DEFAULT_POLL_TIMEOUT = 100;
 
