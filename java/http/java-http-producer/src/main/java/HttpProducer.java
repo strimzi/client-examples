@@ -64,17 +64,27 @@ public class HttpProducer {
                 GlobalOpenTelemetry.getTracer("client-examples");
     }
 
+    private Long getDefaultMessageCount() {
+        Long messageCount = this.config.getMessageCount();
+        return messageCount == null ? 1000000L : messageCount;
+    }
+
     public void run() throws InterruptedException {
-        log.info("Scheduling periodic send: {} messages every {} ms ...", this.config.getMessageCount(), this.config.getDelay());
+        Long messageCount = getDefaultMessageCount();
+        log.info("Scheduling periodic send: {} messages every {} ms ...", messageCount, this.config.getDelay());
         this.executorService.scheduleAtFixedRate(this::scheduledSend, 0, this.config.getDelay(), TimeUnit.MILLISECONDS);
-        this.executorService.awaitTermination(this.config.getDelay() * this.config.getMessageCount() + 60_000L, TimeUnit.MILLISECONDS);
+        this.executorService.awaitTermination(messageCount, TimeUnit.MILLISECONDS);
         log.info("... {} messages sent", this.messageSent);
     }
 
+
     private void scheduledSend() {
-        this.send();
-        if (this.messageSent == this.config.getMessageCount()) {
-            this.executorService.shutdown();
+        Long messageCount = getDefaultMessageCount();
+        if(messageCount != null) {
+            this.send();
+            if (this.messageSent == messageCount) {
+                this.executorService.shutdown();
+            }
         }
     }
 
