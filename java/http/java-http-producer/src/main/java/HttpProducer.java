@@ -77,7 +77,6 @@ public class HttpProducer {
         log.info("... {} messages sent", this.messageSent);
     }
 
-
     private void scheduledSend() {
         this.send();
         if (this.config.getMessageCount() != null && this.messageSent >= this.config.getMessageCount()) {

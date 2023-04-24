@@ -132,7 +132,6 @@ public class HttpConsumer {
         log.info("... {} messages received", this.messageReceived);
     }
 
-
     private void scheduledPoll() {
         this.poll();
         if (this.config.getMessageCount() != null && this.messageReceived == this.config.getMessageCount()) {
@@ -141,7 +140,6 @@ public class HttpConsumer {
             log.info("All messages received");
         }
     }
-
 
     public void poll() {
         try {
@@ -176,14 +174,11 @@ public class HttpConsumer {
                 span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, response.statusCode());
                 span.setStatus(response.statusCode() == 200 ? StatusCode.OK : StatusCode.ERROR);
             } finally {
-
                 span.end();
             }
         } catch (URISyntaxException | IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
-
-
     }
 
     public void deleteConsumer() throws IOException, InterruptedException {
@@ -201,4 +196,3 @@ public class HttpConsumer {
         }
     }
 }
-
