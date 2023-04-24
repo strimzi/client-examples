@@ -9,7 +9,6 @@ public class HttpProducerConfig {
     private static final String DEFAULT_HOSTNAME = "localhost";
     private static final int DEFAULT_PORT = 8080;
     private static final String DEFAULT_TOPIC = "my-topic";
-    private static final long DEFAULT_MESSAGES_COUNT = 10;
     private static final String DEFAULT_MESSAGE = "Hello world";
 
     private static final int DEFAULT_DELAY_MS = 1000;
@@ -17,7 +16,7 @@ public class HttpProducerConfig {
     private final String hostName;
     private final int port;
     private final String topic;
-    private final long messageCount;
+    private final Long messageCount;
     private final int delay;
     private final String message;
     private final TracingSystem tracingSystem;
@@ -37,7 +36,7 @@ public class HttpProducerConfig {
         String hostName = System.getenv("STRIMZI_HOSTNAME") == null ? DEFAULT_HOSTNAME : System.getenv("STRIMZI_HOSTNAME");
         int port = System.getenv("STRIMZI_PORT") == null ? DEFAULT_PORT : Integer.parseInt(System.getenv("STRIMZI_PORT"));
         String topic = System.getenv("STRIMZI_TOPIC") == null ? DEFAULT_TOPIC : System.getenv("STRIMZI_TOPIC");
-        Long messageCount = System.getenv("STRIMZI_MESSAGE_COUNT") == null ? DEFAULT_MESSAGES_COUNT : Long.parseLong(System.getenv("STRIMZI_MESSAGE_COUNT"));
+        Long messageCount = System.getenv("STRIMZI_MESSAGE_COUNT") == null ? null : Long.parseLong(System.getenv("STRIMZI_MESSAGE_COUNT"));
         int delay = System.getenv("STRIMZI_DELAY_MS") == null ? DEFAULT_DELAY_MS : Integer.parseInt(System.getenv("STRIMZI_DELAY_MS"));
         String message = System.getenv("STRIMZI_MESSAGE") == null ? DEFAULT_MESSAGE : System.getenv("STRIMZI_MESSAGE");
         TracingSystem tracingSystem = TracingSystem.forValue(System.getenv().getOrDefault("STRIMZI_TRACING_SYSTEM", ""));
@@ -56,7 +55,7 @@ public class HttpProducerConfig {
         return topic;
     }
 
-    public long getMessageCount() {
+    public Long getMessageCount() {
         return messageCount;
     }
 
