@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -37,10 +38,12 @@ public class HttpProducer {
     private HttpClient httpClient;
     private URI sendEndpoint;
     private Tracer tracer;
+    private CountDownLatch messagesSentLatch;
 
     public static void main(String[] args) throws InterruptedException, URISyntaxException {
-        HttpProducerConfig config = HttpProducerConfig.fromEnv();
 
+        HttpProducerConfig config = HttpProducerConfig.fromEnv();
+        CountDownLatch messagesSentLatch = new CountDownLatch(1);
         TracingSystem tracingSystem = config.getTracingSystem();
         if (tracingSystem != TracingSystem.NONE) {
             if (tracingSystem == TracingSystem.OPENTELEMETRY) {
@@ -50,12 +53,16 @@ public class HttpProducer {
             }
         }
 
-        HttpProducer httpProducer = new HttpProducer(config);
+        HttpProducer httpProducer = new HttpProducer(config, messagesSentLatch);
         httpProducer.run();
+
+        log.info("Waiting for sending all messages");
+        messagesSentLatch.await();
     }
 
-    public HttpProducer(HttpProducerConfig config) throws URISyntaxException {
+    public HttpProducer(HttpProducerConfig config,CountDownLatch messagesSentLatch ) throws URISyntaxException {
         this.config = config;
+        this.messagesSentLatch = messagesSentLatch;
         this.executorService = Executors.newSingleThreadScheduledExecutor();
         this.httpClient = HttpClient.newHttpClient();
         this.sendEndpoint = new URI("http://" + this.config.getHostName() + ":" + this.config.getPort() + "/topics/" + this.config.getTopic());
@@ -64,27 +71,19 @@ public class HttpProducer {
                 GlobalOpenTelemetry.getTracer("client-examples");
     }
 
-    private Long getDefaultMessageCount() {
-        Long messageCount = this.config.getMessageCount();
-        return messageCount == null ? 1000000L : messageCount;
-    }
-
     public void run() throws InterruptedException {
-        Long messageCount = getDefaultMessageCount();
-        log.info("Scheduling periodic send: {} messages every {} ms ...", messageCount, this.config.getDelay());
+        log.info("Scheduling periodic send: {} messages every {} ms ...", this.config.getMessageCount(), this.config.getDelay());
         this.executorService.scheduleAtFixedRate(this::scheduledSend, 0, this.config.getDelay(), TimeUnit.MILLISECONDS);
-        this.executorService.awaitTermination(messageCount, TimeUnit.MILLISECONDS);
         log.info("... {} messages sent", this.messageSent);
     }
 
 
     private void scheduledSend() {
-        Long messageCount = getDefaultMessageCount();
-        if(messageCount != null) {
-            this.send();
-            if (this.messageSent == messageCount) {
-                this.executorService.shutdown();
-            }
+        this.send();
+        if (this.config.getMessageCount() != null && this.messageSent >= this.config.getMessageCount()) {
+            this.executorService.shutdown();
+            this.messagesSentLatch.countDown();
+            log.info("All messages sent");
         }
     }
 
@@ -124,3 +123,4 @@ public class HttpProducer {
         }
     }
 }
+
