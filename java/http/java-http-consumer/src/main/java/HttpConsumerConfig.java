@@ -11,8 +11,6 @@ public class HttpConsumerConfig {
     private static final String DEFAULT_TOPIC = "my-topic";
     private static final String DEFAULT_GROUPID = "my-group";
     private static final String DEFAULT_CLIENTID = "my-consumer";
-
-    private static final long DEFAULT_MESSAGES_COUNT = 10;
     private static final int DEFAULT_POLL_INTERVAL = 1000;
     private static final int DEFAULT_POLL_TIMEOUT = 100;
 
@@ -21,13 +19,13 @@ public class HttpConsumerConfig {
     private final String topic;
     private final String groupId;
     private final String clientId;
-    private final long messageCount;
+    private final Long messageCount;
     private final int pollInterval;
     private final int pollTimeout;
     private final TracingSystem tracingSystem;
 
     private HttpConsumerConfig(String hostName, int port, String topic, String groupId, String clientId,
-                               long messageCount, int pollInterval, int pollTimeout, TracingSystem tracingSystem) {
+                               Long messageCount, int pollInterval, int pollTimeout, TracingSystem tracingSystem) {
         this.hostName = hostName;
         this.port = port;
         this.topic = topic;
@@ -45,7 +43,7 @@ public class HttpConsumerConfig {
         String topic = System.getenv("STRIMZI_TOPIC") == null ? DEFAULT_TOPIC : System.getenv("STRIMZI_TOPIC");
         String groupId = System.getenv("STRIMZI_GROUP_ID") == null ? DEFAULT_GROUPID : System.getenv("STRIMZI_GROUP_ID");
         String clientId = System.getenv("STRIMZI_CLIENT_ID") == null ? DEFAULT_CLIENTID : System.getenv("STRIMZI_CLIENT_ID");
-        Long messageCount = System.getenv("STRIMZI_MESSAGE_COUNT") == null ? DEFAULT_MESSAGES_COUNT : Long.parseLong(System.getenv("STRIMZI_MESSAGE_COUNT"));
+        Long messageCount = System.getenv("STRIMZI_MESSAGE_COUNT") == null ? null : Long.parseLong(System.getenv("STRIMZI_MESSAGE_COUNT"));
         int pollInterval = System.getenv("STRIMZI_POLL_INTERVAL") == null ? DEFAULT_POLL_INTERVAL : Integer.parseInt(System.getenv("STRIMZI_POLL_INTERVAL"));
         int pollTimeout = System.getenv("STRIMZI_POLL_TIMEOUT") == null ? DEFAULT_POLL_TIMEOUT : Integer.parseInt(System.getenv("STRIMZI_POLL_TIMEOUT"));
         TracingSystem tracingSystem = TracingSystem.forValue(System.getenv().getOrDefault("STRIMZI_TRACING_SYSTEM", ""));
@@ -72,7 +70,7 @@ public class HttpConsumerConfig {
         return clientId;
     }
 
-    public long getMessageCount() {
+    public Long getMessageCount() {
         return messageCount;
     }
 

@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -43,10 +44,12 @@ public class HttpConsumer {
     private int messageReceived = 0;
     private ScheduledExecutorService executorService;
     private Tracer tracer;
+    private CountDownLatch messagesReceivedLatch;
 
 
     public static void main(String[] args) throws URISyntaxException, IOException, InterruptedException {
         HttpConsumerConfig config = HttpConsumerConfig.fromEnv();
+        CountDownLatch messagesReceivedLatch = new CountDownLatch(1);
 
         TracingSystem tracingSystem = config.getTracingSystem();
         if (tracingSystem != TracingSystem.NONE) {
@@ -57,18 +60,21 @@ public class HttpConsumer {
             }
         }
 
-        HttpConsumer consumer = new HttpConsumer(config);
+        HttpConsumer consumer = new HttpConsumer(config, messagesReceivedLatch);
         try {
             consumer.createConsumer();
             consumer.subscribe();
             consumer.run();
+            log.info("Waiting for receiving all messages");
+            messagesReceivedLatch.await();
         } finally {
             consumer.deleteConsumer();
         }
     }
 
-    public HttpConsumer(HttpConsumerConfig config) throws URISyntaxException {
+    public HttpConsumer(HttpConsumerConfig config, CountDownLatch messagesReceivedLatch) throws URISyntaxException {
         this.config = config;
+        this.messagesReceivedLatch = messagesReceivedLatch;
         this.executorService = Executors.newSingleThreadScheduledExecutor();
         this.httpClient = HttpClient.newHttpClient();
         this.createConsumerEndpoint = new URI("http://" + this.config.getHostName() + ":" + this.config.getPort() + "/consumers/" + this.config.getGroupId());
@@ -123,14 +129,15 @@ public class HttpConsumer {
     public void run() throws InterruptedException {
         log.info("Scheduling periodic poll every {} ms waiting for {} ...", this.config.getPollInterval(), this.config.getMessageCount());
         this.executorService.scheduleAtFixedRate(this::scheduledPoll, 0, this.config.getPollInterval(), TimeUnit.MILLISECONDS);
-        this.executorService.awaitTermination(this.config.getPollInterval() * this.config.getMessageCount() + 60_000L, TimeUnit.MILLISECONDS);
         log.info("... {} messages received", this.messageReceived);
     }
 
     private void scheduledPoll() {
         this.poll();
-        if (this.messageReceived == this.config.getMessageCount()) {
+        if (this.config.getMessageCount() != null && this.messageReceived == this.config.getMessageCount()) {
             this.executorService.shutdown();
+            this.messagesReceivedLatch.countDown();
+            log.info("All messages received");
         }
     }
 
