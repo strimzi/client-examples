@@ -17,7 +17,7 @@ COPY_SCRIPTS       ?= cp ../../../scripts/run.sh ./scripts/run.sh
 all: docker_build docker_push
 
 docker_build:
-	echo "Building Docker image ..."
+ 	docker build $(DOCKER_PLATFORM) --build-arg version=$(DOCKER_VERSION_ARG) -t strimzi/$(PROJECT_NAME):$(DOCKER_TAG) $(DOCKERFILE_DIR)
 	mkdir -p scripts
 	$(COPY_SCRIPTS)
 	docker build $(DOCKER_PLATFORM) --build-arg version=$(DOCKER_VERSION_ARG) -t strimzi/$(PROJECT_NAME):$(DOCKER_TAG) $(DOCKERFILE_DIR)
