@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: java-http-consumer
-        image: quay.io/strimzi-examples/java-http-consumer:latest
+        image: docker.io/owenerz/java-http-consumer:latest
         env:
           - name: STRIMZI_HOSTNAME
             value: my-bridge-bridge-service
@@ -30,6 +30,8 @@ spec:
             value: "my-group"
           - name: STRIMZI_POLL_INTERVAL
             value: "1000"
+          - name: STRIMZI_MESSAGE_COUNT
+            value: "1000000"
         resources:
           requests:
             memory: "256Mi"
