@@ -26,8 +26,6 @@ spec:
             value: my-topic
           - name: STRIMZI_SEND_INTERVAL
             value: "1000"
-          - name: STRIMZI_MESSAGE_COUNT
-            value: "1000000"
         resources:
           requests:
             memory: "256Mi"

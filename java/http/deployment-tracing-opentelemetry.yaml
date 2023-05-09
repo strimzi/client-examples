@@ -26,8 +26,6 @@ spec:
             value: my-topic
           - name: STRIMZI_SEND_INTERVAL
             value: "1000"
-          - name: STRIMZI_MESSAGE_COUNT
-            value: "1000000"
           - name: STRIMZI_TRACING_SYSTEM
             value: "opentelemetry"
           - name: OTEL_SERVICE_NAME
@@ -72,8 +70,6 @@ spec:
             value: "my-group"
           - name: STRIMZI_POLL_INTERVAL
             value: "1000"
-          - name: STRIMZI_MESSAGE_COUNT
-            value: "1000000"
           - name: STRIMZI_TRACING_SYSTEM
             value: "opentelemetry"
           - name: OTEL_SERVICE_NAME

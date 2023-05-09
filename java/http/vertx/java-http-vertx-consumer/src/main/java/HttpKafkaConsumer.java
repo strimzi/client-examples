@@ -18,8 +18,10 @@ import io.opentracing.propagation.Format;
 import io.opentracing.propagation.TextMapAdapter;
 import io.opentracing.tag.Tags;
 import io.opentracing.util.GlobalTracer;
-import io.vertx.core.*;
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
+import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.HttpResponse;
@@ -128,30 +130,30 @@ public class HttpKafkaConsumer extends AbstractVerticle {
         Promise<CreatedConsumer> promise = Promise.promise();
 
         JsonObject json = new JsonObject()
-                .put("format", "json");
+            .put("format", "json");
 
         if (config.getClientId() != null) {
             json.put("name", config.getClientId());
         }
 
         this.client.post(this.config.getEndpointPrefix() + "/consumers/" + this.config.getGroupid())
-                .putHeader(HttpHeaderNames.CONTENT_LENGTH.toString(), String.valueOf(json.toBuffer().length()))
-                .putHeader(HttpHeaderNames.CONTENT_TYPE.toString(), "application/vnd.kafka.v2+json")
-                .as(BodyCodec.jsonObject())
-                .sendJsonObject(json)
-                .onSuccess(response -> {
-                    if (response.statusCode() == HttpResponseStatus.OK.code()) {
-                        JsonObject body = response.body();
-                        this.consumer = new CreatedConsumer(body.getString("instance_id"), body.getString("base_uri"));
-                        log.info("Consumer created as {}", this.consumer);
-                        promise.complete(consumer);
-                    } else {
-                        promise.fail(new RuntimeException("Got HTTP status code " + response.statusCode()));
-                    }
-                })
-                .onFailure(cause -> {
-                    promise.fail(cause);
-                });
+             .putHeader(HttpHeaderNames.CONTENT_LENGTH.toString(), String.valueOf(json.toBuffer().length()))
+             .putHeader(HttpHeaderNames.CONTENT_TYPE.toString(), "application/vnd.kafka.v2+json")
+             .as(BodyCodec.jsonObject())
+             .sendJsonObject(json)
+             .onSuccess(response -> {
+                 if (response.statusCode() == HttpResponseStatus.OK.code()) {
+                     JsonObject body = response.body();
+                     this.consumer = new CreatedConsumer(body.getString("instance_id"), body.getString("base_uri"));
+                     log.info("Consumer created as {}", this.consumer);
+                     promise.complete(consumer);
+                 } else {
+                     promise.fail(new RuntimeException("Got HTTP status code " + response.statusCode()));
+                 }
+             })
+             .onFailure(cause -> {
+                 promise.fail(cause);
+             });
         return promise.future();
     }
 
@@ -170,10 +172,10 @@ public class HttpKafkaConsumer extends AbstractVerticle {
                             Tracer tracer = GlobalTracer.get();
 
                             MultiMap rawHeaders = response.headers();
-                            final Map<String, String> headers = new HashMap<>();
-                            for (Map.Entry<String, String> header : rawHeaders) {
-                                headers.put(header.getKey(), header.getValue());
-                            }
+                        final Map<String, String> headers = new HashMap<>();
+                        for (Map.Entry<String, String> header : rawHeaders) {
+                            headers.put(header.getKey(), header.getValue());
+                        }
 
                             String operation = "poll";
                             Tracer.SpanBuilder spanBuilder;
@@ -203,7 +205,7 @@ public class HttpKafkaConsumer extends AbstractVerticle {
                             });
                             this.messagesReceived += list.size();
 
-                            span.finish();
+                        span.finish();
 
                             promise.complete(list);
                         } else {
@@ -218,8 +220,8 @@ public class HttpKafkaConsumer extends AbstractVerticle {
                         // signal to main thread that all messages are received, application can exit
                         this.messagesReceivedLatch.countDown();
                         log.info("All messages received");
-                    }
-                });
+                }
+            });
         return promise.future();
     }
 
