@@ -134,7 +134,7 @@ public class HttpKafkaConsumer extends AbstractVerticle {
         Promise<Void> promise = Promise.promise();
 
         JsonObject topics = new JsonObject()
-                .put("topics", new JsonArray().add(topic));
+            .put("topics", new JsonArray().add(topic));
 
         HttpRequest<JsonObject> request = client.post(consumer.getBaseUri() + "/subscription")
             .putHeader(HttpHeaderNames.CONTENT_LENGTH.toString(), String.valueOf(topics.toBuffer().length()))
