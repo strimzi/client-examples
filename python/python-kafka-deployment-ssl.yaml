@@ -1,0 +1,157 @@
+apiVersion: kafka.strimzi.io/v1beta1
+kind: KafkaTopic
+metadata:
+  name: my-topic
+  labels:
+    strimzi.io/cluster: my-cluster
+spec:
+  replicas: 3
+  partitions: 12
+---
+apiVersion: kafka.strimzi.io/v1beta1
+kind: KafkaUser
+metadata:
+  name: python-kafka-producer
+  labels:
+    strimzi.io/cluster: my-cluster
+spec:
+  authentication:
+    type: tls
+#  authorization:
+#    type: simple
+#    acls:
+#      - resource:
+#          type: topic
+#          name: my-topic
+#        operations:
+#         - Write
+#         - Create
+#         - Describe
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: python-kafka-producer
+  name: python-kafka-producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-kafka-producer
+  template:
+    metadata:
+      labels:
+        app: python-kafka-producer
+    spec:
+      containers:
+        - name: python-kafka-producer
+          image: docker.io/owenerz/python-kafka-producer:latest
+          env:
+            - name: STRIMZI_TOPIC
+              value: my-topic
+            - name: STRIMZI_DELAY_MS
+              value: "1000"
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: my-cluster-kafka-bootstrap:9093
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: ssl
+              # Client's Truststore - contains CA cert of the Brokers
+            - name: KAFKA_SSL_CA_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: my-cluster-cluster-ca-cert
+                  key: ca.crt
+              # Client's Public Key - part of client Keystore
+            - name: KAFKA_SSL_CERTIFICATE_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: python-kafka-producer
+                  key: user.crt
+              # Client's Private Key
+            - name: KAFKA_SSL_KEY_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: python-kafka-producer
+                  key: user.key
+              # Client's Keystore Password
+            - name: KAFKA_SSL_KEYSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: python-kafka-producer
+                  key: user.password
+---
+apiVersion: kafka.strimzi.io/v1beta1
+kind: KafkaUser
+metadata:
+  name: python-kafka-consumer
+  labels:
+    strimzi.io/cluster: my-cluster
+spec:
+  authentication:
+    type: tls
+#  authorization:
+#    type: simple
+#    acls:
+#      - resource:
+#          type: topic
+#          name: my-topic
+#        operations:
+#          - Read
+#          - Describe
+#      - resource:
+#          type: group
+#          name: java-kafka-consumer
+#        operations:
+#          - Read
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: python-kafka-consumer
+  name: python-kafka-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-kafka-consumer
+  template:
+    metadata:
+      labels:
+        app: python-kafka-consumer
+    spec:
+      containers:
+        - name: python-kafka-consumer
+          image: docker.io/owenerz/python-kafka-consumer:latest
+          env:
+            - name: STRIMZI_TOPIC
+              value: my-topic
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: my-cluster-kafka-bootstrap:9093
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: ssl
+              # Client's Truststore - contains CA cert of the Brokers
+            - name: KAFKA_SSL_CA_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: my-cluster-cluster-ca-cert
+                  key: ca.crt
+              # Client's Public Key - part of client Keystore
+            - name: KAFKA_SSL_CERTIFICATE_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: python-kafka-consumer
+                  key: user.crt
+              # Client's Private Key
+            - name: KAFKA_SSL_KEY_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: python-kafka-consumer
+                  key: user.key
+              # Client's Keystore Password
+            - name: KAFKA_SSL_KEYSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: python-kafka-consumer
+                  key: user.password

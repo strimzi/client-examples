@@ -1,0 +1,74 @@
+apiVersion: kafka.strimzi.io/v1beta1
+kind: KafkaTopic
+metadata:
+  name: my-topic
+  labels:
+      strimzi.io/cluster: my-cluster
+spec:
+  replicas: 3
+  partitions: 12
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: python-kafka-producer-oauth
+type: Opaque
+data:
+  clientSecret: aGVsbG8td29ybGQtcHJvZHVjZXItc2VjcmV0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: python-kafka-producer
+  name: python-kafka-producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-kafka-producer
+  template:
+    metadata:
+      labels:
+        app: python-kafka-producer
+    spec:
+      containers:
+        - name: python-kafka-producer
+          image: docker.io/owenerz/java-kafka-producer:latest
+          env:
+            - name: STRIMZI_TOPIC
+              value: my-topic
+            - name: STRIMZI_DELAY_MS
+              value: "1000"
+
+            - name: OAUTH_CLIENT_ID
+              value: java-kafka-producer
+            - name: OAUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: java-kafka-producer-oauth
+                  key: secret
+            - name: OAUTH_TOKEN_ENDPOINT_URI
+              value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
+            - name: OAUTH_SSL_TRUSTSTORE_TYPE
+              value: PEM
+            - name: OAUTH_SSL_TRUSTSTORE_CERTIFICATES
+              valueFrom:
+                secretKeyRef:
+                  name: sso-x509-https-secret
+                  key: tls.crt
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: my-cluster-kafka-bootstrap:9093
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: "SASL_SSL"
+            - name: KAFKA_SASL_JAAS_CONFIG
+              value: "org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;"
+            - name: KAFKA_SASL_MECHANISM
+              value: OAUTHBEARER
+            - name: KAFKA_SASL_LOGIN_CALLBACK_HANDLER_CLASS
+              value: "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler"
+            - name: KAFKA_SSL_CA_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: my-cluster-cluster-ca-cert
+                  key: ca.crt
