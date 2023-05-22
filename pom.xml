@@ -25,12 +25,12 @@
         <maven.shade.version>3.4.1</maven.shade.version>
 
         <!-- Regular dependencies -->
-        <kafka.version>3.3.1</kafka.version>
+        <kafka.version>3.4.0</kafka.version>
         <log4j.version>2.17.1</log4j.version>
         <opentracing.version>0.33.0</opentracing.version>
         <opentracing-kafka.version>0.1.15</opentracing-kafka.version>
-        <opentelemetry-alpha.version>1.18.0-alpha</opentelemetry-alpha.version>
-        <opentelemetry.version>1.18.0</opentelemetry.version>
+        <opentelemetry-alpha.version>1.19.0-alpha</opentelemetry-alpha.version>
+        <opentelemetry.version>1.19.0</opentelemetry.version>
         <jaeger.version>1.1.0</jaeger.version>
         <strimzi-oauth-callback.version>0.8.1</strimzi-oauth-callback.version>
         <vertx.version>4.3.7</vertx.version>
