@@ -60,7 +60,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: java-kafka-producer-oauth
-                  key: secret
+                  key: clientSecret
             - name: OAUTH_TOKEN_ENDPOINT_URI
               value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
             - name: OAUTH_SSL_TRUSTSTORE_TYPE
@@ -208,7 +208,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: java-kafka-consumer-oauth
-                  key: secret
+                  key: clientSecret
             - name: OAUTH_TOKEN_ENDPOINT_URI
               value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
             - name: OAUTH_SSL_TRUSTSTORE_TYPE
