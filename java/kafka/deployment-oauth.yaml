@@ -71,7 +71,7 @@ spec:
                   name: sso-x509-https-secret
                   key: tls.crt
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9092
+              value: my-cluster-kafka-bootstrap:9093
             - name: KAFKA_KEY_SERIALIZER
               value: "org.apache.kafka.common.serialization.StringSerializer"
             - name: KAFKA_VALUE_SERIALIZER
@@ -143,7 +143,7 @@ spec:
                   name: sso-x509-https-secret
                   key: tls.crt
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9092
+              value: my-cluster-kafka-bootstrap:9093
             - name: KAFKA_APPLICATION_ID
               value: java-kafka-streams
             - name: KAFKA_DEFAULT_COMMIT_INTERVAL_MS
@@ -219,7 +219,7 @@ spec:
                   name: sso-x509-https-secret
                   key: tls.crt
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9092
+              value: my-cluster-kafka-bootstrap:9093
             - name: KAFKA_GROUP_ID
               value: java-kafka-consumer
             - name: KAFKA_KEY_DESERIALIZER
