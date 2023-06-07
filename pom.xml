@@ -14,6 +14,7 @@
     </modules>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>17</maven.compiler.release>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -23,6 +24,7 @@
         <maven.compiler.version>3.10.1</maven.compiler.version>
         <maven.dependency.version>3.3.0</maven.dependency.version>
         <maven.shade.version>3.4.1</maven.shade.version>
+        <maven.checkstyle.version>3.2.0</maven.checkstyle.version>
 
         <!-- Regular dependencies -->
         <kafka.version>3.4.0</kafka.version>
@@ -175,6 +177,36 @@
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${maven.checkstyle.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>9.0</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                        <execution>
+                            <id>validate</id>
+                            <phase>validate</phase>
+                            <configuration>
+                                <configLocation>.checkstyle/checkstyle.xml</configLocation>
+                                <headerLocation>.checkstyle/java.header</headerLocation>
+                                <suppressionsLocation>.checkstyle/suppressions.xml</suppressionsLocation>
+                                <includeTestSourceDirectory>true</includeTestSourceDirectory>
+<!--                                <encoding>UTF-8</encoding>-->
+                                <consoleOutput>true</consoleOutput>
+                                <failsOnError>true</failsOnError>
+                            </configuration>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
