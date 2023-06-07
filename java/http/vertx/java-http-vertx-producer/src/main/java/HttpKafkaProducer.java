@@ -133,7 +133,7 @@ public class HttpKafkaProducer extends AbstractVerticle {
 
                     if (this.config.getMessageCount().isPresent() &&
                         this.messagesSent >= this.config.getMessageCount().get()) {
-                            // signal to main thread that all messages are sent, application can exit
+                        // signal to main thread that all messages are sent, application can exit
                         this.messagesSentLatch.countDown();
                         log.info("All messages sent");
                     }
