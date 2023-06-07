@@ -4,6 +4,8 @@
  */
 package io.strimzi.common;
 
+import java.util.Locale;
+
 /**
  * Provides utility methods for managing common configuration properties.
  */
@@ -15,6 +17,6 @@ public class ConfigUtil {
      * @return Returns a String which removes a prefix containing '_', converts to lower case and replaces '_' with '.'.
      */
     public static String convertEnvVarToPropertyKey(String envVar) {
-        return envVar.substring(envVar.indexOf("_") + 1).toLowerCase().replace("_", ".");
+        return envVar.substring(envVar.indexOf("_") + 1).toLowerCase(Locale.ENGLISH).replace("_", ".");
     }
 }

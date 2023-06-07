@@ -108,7 +108,7 @@ public class HttpKafkaProducerConfig {
         String topic = (String) map.getOrDefault(ENV_TOPIC, DEFAULT_TOPIC);
         int sendInterval = Integer.parseInt(map.getOrDefault(ENV_SEND_INTERVAL, DEFAULT_SEND_INTERVAL).toString());
         String envMessageCount = (String) map.get(ENV_MESSAGE_COUNT);
-        Optional<Long> messageCount = envMessageCount != null ? Optional.of((Long.parseLong(envMessageCount))) : Optional.empty();
+        Optional<Long> messageCount = envMessageCount != null ? Optional.of(Long.parseLong(envMessageCount)) : Optional.empty();
         String endpointPrefix = (String) map.getOrDefault(ENV_ENDPOINT_PREFIX, DEFAULT_ENDPOINT_PREFIX);
         return new HttpKafkaProducerConfig(hostname, port, topic, sendInterval, messageCount, endpointPrefix);
     }

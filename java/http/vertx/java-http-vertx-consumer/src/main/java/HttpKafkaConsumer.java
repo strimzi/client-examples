@@ -83,7 +83,7 @@ public class HttpKafkaConsumer extends AbstractVerticle {
             startPromise.complete();
             return Future.succeededFuture();
         })
-        .onFailure(startPromise::fail);
+            .onFailure(startPromise::fail);
     }
 
     @Override

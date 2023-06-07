@@ -175,7 +175,7 @@ public class HttpKafkaConsumerConfig {
         boolean pipelining = Boolean.valueOf(map.getOrDefault(ENV_PIPELINING, DEFAULT_PIPELINING).toString());
         int pipeliningLimit = Integer.parseInt(map.getOrDefault(ENV_PIPELINING_LIMIT, DEFAULT_PIPELINING_LIMIT).toString());
         String envMessageCount = (String) map.get(ENV_MESSAGE_COUNT);
-        Optional<Long> messageCount = envMessageCount != null ? Optional.of((Long.parseLong(envMessageCount))) : Optional.empty();
+        Optional<Long> messageCount = envMessageCount != null ? Optional.of(Long.parseLong(envMessageCount)) : Optional.empty();
         String endpointPrefix = (String) map.getOrDefault(ENV_ENDPOINT_PREFIX, DEFAULT_ENDPOINT_PREFIX);
         return new HttpKafkaConsumerConfig(hostname, port, topic, clientId, groupid, pollInterval, pollTimeout, pipelining, pipeliningLimit, messageCount, endpointPrefix);
     }
