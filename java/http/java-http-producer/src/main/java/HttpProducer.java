@@ -60,7 +60,7 @@ public class HttpProducer {
         messagesSentLatch.await();
     }
 
-    public HttpProducer(HttpProducerConfig config,CountDownLatch messagesSentLatch ) throws URISyntaxException {
+    public HttpProducer(HttpProducerConfig config, CountDownLatch messagesSentLatch) throws URISyntaxException {
         this.config = config;
         this.messagesSentLatch = messagesSentLatch;
         this.executorService = Executors.newSingleThreadScheduledExecutor();

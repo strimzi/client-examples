@@ -24,6 +24,7 @@ public class HttpConsumerConfig {
     private final int pollTimeout;
     private final TracingSystem tracingSystem;
 
+    @SuppressWarnings("checkstyle:ParameterNumber")
     private HttpConsumerConfig(String hostName, int port, String topic, String groupId, String clientId,
                                Long messageCount, int pollInterval, int pollTimeout, TracingSystem tracingSystem) {
         this.hostName = hostName;
@@ -37,6 +38,7 @@ public class HttpConsumerConfig {
         this.tracingSystem = tracingSystem;
     }
 
+    @SuppressWarnings("checkstyle:NPathComplexity")
     public static HttpConsumerConfig fromEnv() {
         String hostName = System.getenv("STRIMZI_HOSTNAME") == null ? DEFAULT_HOSTNAME : System.getenv("STRIMZI_HOSTNAME");
         int port = System.getenv("STRIMZI_PORT") == null ? DEFAULT_PORT : Integer.parseInt(System.getenv("STRIMZI_PORT"));
