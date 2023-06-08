@@ -86,7 +86,7 @@ public class HttpKafkaProducer extends AbstractVerticle {
         stopPromise.complete();
     }
 
-    private Promise <List<OffsetRecordSent>> send(String topic, Span span) {
+    private Promise<List<OffsetRecordSent>> send(String topic, Span span) {
         Promise<List<OffsetRecordSent>> fut = Promise.promise();
 
         JsonObject records = new JsonObject();
@@ -121,7 +121,7 @@ public class HttpKafkaProducer extends AbstractVerticle {
                                 list.add(new OffsetRecordSent(
                                     json.getInteger("partition"),
                                     json.getLong("offset"))
-                                    );
+                                );
                             });
                             fut.complete(list);
                         } else {
@@ -133,9 +133,9 @@ public class HttpKafkaProducer extends AbstractVerticle {
 
                     if (this.config.getMessageCount().isPresent() &&
                         this.messagesSent >= this.config.getMessageCount().get()) {
-                            // signal to main thread that all messages are sent, application can exit
-                            this.messagesSentLatch.countDown();
-                            log.info("All messages sent");
+                        // signal to main thread that all messages are sent, application can exit
+                        this.messagesSentLatch.countDown();
+                        log.info("All messages sent");
                     }
                 });
         return fut;
