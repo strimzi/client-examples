@@ -62,6 +62,7 @@ public class HttpKafkaConsumerConfig {
      * @param messageCount number of messages to receive
      * @param endpointPrefix a prefix to use in the endpoint path
      */
+    @SuppressWarnings("checkstyle:ParameterNumber")
     private HttpKafkaConsumerConfig(String hostname, int port, 
                                     String topic, String clientId, String groupid, 
                                     int pollInterval, int pollTimeout,

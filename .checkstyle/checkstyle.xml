@@ -92,25 +92,13 @@
 
         <!-- code quality -->
         <module name="MethodLength"/>
-        <module name="ParameterNumber">
-            <!-- default is 8 -->
-            <property name="max" value="11"/>
-        </module>
-        <module name="ClassDataAbstractionCoupling">
-            <!-- default is 7 -->
-            <property name="max" value="9"/>
-        </module>
+        <module name="ParameterNumber"/>
+        <module name="ClassDataAbstractionCoupling"/>
         <module name="BooleanExpressionComplexity"/>
-        <module name="ClassFanOutComplexity">
-            <!-- default is 20 -->
-            <property name="max" value="21"/>
-        </module>
+        <module name="ClassFanOutComplexity"/>
         <module name="CyclomaticComplexity"/>
         <module name="JavaNCSS"/>
-        <module name="NPathComplexity">
-            <property name="max" value="256"/>
-        </module>
-
+        <module name="NPathComplexity"/>
         <module name="IllegalToken">
             <property name="tokens" value="LITERAL_ASSERT"/>
         </module>

@@ -35,6 +35,7 @@ import org.apache.logging.log4j.LogManager;
 /**
  * HttpKafkaConsumer
  */
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class HttpKafkaConsumer extends AbstractVerticle {
 
     private final static Logger log = LogManager.getLogger(HttpKafkaConsumer.class);
