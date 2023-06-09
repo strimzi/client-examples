@@ -104,7 +104,9 @@ public class HttpProducer {
                     .POST(HttpRequest.BodyPublishers.ofString(records));
 
             try (Scope ignored = span.makeCurrent()) {
-                GlobalOpenTelemetry.getPropagators().getTextMapPropagator().inject(Context.current(), builder, HttpRequest.Builder::setHeader);
+                if (!this.config.getTracingSystem().equals(TracingSystem.NONE)) {
+                    GlobalOpenTelemetry.getPropagators().getTextMapPropagator().inject(Context.current(), builder, HttpRequest.Builder::setHeader);
+                }
                 HttpRequest request = builder.build();
 
                 HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
