@@ -73,6 +73,7 @@ public class HttpConsumer {
     }
 
     public HttpConsumer(HttpConsumerConfig config, CountDownLatch messagesReceivedLatch) throws URISyntaxException {
+        System.setProperty("otel.metrics.exporter", "none"); // disable metrics
         this.config = config;
         this.messagesReceivedLatch = messagesReceivedLatch;
         this.executorService = Executors.newSingleThreadScheduledExecutor();
@@ -158,9 +159,7 @@ public class HttpConsumer {
                     .GET();
 
             try (Scope ignored = span.makeCurrent()) {
-                if (!this.config.getTracingSystem().equals(TracingSystem.NONE)) {
-                    GlobalOpenTelemetry.getPropagators().getTextMapPropagator().inject(Context.current(), builder, HttpRequest.Builder::setHeader);
-                }
+                GlobalOpenTelemetry.getPropagators().getTextMapPropagator().inject(Context.current(), builder, HttpRequest.Builder::setHeader);
                 HttpRequest request = builder.build();
 
                 HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());

@@ -44,6 +44,7 @@ public class HttpProducer {
 
         HttpProducerConfig config = HttpProducerConfig.fromEnv();
         CountDownLatch messagesSentLatch = new CountDownLatch(1);
+
         TracingSystem tracingSystem = config.getTracingSystem();
         if (tracingSystem != TracingSystem.NONE) {
             if (tracingSystem == TracingSystem.OPENTELEMETRY) {
@@ -61,6 +62,7 @@ public class HttpProducer {
     }
 
     public HttpProducer(HttpProducerConfig config, CountDownLatch messagesSentLatch) throws URISyntaxException {
+        System.setProperty("otel.metrics.exporter", "none"); // disable metrics
         this.config = config;
         this.messagesSentLatch = messagesSentLatch;
         this.executorService = Executors.newSingleThreadScheduledExecutor();
@@ -104,9 +106,7 @@ public class HttpProducer {
                     .POST(HttpRequest.BodyPublishers.ofString(records));
 
             try (Scope ignored = span.makeCurrent()) {
-                if (!this.config.getTracingSystem().equals(TracingSystem.NONE)) {
-                    GlobalOpenTelemetry.getPropagators().getTextMapPropagator().inject(Context.current(), builder, HttpRequest.Builder::setHeader);
-                }
+                GlobalOpenTelemetry.getPropagators().getTextMapPropagator().inject(Context.current(), builder, HttpRequest.Builder::setHeader);
                 HttpRequest request = builder.build();
 
                 HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
