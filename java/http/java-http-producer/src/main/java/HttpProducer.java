@@ -44,7 +44,6 @@ public class HttpProducer {
 
         HttpProducerConfig config = HttpProducerConfig.fromEnv();
         CountDownLatch messagesSentLatch = new CountDownLatch(1);
-
         TracingSystem tracingSystem = config.getTracingSystem();
         if (tracingSystem != TracingSystem.NONE) {
             if (tracingSystem == TracingSystem.OPENTELEMETRY) {
