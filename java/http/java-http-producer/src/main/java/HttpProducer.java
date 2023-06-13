@@ -61,6 +61,7 @@ public class HttpProducer {
     }
 
     public HttpProducer(HttpProducerConfig config, CountDownLatch messagesSentLatch) throws URISyntaxException {
+        System.setProperty("otel.metrics.exporter", "none"); // disable metrics
         this.config = config;
         this.messagesSentLatch = messagesSentLatch;
         this.executorService = Executors.newSingleThreadScheduledExecutor();
@@ -122,4 +123,3 @@ public class HttpProducer {
         }
     }
 }
-
