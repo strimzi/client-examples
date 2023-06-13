@@ -73,6 +73,7 @@ public class HttpConsumer {
     }
 
     public HttpConsumer(HttpConsumerConfig config, CountDownLatch messagesReceivedLatch) throws URISyntaxException {
+        System.setProperty("otel.metrics.exporter", "none"); // disable metrics
         this.config = config;
         this.messagesReceivedLatch = messagesReceivedLatch;
         this.executorService = Executors.newSingleThreadScheduledExecutor();
