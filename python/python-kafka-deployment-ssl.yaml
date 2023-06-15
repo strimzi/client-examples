@@ -17,16 +17,6 @@ metadata:
 spec:
   authentication:
     type: tls
-#  authorization:
-#    type: simple
-#    acls:
-#      - resource:
-#          type: topic
-#          name: my-topic
-#        operations:
-#         - Write
-#         - Create
-#         - Describe
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -90,20 +80,6 @@ metadata:
 spec:
   authentication:
     type: tls
-#  authorization:
-#    type: simple
-#    acls:
-#      - resource:
-#          type: topic
-#          name: my-topic
-#        operations:
-#          - Read
-#          - Describe
-#      - resource:
-#          type: group
-#          name: java-kafka-consumer
-#        operations:
-#          - Read
 ---
 apiVersion: apps/v1
 kind: Deployment
