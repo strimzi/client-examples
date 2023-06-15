@@ -251,7 +251,7 @@ public class HttpKafkaConsumer extends AbstractVerticle {
     /**
      * Information about using the consumer on the bridge
      */
-    class CreatedConsumer {
+    static class CreatedConsumer {
 
         private final String instanceId;
         private final String baseUri;
@@ -287,7 +287,7 @@ public class HttpKafkaConsumer extends AbstractVerticle {
     /**
      * Represents a consumed record
      */
-    class ConsumerRecord {
+    static class ConsumerRecord {
 
         private final String topic;
         private final Object key;

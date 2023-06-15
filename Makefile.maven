@@ -9,3 +9,6 @@ java_build:
 java_clean:
 	echo "Cleaning Maven build ..."
 	mvn $(MVN_ARGS) clean
+
+spotbugs:
+	mvn $(MVN_ARGS) spotbugs:check

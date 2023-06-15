@@ -14,6 +14,7 @@ import org.apache.kafka.common.header.Header;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
@@ -60,7 +61,7 @@ public class KafkaConsumerExample {
                 if (record.headers() != null) {
                     log.info("\theaders: ");
                     for (Header header : record.headers()) {
-                        log.info("\t\tkey: {}, value: {}", header.key(), new String(header.value()));
+                        log.info("\t\tkey: {}, value: {}", header.key(), new String(header.value(), StandardCharsets.UTF_8));
                     }
                 }
                 receivedMsgs++;

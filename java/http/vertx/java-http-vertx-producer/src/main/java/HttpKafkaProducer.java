@@ -56,6 +56,24 @@ public class HttpKafkaProducer extends AbstractVerticle {
         this.messagesSentLatch = messagesSentLatch;
     }
 
+    public static class TextMapWrapper implements TextMap {
+
+        private final HttpRequest<Buffer> httpRequest;
+
+        public TextMapWrapper(HttpRequest<Buffer> httpRequest) {
+            this.httpRequest = httpRequest;
+        }
+
+        @Override
+        public Iterator<Map.Entry<String, String>> iterator() {
+            throw new UnsupportedOperationException("TextMapInjectAdapter should only be used with Tracer.inject()");
+        }
+
+        @Override
+        public void put(String key, String value) {
+            httpRequest.putHeader(key, value);
+        }
+    }
     @Override
     public void start(Promise<Void> startPromise) throws Exception {
         log.info("HTTP Kafka producer starting with config {}", this.config);
@@ -95,17 +113,7 @@ public class HttpKafkaProducer extends AbstractVerticle {
         HttpRequest<Buffer> httpRequest = this.client.post(this.config.getEndpointPrefix() + "/topics/" + topic);
 
         Tracer tracer = GlobalTracer.get();
-        tracer.inject(span.context(), Format.Builtin.HTTP_HEADERS, new TextMap() {
-            @Override
-            public Iterator<Map.Entry<String, String>> iterator() {
-                throw new UnsupportedOperationException("TextMapInjectAdapter should only be used with Tracer.inject()");
-            }
-
-            @Override
-            public void put(String key, String value) {
-                httpRequest.putHeader(key, value);
-            }
-        });
+        tracer.inject(span.context(), Format.Builtin.HTTP_HEADERS, new TextMapWrapper(httpRequest));
 
         httpRequest
                 .putHeader(HttpHeaderNames.CONTENT_LENGTH.toString(), String.valueOf(records.toBuffer().length()))
@@ -144,7 +152,7 @@ public class HttpKafkaProducer extends AbstractVerticle {
     /**
      * Represents information about a message sent
      */
-    class OffsetRecordSent {
+    static class OffsetRecordSent {
 
         private final int partition;
         private final long offset;
