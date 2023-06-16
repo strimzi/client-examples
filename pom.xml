@@ -26,8 +26,6 @@
         <maven.shade.version>3.4.1</maven.shade.version>
         <maven.checkstyle.version>3.2.0</maven.checkstyle.version>
 
-
-
         <!-- Build tools -->
         <checkstyle.version>9.2.1</checkstyle.version>
         <spotbugs.version>4.7.3</spotbugs.version>
