@@ -67,6 +67,7 @@ public final class ConsumerApp {
         messagesReceivedLatch.await();
         vertx.close(done -> exitLatch.countDown());
         log.info("Waiting HTTP consumer verticle to be closed");
-        exitLatch.await(60000, TimeUnit.MILLISECONDS);
+        boolean releaseBeforeTimeout = exitLatch.await(60000, TimeUnit.MILLISECONDS);
+        log.info("Latch released before Timeout: {}", releaseBeforeTimeout);
     }
 }

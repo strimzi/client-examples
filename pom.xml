@@ -28,7 +28,8 @@
 
         <!-- Build tools -->
         <checkstyle.version>9.2.1</checkstyle.version>
-
+        <spotbugs.version>4.7.3</spotbugs.version>
+        <maven.spotbugs.version>4.7.3.0</maven.spotbugs.version>
         <!-- Regular dependencies -->
         <kafka.version>3.4.0</kafka.version>
         <log4j.version>2.17.1</log4j.version>
@@ -74,6 +75,12 @@
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-slf4j-impl</artifactId>
                 <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-annotations</artifactId>
+                <version>${spotbugs.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>io.vertx</groupId>
@@ -259,6 +266,30 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>${maven.spotbugs.version}</version>
+                <dependencies>
+                    <!-- overwrite dependency on spotbugs if you want to specify the version of˓→spotbugs -->
+                    <dependency>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs</artifactId>
+                        <version>${spotbugs.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <effort>Max</effort>
+                    <!-- Reports all bugs (other values are medium and max) -->
+                    <threshold>Low</threshold>
+                    <!-- Produces XML report -->
+                    <xmlOutput>true</xmlOutput>
+                    <!-- Configures the directory in which the XML report is created -->
+                    <spotbugsXmlOutputDirectory>${project.build.directory}/spotbugs</spotbugsXmlOutputDirectory>
+                    <!-- Configures the file for excluding warnings -->
+                    <excludeFilterFile>${project.basedir}/../../.spotbugs/spotbugs-exclude.xml</excludeFilterFile>
+                </configuration>
             </plugin>
         </plugins>
     </build>
