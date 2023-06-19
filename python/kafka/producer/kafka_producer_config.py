@@ -7,11 +7,13 @@ KAFKA_PREFIX = 'KAFKA_'
 TOPIC = 'STRIMZI_TOPIC'
 MESSAGE = 'STRIMZI_MESSAGE'
 DELAY_MS = 'STRIMZI_DELAY_MS'
+LOG_LEVEL = 'STRIMZI_LOG_LEVEL'
 
 # default values for Strimzi environment variables
 DEFAULT_TOPIC = 'my-topic'
 DEFAULT_MESSAGE = 'Hello World'
 DEFAULT_DELAY_MS = '1000'
+DEFAULT_LOG_LEVEL = '6'
 
 # default values for environmental variables in dictionary
 DEFAULT_PROPERTIES = {
@@ -21,7 +23,10 @@ DEFAULT_PROPERTIES = {
 
 # Converts env var names to variable names that are compliant with Kafka properties file format
 def convertEnvVarToPropertyKey(e):
-    return e[e.index('_') + 1:].lower().replace('_', '.')
+    if 'LOG' not in e and 'log' not in e:
+        return e[e.index('_') + 1:].lower().replace('_', '.')
+    else:
+        return e
 
 
 class KafkaProducerConfig:

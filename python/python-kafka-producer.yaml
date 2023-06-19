@@ -16,11 +16,13 @@ spec:
     spec:
       containers:
         - name: python-kafka-producer
-          image: quay.io/strimzi-examples/python-kafka-producer:latest
+          image: docker.io/owenerz/python-kafka-producer:latest
           env:
             - name: STRIMZI_TOPIC
               value: my-topic
             - name: STRIMZI_DELAY_MS
               value: "1000"
+            - name: STRIMZI_LOG_LEVEL
+              value: "6"
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: my-cluster-kafka-bootstrap:9092
