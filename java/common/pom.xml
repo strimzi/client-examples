@@ -38,5 +38,6 @@
                 <artifactId>maven-dependency-plugin</artifactId>
             </plugin>
         </plugins>
+
     </build>
 </project>

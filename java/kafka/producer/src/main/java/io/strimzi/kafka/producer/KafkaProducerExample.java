@@ -14,6 +14,7 @@ import org.apache.kafka.common.header.internals.RecordHeader;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -50,7 +51,7 @@ public class KafkaProducerExample {
 
             String[] headersArray = config.getHeaders().split(", [\t\n\r]?");
             for (String header : headersArray) {
-                headers.add(new RecordHeader(header.split("=")[0], header.split("=")[1].getBytes()));
+                headers.add(new RecordHeader(header.split("=")[0], header.split("=")[1].getBytes(StandardCharsets.UTF_8)));
             }
         }
 

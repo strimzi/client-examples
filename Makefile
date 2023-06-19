@@ -8,6 +8,8 @@ build: $(SUBDIRS)
 clean: $(SUBDIRS)
 $(DOCKER_TARGETS): $(SUBDIRS)
 
+spotbugs: $(SUBDIRS)
+
 $(SUBDIRS):
 	$(MAKE) -C $@ $(MAKECMDGOALS)
 
