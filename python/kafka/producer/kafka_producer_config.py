@@ -13,7 +13,7 @@ LOG_LEVEL = 'STRIMZI_LOG_LEVEL'
 DEFAULT_TOPIC = 'my-topic'
 DEFAULT_MESSAGE = 'Hello World'
 DEFAULT_DELAY_MS = '1000'
-DEFAULT_LOG_LEVEL = '6'
+DEFAULT_LOG_LEVEL = '1'
 
 # default values for environmental variables in dictionary
 DEFAULT_PROPERTIES = {

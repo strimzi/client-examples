@@ -34,14 +34,14 @@ spec:
     spec:
       containers:
         - name: python-kafka-producer
-          image: quay.io/strimzi-examples/python-kafka-producer:latest
+          image: docker.io/owenerz/python-kafka-producer:latest
           env:
             - name: STRIMZI_TOPIC
               value: my-topic
             - name: STRIMZI_DELAY_MS
               value: "10"
-            - name: LOG_LEVEL
-              value: "0"
+            - name: STRIMZI_LOG_LEVEL
+              value: "1"
             - name: SASL_OAUTHBEARER_METHOD
               value: default
             - name: SASL_OAUTHBEARER_CLIENT_ID
@@ -50,6 +50,70 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: python-kafka-producer-oauth
+                  key: clientSecret
+            - name: SASL_OAUTHBEARER_ENDPOINT_URL
+              value: https://keycloak:8443/auth/realms/kafka-authz/protocol/openid-connect/token
+            - name: OAUTH_SSL_TRUSTSTORE_TYPE
+              value: PEM
+            - name: OAUTH_SSL_TRUSTSTORE_CERTIFICATES
+              valueFrom:
+                secretKeyRef:
+                  name: tls-keys
+                  key: tls.crt
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: my-cluster-kafka-bootstrap:9093
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: "SASL_SSL"
+            - name: KAFKA_SASL_MECHANISMS
+              value: OAUTHBEARER
+            - name: KAFKA_SSL_CA_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: my-cluster-cluster-ca-cert
+                  key: ca.crt
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: python-kafka-consumer-oauth
+type: Opaque
+data:
+  clientSecret: cVVKNFlWTlJsbnNUVUgxTGViMVpvR0lxMHNrSXJJT0s=
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: python-kafka-consumer
+  name: python-kafka-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-kafka-consumer
+  template:
+    metadata:
+      labels:
+        app: python-kafka-consumer
+    spec:
+      containers:
+        - name: python-kafka-consumer
+          image: docker.io/owenerz/python-kafka-consumer:latest
+          env:
+            - name: STRIMZI_TOPIC
+              value: my-topic
+            - name: STRIMZI_DELAY_MS
+              value: "10"
+            - name: LOG_LEVEL
+              value: "1"
+            - name: SASL_OAUTHBEARER_METHOD
+              value: default
+            - name: SASL_OAUTHBEARER_CLIENT_ID
+              value: python-kafka-consumer
+            - name: SASL_OAUTHBEARER_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: python-kafka-consumer-oauth
                   key: clientSecret
             - name: SASL_OAUTHBEARER_ENDPOINT_URL
               value: https://keycloak:8443/auth/realms/kafka-authz/protocol/openid-connect/token
