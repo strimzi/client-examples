@@ -131,6 +131,7 @@ public class HttpConsumer {
         log.info("Scheduling periodic poll every {} ms waiting for {} ...", this.config.getPollInterval(), this.config.getMessageCount());
         this.executorService.scheduleAtFixedRate(this::scheduledPoll, 0, this.config.getPollInterval(), TimeUnit.MILLISECONDS);
         log.info("... {} messages received", this.messageReceived);
+
     }
 
     private void scheduledPoll() {
@@ -166,7 +167,9 @@ public class HttpConsumer {
 
                 ArrayNode records = (ArrayNode) MAPPER.readTree(response.body());
                 log.info("... got {} records", records.size());
-
+                if (records.size() > 0) {
+                    this.commitMessages();
+                }
                 for (JsonNode record : records) {
                     log.info("Record {}", record);
                     this.messageReceived++;
@@ -176,6 +179,28 @@ public class HttpConsumer {
                 span.setStatus(response.statusCode() == 200 ? StatusCode.OK : StatusCode.ERROR);
             } finally {
                 span.end();
+            }
+        } catch (URISyntaxException | IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void commitMessages() {
+        try {
+            log.info("Committing Messages ...");
+            URI commitEndpoint = new URI(this.consumerEndpoint.toString() + "/offsets");
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(commitEndpoint)
+                    .headers("Content-Type", "application/vnd.kafka.v2+json")
+                    .POST(HttpRequest.BodyPublishers.ofString("{}"))
+                    .build();
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == HttpResponseStatus.NO_CONTENT.code()) {
+                log.info("Successfully committed messages.");
+            } else {
+                throw new RuntimeException("Failed to commit messages. Response: " + response.body());
             }
         } catch (URISyntaxException | IOException | InterruptedException e) {
             throw new RuntimeException(e);
