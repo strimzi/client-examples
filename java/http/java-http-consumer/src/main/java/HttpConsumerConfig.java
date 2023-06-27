@@ -2,7 +2,12 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
+import io.strimzi.common.ConfigUtil;
 import io.strimzi.common.TracingSystem;
+
+import java.util.Map;
+import java.util.Properties;
+import java.util.stream.Collectors;
 
 public class HttpConsumerConfig {
 
@@ -13,6 +18,7 @@ public class HttpConsumerConfig {
     private static final String DEFAULT_CLIENTID = "my-consumer";
     private static final int DEFAULT_POLL_INTERVAL = 1000;
     private static final int DEFAULT_POLL_TIMEOUT = 100;
+    private static final String KAFKA_PREFIX = "KAFKA_";
 
     private final String hostName;
     private final int port;
@@ -23,10 +29,11 @@ public class HttpConsumerConfig {
     private final int pollInterval;
     private final int pollTimeout;
     private final TracingSystem tracingSystem;
+    private final Properties properties;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     private HttpConsumerConfig(String hostName, int port, String topic, String groupId, String clientId,
-                               Long messageCount, int pollInterval, int pollTimeout, TracingSystem tracingSystem) {
+                               Long messageCount, int pollInterval, int pollTimeout, TracingSystem tracingSystem, Properties properties) {
         this.hostName = hostName;
         this.port = port;
         this.topic = topic;
@@ -36,6 +43,7 @@ public class HttpConsumerConfig {
         this.pollInterval = pollInterval;
         this.pollTimeout = pollTimeout;
         this.tracingSystem = tracingSystem;
+        this.properties = properties;
     }
 
     @SuppressWarnings("checkstyle:NPathComplexity")
@@ -49,7 +57,13 @@ public class HttpConsumerConfig {
         int pollInterval = System.getenv("STRIMZI_POLL_INTERVAL") == null ? DEFAULT_POLL_INTERVAL : Integer.parseInt(System.getenv("STRIMZI_POLL_INTERVAL"));
         int pollTimeout = System.getenv("STRIMZI_POLL_TIMEOUT") == null ? DEFAULT_POLL_TIMEOUT : Integer.parseInt(System.getenv("STRIMZI_POLL_TIMEOUT"));
         TracingSystem tracingSystem = TracingSystem.forValue(System.getenv().getOrDefault("STRIMZI_TRACING_SYSTEM", ""));
-        return new HttpConsumerConfig(hostName, port, topic, groupId, clientId, messageCount, pollInterval, pollTimeout, tracingSystem);
+        Properties properties = new Properties();
+        properties.putAll(System.getenv()
+                .entrySet()
+                .stream()
+                .filter(mapEntry -> mapEntry.getKey().startsWith(KAFKA_PREFIX))
+                .collect(Collectors.toMap(mapEntry -> ConfigUtil.convertEnvVarToPropertyKey(mapEntry.getKey()), Map.Entry::getValue)));
+        return new HttpConsumerConfig(hostName, port, topic, groupId, clientId, messageCount, pollInterval, pollTimeout, tracingSystem, properties);
     }
 
     public String getHostName() {
@@ -88,6 +102,10 @@ public class HttpConsumerConfig {
         return tracingSystem;
     }
 
+    public Properties getProperties() {
+        return properties;
+    }
+
     @Override
     public String toString() {
         return "HttpConsumerConfig{" +
@@ -100,6 +118,7 @@ public class HttpConsumerConfig {
                 ", pollInterval=" + pollInterval +
                 ", pollTimeout=" + pollTimeout +
                 ", tracingSystem=" + tracingSystem +
+                ", properties ='" + properties + '\'' +
                 "}";
     }
 }

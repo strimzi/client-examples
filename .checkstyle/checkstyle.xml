@@ -95,7 +95,9 @@
         <module name="ParameterNumber"/>
         <module name="ClassDataAbstractionCoupling"/>
         <module name="BooleanExpressionComplexity"/>
-        <module name="ClassFanOutComplexity"/>
+        <module name="ClassFanOutComplexity">
+        <property name="max" value="22"/>
+        </module>
         <module name="CyclomaticComplexity"/>
         <module name="JavaNCSS"/>
         <module name="NPathComplexity"/>

@@ -52,8 +52,12 @@
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-semconv</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>3.4.1</version>
+        </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

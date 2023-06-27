@@ -27,10 +27,13 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static org.apache.kafka.clients.consumer.ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG;
 
 public class HttpConsumer {
 
@@ -45,11 +48,13 @@ public class HttpConsumer {
     private ScheduledExecutorService executorService;
     private Tracer tracer;
     private CountDownLatch messagesReceivedLatch;
+    private boolean manualCommit = false;
 
 
     public static void main(String[] args) throws URISyntaxException, IOException, InterruptedException {
         HttpConsumerConfig config = HttpConsumerConfig.fromEnv();
         CountDownLatch messagesReceivedLatch = new CountDownLatch(1);
+        Properties props = config.getProperties();
 
         TracingSystem tracingSystem = config.getTracingSystem();
         if (tracingSystem != TracingSystem.NONE) {
@@ -61,6 +66,8 @@ public class HttpConsumer {
         }
 
         HttpConsumer consumer = new HttpConsumer(config, messagesReceivedLatch);
+        boolean enableAutoCommit = (props.getProperty(ENABLE_AUTO_COMMIT_CONFIG)) == null || Boolean.parseBoolean(props.getProperty(ENABLE_AUTO_COMMIT_CONFIG));
+        consumer.manualCommit = !enableAutoCommit;
         try {
             consumer.createConsumer();
             consumer.subscribe();
@@ -167,14 +174,14 @@ public class HttpConsumer {
 
                 ArrayNode records = (ArrayNode) MAPPER.readTree(response.body());
                 log.info("... got {} records", records.size());
-                if (records.size() > 0) {
-                    this.commitMessages();
-                }
+
                 for (JsonNode record : records) {
                     log.info("Record {}", record);
                     this.messageReceived++;
                 }
-
+                if (records.size() > 0 && this.manualCommit) {
+                    this.commitMessages();
+                }
                 span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, response.statusCode());
                 span.setStatus(response.statusCode() == 200 ? StatusCode.OK : StatusCode.ERROR);
             } finally {
