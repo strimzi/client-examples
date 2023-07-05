@@ -27,18 +27,22 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static org.apache.kafka.clients.consumer.ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG;
-
+@SuppressWarnings("classFanOutComplexity")
 public class HttpConsumer {
 
     private static final Logger log = LogManager.getLogger(HttpConsumer.class);
     private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final String ENABLE_AUTO_COMMIT_CONFIG = "enable.auto.commit";
 
     private final HttpConsumerConfig config;
     private HttpClient httpClient;
@@ -48,8 +52,18 @@ public class HttpConsumer {
     private ScheduledExecutorService executorService;
     private Tracer tracer;
     private CountDownLatch messagesReceivedLatch;
-    private boolean manualCommit = false;
+    private static boolean enableAutoCommit = false;
 
+    private static List<String> commonProps;
+    static {
+        commonProps = new ArrayList<>();
+        commonProps.add("auto.offset.reset");
+        commonProps.add("enable.auto.commit");
+        commonProps.add("fetch.min.bytes");
+        commonProps.add("request.timeout.ms");
+        commonProps.add("client.id");
+        commonProps.add("isolation.level");
+    }
 
     public static void main(String[] args) throws URISyntaxException, IOException, InterruptedException {
         HttpConsumerConfig config = HttpConsumerConfig.fromEnv();
@@ -66,8 +80,8 @@ public class HttpConsumer {
         }
 
         HttpConsumer consumer = new HttpConsumer(config, messagesReceivedLatch);
-        boolean enableAutoCommit = (props.getProperty(ENABLE_AUTO_COMMIT_CONFIG)) == null || Boolean.parseBoolean(props.getProperty(ENABLE_AUTO_COMMIT_CONFIG));
-        consumer.manualCommit = !enableAutoCommit;
+        enableAutoCommit = (props.getProperty(ENABLE_AUTO_COMMIT_CONFIG)) == null || Boolean.parseBoolean(props.getProperty(ENABLE_AUTO_COMMIT_CONFIG));
+
         try {
             consumer.createConsumer();
             consumer.subscribe();
@@ -90,12 +104,21 @@ public class HttpConsumer {
                 OpenTelemetry.noop().getTracer("client-examples") :
                 GlobalOpenTelemetry.getTracer("client-examples");
     }
-
+    @SuppressWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     public void createConsumer() throws IOException, InterruptedException, URISyntaxException {
-        String consumerInfo = "{\"name\":\"" + this.config.getClientId() + "\",\"format\":\"json\",\"auto.offset.reset\":\"earliest\"}";
+        Properties props = config.getProperties();
+        enableAutoCommit = (props.getProperty(ENABLE_AUTO_COMMIT_CONFIG)) == null || Boolean.parseBoolean(props.getProperty(ENABLE_AUTO_COMMIT_CONFIG));
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", "my-consumer");
+        map.put("format", "json");
+        for (String k : commonProps) {
+            processProperty(props, k, map);
+        }
+
+        String consumerInfo = objectMapper.writeValueAsString(map);
         log.info("Creating consumer = {}", consumerInfo);
         this.consumerEndpoint = new URI("http://" + this.config.getHostName() + ":" + this.config.getPort() + "/consumers/" + this.config.getGroupId() + "/instances/" + this.config.getClientId());
-
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(this.createConsumerEndpoint)
                 .headers("Content-Type", "application/vnd.kafka.v2+json")
@@ -115,6 +138,22 @@ public class HttpConsumer {
         }
     }
 
+    public void processProperty(Properties props, String k, Map<String, Object> map) {
+        if (props.stringPropertyNames().contains(k)) {
+            String v = props.getProperty(k);
+            Object obj;
+            if (isStringBoolean(v)) {
+                obj = Boolean.parseBoolean(v);
+            } else if (isStringNumber(v)) {
+                obj = Integer.parseInt(v);
+            } else {
+                obj = v;
+            }
+            map.put(k, obj);
+            log.info("key: {}, value: {}", k, v);
+        }
+    }
+
     public void subscribe() throws URISyntaxException, IOException, InterruptedException {
         URI subscriptionEndpoint = new URI(this.consumerEndpoint.toString() + "/subscription");
         String topics = "{\"topics\":[\"" + this.config.getTopic() + "\"]}";
@@ -131,6 +170,21 @@ public class HttpConsumer {
             log.info("Successfully subscribed to topics {}", this.config.getTopic());
         } else {
             throw new RuntimeException(String.format("Failed to subscribe consumer: %s to topics: %s, response: %s", this.config.getClientId(), this.config.getTopic(), response.body()));
+        }
+    }
+
+    @SuppressWarnings({"Regexp"})
+    public static boolean isStringBoolean(String input) {
+        String lowerCaseInput = input.toLowerCase();
+        return lowerCaseInput.equals("true") || lowerCaseInput.equals("false");
+    }
+
+    public static boolean isStringNumber(String input) {
+        try {
+            Integer.parseInt(input);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 
@@ -179,7 +233,7 @@ public class HttpConsumer {
                     log.info("Record {}", record);
                     this.messageReceived++;
                 }
-                if (records.size() > 0 && this.manualCommit) {
+                if (records.size() > 0 && !enableAutoCommit) {
                     this.commitMessages();
                 }
                 span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, response.statusCode());
