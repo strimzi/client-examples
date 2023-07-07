@@ -52,7 +52,7 @@ public class HttpConsumer {
     private ScheduledExecutorService executorService;
     private Tracer tracer;
     private CountDownLatch messagesReceivedLatch;
-    private static boolean enableAutoCommit = false;
+    private boolean enableAutoCommit = false;
 
     private static List<String> commonProps;
     static {
@@ -68,7 +68,6 @@ public class HttpConsumer {
     public static void main(String[] args) throws URISyntaxException, IOException, InterruptedException {
         HttpConsumerConfig config = HttpConsumerConfig.fromEnv();
         CountDownLatch messagesReceivedLatch = new CountDownLatch(1);
-        Properties props = config.getProperties();
 
         TracingSystem tracingSystem = config.getTracingSystem();
         if (tracingSystem != TracingSystem.NONE) {
@@ -80,7 +79,6 @@ public class HttpConsumer {
         }
 
         HttpConsumer consumer = new HttpConsumer(config, messagesReceivedLatch);
-        enableAutoCommit = (props.getProperty(ENABLE_AUTO_COMMIT_CONFIG)) == null || Boolean.parseBoolean(props.getProperty(ENABLE_AUTO_COMMIT_CONFIG));
 
         try {
             consumer.createConsumer();
@@ -104,7 +102,7 @@ public class HttpConsumer {
                 OpenTelemetry.noop().getTracer("client-examples") :
                 GlobalOpenTelemetry.getTracer("client-examples");
     }
-    @SuppressWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
+
     public void createConsumer() throws IOException, InterruptedException, URISyntaxException {
         Properties props = config.getProperties();
         enableAutoCommit = (props.getProperty(ENABLE_AUTO_COMMIT_CONFIG)) == null || Boolean.parseBoolean(props.getProperty(ENABLE_AUTO_COMMIT_CONFIG));
@@ -192,7 +190,6 @@ public class HttpConsumer {
         log.info("Scheduling periodic poll every {} ms waiting for {} ...", this.config.getPollInterval(), this.config.getMessageCount());
         this.executorService.scheduleAtFixedRate(this::scheduledPoll, 0, this.config.getPollInterval(), TimeUnit.MILLISECONDS);
         log.info("... {} messages received", this.messageReceived);
-
     }
 
     private void scheduledPoll() {
