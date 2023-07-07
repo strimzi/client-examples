@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -105,7 +106,7 @@ public class HttpConsumer {
 
     public void createConsumer() throws IOException, InterruptedException, URISyntaxException {
         Properties props = config.getProperties();
-        enableAutoCommit = (props.getProperty(ENABLE_AUTO_COMMIT_CONFIG)) == null || Boolean.parseBoolean(props.getProperty(ENABLE_AUTO_COMMIT_CONFIG));
+        enableAutoCommit = Boolean.parseBoolean(props.getProperty(ENABLE_AUTO_COMMIT_CONFIG));
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> map = new HashMap<>();
         map.put("name", "my-consumer");
@@ -171,9 +172,8 @@ public class HttpConsumer {
         }
     }
 
-    @SuppressWarnings({"Regexp"})
     public static boolean isStringBoolean(String input) {
-        String lowerCaseInput = input.toLowerCase();
+        String lowerCaseInput = input.toLowerCase(Locale.ENGLISH);
         return lowerCaseInput.equals("true") || lowerCaseInput.equals("false");
     }
 
