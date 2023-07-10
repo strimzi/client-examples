@@ -19,6 +19,7 @@ public class HttpConsumerConfig {
     private static final int DEFAULT_POLL_INTERVAL = 1000;
     private static final int DEFAULT_POLL_TIMEOUT = 100;
     private static final String KAFKA_PREFIX = "KAFKA_";
+    private static final String ENABLE_AUTO_COMMIT_CONFIG = "enable.auto.commit";
 
     private final String hostName;
     private final int port;
@@ -29,11 +30,12 @@ public class HttpConsumerConfig {
     private final int pollInterval;
     private final int pollTimeout;
     private final TracingSystem tracingSystem;
+    private final boolean enableAutoCommit;
     private final Properties properties;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     private HttpConsumerConfig(String hostName, int port, String topic, String groupId, String clientId,
-                               Long messageCount, int pollInterval, int pollTimeout, TracingSystem tracingSystem, Properties properties) {
+                               Long messageCount, int pollInterval, int pollTimeout, TracingSystem tracingSystem, boolean enableAutoCommit, Properties properties) {
         this.hostName = hostName;
         this.port = port;
         this.topic = topic;
@@ -43,7 +45,9 @@ public class HttpConsumerConfig {
         this.pollInterval = pollInterval;
         this.pollTimeout = pollTimeout;
         this.tracingSystem = tracingSystem;
+        this.enableAutoCommit = enableAutoCommit;
         this.properties = properties;
+
     }
 
     @SuppressWarnings("checkstyle:NPathComplexity")
@@ -63,7 +67,8 @@ public class HttpConsumerConfig {
                 .stream()
                 .filter(mapEntry -> mapEntry.getKey().startsWith(KAFKA_PREFIX))
                 .collect(Collectors.toMap(mapEntry -> ConfigUtil.convertEnvVarToPropertyKey(mapEntry.getKey()), Map.Entry::getValue)));
-        return new HttpConsumerConfig(hostName, port, topic, groupId, clientId, messageCount, pollInterval, pollTimeout, tracingSystem, properties);
+        boolean enableAutoCommit = Boolean.parseBoolean(properties.getProperty(ENABLE_AUTO_COMMIT_CONFIG));
+        return new HttpConsumerConfig(hostName, port, topic, groupId, clientId, messageCount, pollInterval, pollTimeout, tracingSystem, enableAutoCommit, properties);
     }
 
     public String getHostName() {
@@ -101,6 +106,11 @@ public class HttpConsumerConfig {
     public TracingSystem getTracingSystem() {
         return tracingSystem;
     }
+
+    public boolean getEnableAutoCommit() {
+        return enableAutoCommit;
+    }
+
 
     public Properties getProperties() {
         return properties;

@@ -43,8 +43,6 @@ public class HttpConsumer {
 
     private static final Logger log = LogManager.getLogger(HttpConsumer.class);
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final String ENABLE_AUTO_COMMIT_CONFIG = "enable.auto.commit";
-
     private final HttpConsumerConfig config;
     private HttpClient httpClient;
     private URI createConsumerEndpoint;
@@ -106,8 +104,7 @@ public class HttpConsumer {
 
     public void createConsumer() throws IOException, InterruptedException, URISyntaxException {
         Properties props = config.getProperties();
-        enableAutoCommit = Boolean.parseBoolean(props.getProperty(ENABLE_AUTO_COMMIT_CONFIG));
-        ObjectMapper objectMapper = new ObjectMapper();
+        enableAutoCommit = config.getEnableAutoCommit();
         Map<String, Object> map = new HashMap<>();
         map.put("name", "my-consumer");
         map.put("format", "json");
@@ -115,6 +112,7 @@ public class HttpConsumer {
             processProperty(props, k, map);
         }
 
+        ObjectMapper objectMapper = new ObjectMapper();
         String consumerInfo = objectMapper.writeValueAsString(map);
         log.info("Creating consumer = {}", consumerInfo);
         this.consumerEndpoint = new URI("http://" + this.config.getHostName() + ":" + this.config.getPort() + "/consumers/" + this.config.getGroupId() + "/instances/" + this.config.getClientId());
@@ -140,16 +138,13 @@ public class HttpConsumer {
     public void processProperty(Properties props, String k, Map<String, Object> map) {
         if (props.stringPropertyNames().contains(k)) {
             String v = props.getProperty(k);
-            Object obj;
+            Object obj = v;
             if (isStringBoolean(v)) {
                 obj = Boolean.parseBoolean(v);
             } else if (isStringNumber(v)) {
                 obj = Integer.parseInt(v);
-            } else {
-                obj = v;
             }
             map.put(k, obj);
-            log.info("key: {}, value: {}", k, v);
         }
     }
 
