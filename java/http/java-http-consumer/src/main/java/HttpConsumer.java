@@ -120,9 +120,8 @@ public class HttpConsumer {
     }
 
     public void createConsumer() throws IOException, InterruptedException, URISyntaxException {
-        Properties props = config.getProperties();
         ObjectMapper objectMapper = new ObjectMapper();
-        String consumerInfo = objectMapper.writeValueAsString(createConsumerConfig(props));
+        String consumerInfo = objectMapper.writeValueAsString(createConsumerConfig(config.getProperties()));
         log.info("Creating consumer = {}", consumerInfo);
         this.consumerEndpoint = new URI("http://" + this.config.getHostName() + ":" + this.config.getPort() + "/consumers/" + this.config.getGroupId() + "/instances/" + this.config.getClientId());
         HttpRequest request = HttpRequest.newBuilder()
