@@ -51,7 +51,6 @@ public class HttpConsumer {
     private ScheduledExecutorService executorService;
     private Tracer tracer;
     private CountDownLatch messagesReceivedLatch;
-    private boolean enableAutoCommit = false;
 
     private static List<String> commonProps;
     static {
@@ -78,7 +77,6 @@ public class HttpConsumer {
         }
 
         HttpConsumer consumer = new HttpConsumer(config, messagesReceivedLatch);
-
         try {
             consumer.createConsumer();
             consumer.subscribe();
@@ -102,18 +100,29 @@ public class HttpConsumer {
                 GlobalOpenTelemetry.getTracer("client-examples");
     }
 
+    public Map<String, Object> createConsumerConfig(Properties props) {
+        Map<String, Object> consumerConfig = new HashMap<>();
+        consumerConfig.put("name", "my-consumer");
+        consumerConfig.put("format", "json");
+        for (String k : commonProps) {
+            if (props.stringPropertyNames().contains(k)) {
+                String v = props.getProperty(k);
+                Object obj = v;
+                if (isStringBoolean(v)) {
+                    obj = Boolean.parseBoolean(v);
+                } else if (isStringNumber(v)) {
+                    obj = Integer.parseInt(v);
+                }
+                consumerConfig.put(k, obj);
+            }
+        }
+        return consumerConfig;
+    }
+
     public void createConsumer() throws IOException, InterruptedException, URISyntaxException {
         Properties props = config.getProperties();
-        enableAutoCommit = config.getEnableAutoCommit();
-        Map<String, Object> map = new HashMap<>();
-        map.put("name", "my-consumer");
-        map.put("format", "json");
-        for (String k : commonProps) {
-            processProperty(props, k, map);
-        }
-
         ObjectMapper objectMapper = new ObjectMapper();
-        String consumerInfo = objectMapper.writeValueAsString(map);
+        String consumerInfo = objectMapper.writeValueAsString(createConsumerConfig(props));
         log.info("Creating consumer = {}", consumerInfo);
         this.consumerEndpoint = new URI("http://" + this.config.getHostName() + ":" + this.config.getPort() + "/consumers/" + this.config.getGroupId() + "/instances/" + this.config.getClientId());
         HttpRequest request = HttpRequest.newBuilder()
@@ -132,19 +141,6 @@ public class HttpConsumer {
             }
         } else {
             throw new RuntimeException(String.format("Failed to create consumer. Status code: %s, response: %s", response.statusCode(), response.body()));
-        }
-    }
-
-    public void processProperty(Properties props, String k, Map<String, Object> map) {
-        if (props.stringPropertyNames().contains(k)) {
-            String v = props.getProperty(k);
-            Object obj = v;
-            if (isStringBoolean(v)) {
-                obj = Boolean.parseBoolean(v);
-            } else if (isStringNumber(v)) {
-                obj = Integer.parseInt(v);
-            }
-            map.put(k, obj);
         }
     }
 
@@ -225,7 +221,7 @@ public class HttpConsumer {
                     log.info("Record {}", record);
                     this.messageReceived++;
                 }
-                if (records.size() > 0 && !enableAutoCommit) {
+                if (records.size() > 0 && !config.getEnableAutoCommit()) {
                     this.commitMessages();
                 }
                 span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, response.statusCode());
