@@ -31,7 +31,7 @@
         <spotbugs.version>4.7.3</spotbugs.version>
         <maven.spotbugs.version>4.7.3.0</maven.spotbugs.version>
         <!-- Regular dependencies -->
-        <kafka.version>3.4.0</kafka.version>
+        <kafka.version>3.5.0</kafka.version>
         <log4j.version>2.17.1</log4j.version>
         <opentracing.version>0.33.0</opentracing.version>
         <opentracing-kafka.version>0.1.15</opentracing-kafka.version>
