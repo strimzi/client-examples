@@ -30,12 +30,11 @@ public class HttpConsumerConfig {
     private final int pollInterval;
     private final int pollTimeout;
     private final TracingSystem tracingSystem;
-    private final boolean enableAutoCommit;
     private final Properties properties;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     private HttpConsumerConfig(String hostName, int port, String topic, String groupId, String clientId,
-                               Long messageCount, int pollInterval, int pollTimeout, TracingSystem tracingSystem, boolean enableAutoCommit, Properties properties) {
+                               Long messageCount, int pollInterval, int pollTimeout, TracingSystem tracingSystem, Properties properties) {
         this.hostName = hostName;
         this.port = port;
         this.topic = topic;
@@ -45,7 +44,6 @@ public class HttpConsumerConfig {
         this.pollInterval = pollInterval;
         this.pollTimeout = pollTimeout;
         this.tracingSystem = tracingSystem;
-        this.enableAutoCommit = enableAutoCommit;
         this.properties = properties;
 
     }
@@ -67,8 +65,7 @@ public class HttpConsumerConfig {
                 .stream()
                 .filter(mapEntry -> mapEntry.getKey().startsWith(KAFKA_PREFIX))
                 .collect(Collectors.toMap(mapEntry -> ConfigUtil.convertEnvVarToPropertyKey(mapEntry.getKey()), Map.Entry::getValue)));
-        boolean enableAutoCommit = Boolean.parseBoolean(properties.getProperty(ENABLE_AUTO_COMMIT_CONFIG));
-        return new HttpConsumerConfig(hostName, port, topic, groupId, clientId, messageCount, pollInterval, pollTimeout, tracingSystem, enableAutoCommit, properties);
+        return new HttpConsumerConfig(hostName, port, topic, groupId, clientId, messageCount, pollInterval, pollTimeout, tracingSystem, properties);
     }
 
     public String getHostName() {
@@ -108,7 +105,7 @@ public class HttpConsumerConfig {
     }
 
     public boolean getEnableAutoCommit() {
-        return enableAutoCommit;
+        return Boolean.parseBoolean(properties.getProperty(ENABLE_AUTO_COMMIT_CONFIG));
     }
 
 
