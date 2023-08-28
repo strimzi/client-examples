@@ -1,0 +1,63 @@
+apiVersion: kafka.strimzi.io/v1beta1
+kind: KafkaUser
+metadata:
+  name: my-user
+  labels:
+    strimzi.io/cluster: my-cluster
+spec:
+  authentication:
+    type: scram-sha-512
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: my-user
+type: Opaque
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: java-kafka-producer
+  name: java-kafka-producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-kafka-producer
+  template:
+    metadata:
+      labels:
+        app: java-kafka-producer
+    spec:
+      containers:
+        - name: java-kafka-producer
+          image: quay.io/strimzi-examples/java-kafka-producer:latest
+          env:
+            - name: STRIMZI_TOPIC
+              value: my-topic
+            - name: STRIMZI_DELAY_MS
+              value: "1000"
+            - name: STRIMZI_LOG_LEVEL
+              value: "INFO"
+            - name: STRIMZI_MESSAGE_COUNT
+              value: "1000000"
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: my-cluster-kafka-bootstrap:9093
+            - name: KAFKA_KEY_SERIALIZER
+              value: "org.apache.kafka.common.serialization.StringSerializer"
+            - name: KAFKA_VALUE_SERIALIZER
+              value: "org.apache.kafka.common.serialization.StringSerializer"
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: "SASL_SSL"
+            - name: KAFKA_SASL_MECHANISM
+              value: "SCRAM-SHA-512"
+            - name: KAFKA_SASL_JAAS_CONFIG
+              value: "org.apache.kafka.common.security.scram.ScramLoginModule required username='my-user' password='gllklHhnRxuS3lheuBcHAeJJPi0t0Q5b';"
+            - name: KAFKA_SSL_TRUSTSTORE_CERTIFICATES
+              valueFrom:
+                secretKeyRef:
+                  name: my-cluster-cluster-ca-cert
+                  key: ca.crt
+            - name: KAFKA_SSL_TRUSTSTORE_TYPE
+              value: PEM
