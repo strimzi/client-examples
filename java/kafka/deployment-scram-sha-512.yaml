@@ -8,12 +8,6 @@ spec:
   authentication:
     type: scram-sha-512
 ---
-apiVersion: v1
-kind: Secret
-metadata:
-  name: my-user
-type: Opaque
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -43,7 +37,7 @@ spec:
             - name: STRIMZI_MESSAGE_COUNT
               value: "1000000"
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9093
+              value: my-cluster-kafka-bootstrap:9092
             - name: KAFKA_KEY_SERIALIZER
               value: "org.apache.kafka.common.serialization.StringSerializer"
             - name: KAFKA_VALUE_SERIALIZER
@@ -53,7 +47,7 @@ spec:
             - name: KAFKA_SASL_MECHANISM
               value: "SCRAM-SHA-512"
             - name: KAFKA_SASL_JAAS_CONFIG
-              value: "org.apache.kafka.common.security.scram.ScramLoginModule required username='my-user' password='gllklHhnRxuS3lheuBcHAeJJPi0t0Q5b';"
+              value: "org.apache.kafka.common.security.scram.ScramLoginModule required username='my-user' password='tsJ3YeyLR1wf0z8vNBLxM10pH0tA3KYq';"
             - name: KAFKA_SSL_TRUSTSTORE_CERTIFICATES
               valueFrom:
                 secretKeyRef:
