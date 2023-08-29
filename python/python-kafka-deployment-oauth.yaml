@@ -7,14 +7,14 @@ metadata:
 spec:
   replicas: 3
   partitions: 12
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: python-kafka-producer-oauth
-type: Opaque
-data:
-  clientSecret: aGVsbG8td29ybGQtcHJvZHVjZXItc2VjcmV0
+#---
+#apiVersion: v1
+#kind: Secret
+#metadata:
+#  name: python-kafka-producer-oauth
+#type: Opaque
+#data:
+#  clientSecret: UmdraWFGeUVMY2t2NmZZYlhqajhhQXk4NW1hbHl1bG0=
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -34,39 +34,36 @@ spec:
     spec:
       containers:
         - name: python-kafka-producer
-          image: docker.io/owenerz/java-kafka-producer:latest
+          image: docker.io/owenerz/python-kafka-producer:latest
           env:
             - name: STRIMZI_TOPIC
               value: my-topic
             - name: STRIMZI_DELAY_MS
-              value: "1000"
-
-            - name: OAUTH_CLIENT_ID
-              value: java-kafka-producer
-            - name: OAUTH_CLIENT_SECRET
+              value: "10"
+            - name: SASL_OAUTHBEARER_METHOD
+              value: default
+            - name: SASL_OAUTHBEARER_CLIENT_ID
+              value: python-kafka-producer
+            - name: SASL_OAUTHBEARER_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: java-kafka-producer-oauth
-                  key: secret
-            - name: OAUTH_TOKEN_ENDPOINT_URI
-              value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
+                  name: python-kafka-producer-oauth
+                  key: clientSecret
+            - name: SASL_OAUTHBEARER_ENDPOINT_URL
+              value: https://keycloak:8443/auth/realms/kafka-authz/protocol/openid-connect/token
             - name: OAUTH_SSL_TRUSTSTORE_TYPE
               value: PEM
             - name: OAUTH_SSL_TRUSTSTORE_CERTIFICATES
               valueFrom:
                 secretKeyRef:
-                  name: sso-x509-https-secret
+                  name: tls-keys
                   key: tls.crt
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: my-cluster-kafka-bootstrap:9093
             - name: KAFKA_SECURITY_PROTOCOL
               value: "SASL_SSL"
-            - name: KAFKA_SASL_JAAS_CONFIG
-              value: "org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;"
-            - name: KAFKA_SASL_MECHANISM
+            - name: KAFKA_SASL_MECHANISMS
               value: OAUTHBEARER
-            - name: KAFKA_SASL_LOGIN_CALLBACK_HANDLER_CLASS
-              value: "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler"
             - name: KAFKA_SSL_CA_PEM
               valueFrom:
                 secretKeyRef:

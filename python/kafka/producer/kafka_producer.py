@@ -9,6 +9,7 @@ if __name__ == '__main__':
     producer = Producer(
         config.properties
     )
+    print(f'Config Properties: \n{str(config.properties)}')
 
     while True:
         producer_message = config.message.encode('utf-8')
