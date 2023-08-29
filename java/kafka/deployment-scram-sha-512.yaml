@@ -27,6 +27,16 @@ metadata:
 spec:
   authentication:
     type: scram-sha-512
+  authorization:
+    type: simple
+    acls:
+      - resource:
+          type: topic
+          name: my-topic
+        operations:
+          - Write
+          - Create
+          - Describe
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -57,7 +67,7 @@ spec:
             - name: STRIMZI_MESSAGE_COUNT
               value: "1000000"
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9092
+              value: my-cluster-kafka-bootstrap:9093
             - name: KAFKA_KEY_SERIALIZER
               value: "org.apache.kafka.common.serialization.StringSerializer"
             - name: KAFKA_VALUE_SERIALIZER
@@ -88,6 +98,28 @@ metadata:
 spec:
   authentication:
     type: scram-sha-512
+  authorization:
+    type: simple
+    acls:
+      - resource:
+          type: topic
+          name: my-topic
+        operations:
+          - Read
+          - Describe
+      - resource:
+          type: group
+          name: java-kafka-streams
+          patternType: prefix
+        operations:
+          - Read
+      - resource:
+          type: topic
+          name: my-topic-reversed
+        operations:
+          - Write
+          - Create
+          - Describe
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -116,7 +148,7 @@ spec:
             - name: STRIMZI_LOG_LEVEL
               value: "INFO"
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9092
+              value: my-cluster-kafka-bootstrap:9093
             - name: KAFKA_APPLICATION_ID
               value: java-kafka-streams
             - name: KAFKA_DEFAULT_COMMIT_INTERVAL_MS
@@ -151,6 +183,20 @@ metadata:
 spec:
   authentication:
     type: scram-sha-512
+  authorization:
+    type: simple
+    acls:
+      - resource:
+          type: topic
+          name: my-topic-reversed
+        operations:
+          - Read
+          - Describe
+      - resource:
+          type: group
+          name: java-kafka-consumer
+        operations:
+          - Read
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -179,7 +225,7 @@ spec:
             - name: STRIMZI_MESSAGE_COUNT
               value: "1000000"
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9092
+              value: my-cluster-kafka-bootstrap:9093
             - name: KAFKA_GROUP_ID
               value: java-kafka-consumer
             - name: KAFKA_KEY_DESERIALIZER
