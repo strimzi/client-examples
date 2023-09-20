@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: python-kafka-consumer
-          image: quay.io/strimzi-examples/python-kafka-consumer:latest
+          image: docker.io/owenerz/python-kafka-consumer:latest
           env:
             - name: STRIMZI_TOPIC
               value: my-topic
