@@ -24,6 +24,7 @@ if __name__ == '__main__':
         producer_message = config.message.encode('utf-8')
         producer.produce(config.topic, producer_message, )
         producer.flush()
+
         log.info(f'Producing message @ {datetime.now()} | Message = {str(producer_message)}')
         time.sleep(config.delay)
 

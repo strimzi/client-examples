@@ -23,4 +23,5 @@ if __name__ == '__main__':
         if message is None:
             log.info("Waiting...")
         else:
-            log.info(f'Consuming message @ {datetime.now()}', (message.value()))
+            log.info(f'Consuming message @ {datetime.now()}: {str(message.value())}')
+

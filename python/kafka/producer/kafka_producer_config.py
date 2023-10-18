@@ -18,6 +18,8 @@ DEFAULT_LOG_LEVEL = '1'
 # default values for environmental variables in dictionary
 DEFAULT_PROPERTIES = {
     'bootstrap.servers': 'localhost:9092'
+    # 'key.serializer': 'org.apache.kafka.common.serialization.StringSerializer',
+    # 'value.serializer': 'org.apache.kafka.common.serialization.StringSerializer'
 }
 
 
