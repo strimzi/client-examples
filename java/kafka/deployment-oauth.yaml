@@ -3,7 +3,7 @@ kind: KafkaTopic
 metadata:
   name: my-topic
   labels:
-      strimzi.io/cluster: my-cluster
+    strimzi.io/cluster: my-cluster
 spec:
   replicas: 3
   partitions: 12
@@ -24,7 +24,7 @@ metadata:
   name: java-kafka-producer-oauth
 type: Opaque
 data:
-  clientSecret: aGVsbG8td29ybGQtcHJvZHVjZXItc2VjcmV0
+  clientSecret: M0lHeTFqaEd3Y1hjd0pCSVRMVkdTdUxHUXZMSW5paDk=
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -62,13 +62,13 @@ spec:
                   name: java-kafka-producer-oauth
                   key: clientSecret
             - name: OAUTH_TOKEN_ENDPOINT_URI
-              value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
+              value: https://keycloak:8443/auth/realms/kafka-authz/protocol/openid-connect/token
             - name: OAUTH_SSL_TRUSTSTORE_TYPE
               value: PEM
             - name: OAUTH_SSL_TRUSTSTORE_CERTIFICATES
               valueFrom:
                 secretKeyRef:
-                  name: sso-x509-https-secret
+                  name: tls-keys
                   key: tls.crt
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: my-cluster-kafka-bootstrap:9093
@@ -91,153 +91,154 @@ spec:
                 secretKeyRef:
                   name: my-cluster-cluster-ca-cert
                   key: ca.crt
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: java-kafka-streams-oauth
-type: Opaque
-data:
-  clientSecret: aGVsbG8td29ybGQtc3RyZWFtcy1zZWNyZXQ=
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: java-kafka-streams
-  name: java-kafka-streams
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: java-kafka-streams
-  template:
-    metadata:
-      labels:
-        app: java-kafka-streams
-    spec:
-      containers:
-        - name: java-kafka-streams
-          image: quay.io/strimzi-examples/java-kafka-streams:latest
-          env:
-            - name: STRIMZI_SOURCE_TOPIC
-              value: my-topic
-            - name: STRIMZI_TARGET_TOPIC
-              value: my-topic-reversed
-            - name: STRIMZI_LOG_LEVEL
-              value: "INFO"
-            - name: OAUTH_CLIENT_ID
-              value: java-kafka-streams
-            - name: OAUTH_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: java-kafka-streams-oauth
-                  key: clientSecret
-            - name: OAUTH_TOKEN_ENDPOINT_URI
-              value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
-            - name: OAUTH_SSL_TRUSTSTORE_TYPE
-              value: PEM
-            - name: OAUTH_SSL_TRUSTSTORE_CERTIFICATES
-              valueFrom:
-                secretKeyRef:
-                  name: sso-x509-https-secret
-                  key: tls.crt
-            - name: KAFKA_BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9093
-            - name: KAFKA_APPLICATION_ID
-              value: java-kafka-streams
-            - name: KAFKA_DEFAULT_COMMIT_INTERVAL_MS
-              value: "5000"
-            - name: KAFKA_DEFAULT_KEY_SERDE
-              value: "org.apache.kafka.common.serialization.Serdes$StringSerde"
-            - name: KAFKA_DEFAULT_VALUE_SERDE
-              value: "org.apache.kafka.common.serialization.Serdes$StringSerde"
-            - name: KAFKA_SECURITY_PROTOCOL
-              value: "SASL_SSL"
-            - name: KAFKA_SASL_JAAS_CONFIG
-              value: "org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;"
-            - name: KAFKA_SASL_MECHANISM
-              value: OAUTHBEARER
-            - name: KAFKA_SASL_LOGIN_CALLBACK_HANDLER_CLASS
-              value: "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler"
-            - name: KAFKA_SSL_TRUSTSTORE_TYPE
-              value: PEM
-            - name: KAFKA_SSL_TRUSTSTORE_CERTIFICATES
-              valueFrom:
-                secretKeyRef:
-                  name: my-cluster-cluster-ca-cert
-                  key: ca.crt
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: java-kafka-consumer-oauth
-type: Opaque
-data:
-  clientSecret: aGVsbG8td29ybGQtY29uc3VtZXItc2VjcmV0
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: java-kafka-consumer
-  name: java-kafka-consumer
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: java-kafka-consumer
-  template:
-    metadata:
-      labels:
-        app: java-kafka-consumer
-    spec:
-      containers:
-        - name: java-kafka-consumer
-          image: quay.io/strimzi-examples/java-kafka-consumer:latest
-          env:
-            - name: STRIMZI_TOPIC
-              value: my-topic-reversed
-            - name: STRIMZI_LOG_LEVEL
-              value: "INFO"
-            - name: STRIMZI_MESSAGE_COUNT
-              value: "1000000"
-            - name: OAUTH_CLIENT_ID
-              value: java-kafka-consumer
-            - name: OAUTH_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: java-kafka-consumer-oauth
-                  key: clientSecret
-            - name: OAUTH_TOKEN_ENDPOINT_URI
-              value: https://sso.myproject.svc:8443/auth/realms/internal/protocol/openid-connect/token
-            - name: OAUTH_SSL_TRUSTSTORE_TYPE
-              value: PEM
-            - name: OAUTH_SSL_TRUSTSTORE_CERTIFICATES
-              valueFrom:
-                secretKeyRef:
-                  name: sso-x509-https-secret
-                  key: tls.crt
-            - name: KAFKA_BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9093
-            - name: KAFKA_GROUP_ID
-              value: java-kafka-consumer
-            - name: KAFKA_KEY_DESERIALIZER
-              value: "org.apache.kafka.common.serialization.StringDeserializer"
-            - name: KAFKA_VALUE_DESERIALIZER
-              value: "org.apache.kafka.common.serialization.StringDeserializer"
-            - name: KAFKA_SECURITY_PROTOCOL
-              value: "SASL_SSL"
-            - name: KAFKA_SASL_JAAS_CONFIG
-              value: "org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;"
-            - name: KAFKA_SASL_MECHANISM
-              value: OAUTHBEARER
-            - name: KAFKA_SASL_LOGIN_CALLBACK_HANDLER_CLASS
-              value: "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler"
-            - name: KAFKA_SSL_TRUSTSTORE_TYPE
-              value: PEM
-            - name: KAFKA_SSL_TRUSTSTORE_CERTIFICATES
-              valueFrom:
-                secretKeyRef:
-                  name: my-cluster-cluster-ca-cert
-                  key: ca.crt
+#---
+#apiVersion: v1
+#kind: Secret
+#metadata:
+#  name: java-kafka-streams-oauth
+#type: Opaque
+#data:
+#  clientSecret: ZGc5dGVJMjB6azRaVXRtSmh1RFlrMk5ub1VHM1h0VXI=
+#---
+#apiVersion: apps/v1
+#kind: Deployment
+#metadata:
+#  labels:
+#    app: java-kafka-streams
+#  name: java-kafka-streams
+#spec:
+#  replicas: 1
+#  selector:
+#    matchLabels:
+#      app: java-kafka-streams
+#  template:
+#    metadata:
+#      labels:
+#        app: java-kafka-streams
+#    spec:
+#      containers:
+#        - name: java-kafka-streams
+#          image: quay.io/strimzi-examples/java-kafka-streams:latest
+#          env:
+#            - name: STRIMZI_SOURCE_TOPIC
+#              value: my-topic
+#            - name: STRIMZI_TARGET_TOPIC
+#              value: my-topic-reversed
+#            - name: STRIMZI_LOG_LEVEL
+#              value: "INFO"
+#            - name: OAUTH_CLIENT_ID
+#              value: java-kafka-streams
+#            - name: OAUTH_CLIENT_SECRET
+#              valueFrom:
+#                secretKeyRef:
+#                  name: java-kafka-streams-oauth
+#                  key: clientSecret
+#            - name: OAUTH_TOKEN_ENDPOINT_URI
+#              value: https://keycloak:8443/auth/realms/kafka-authz/protocol/openid-connect/token
+#            - name: OAUTH_SSL_TRUSTSTORE_TYPE
+#              value: PEM
+#            - name: OAUTH_SSL_TRUSTSTORE_CERTIFICATES
+#              valueFrom:
+#                secretKeyRef:
+#                  name: tls-keys
+#                  key: tls.crt
+#            - name: KAFKA_BOOTSTRAP_SERVERS
+#              value: my-cluster-kafka-bootstrap:9093
+#            - name: KAFKA_APPLICATION_ID
+#              value: java-kafka-streams
+#            - name: KAFKA_DEFAULT_COMMIT_INTERVAL_MS
+#              value: "5000"
+#            - name: KAFKA_DEFAULT_KEY_SERDE
+#              value: "org.apache.kafka.common.serialization.Serdes$StringSerde"
+#            - name: KAFKA_DEFAULT_VALUE_SERDE
+#              value: "org.apache.kafka.common.serialization.Serdes$StringSerde"
+#            - name: KAFKA_SECURITY_PROTOCOL
+#              value: "SASL_SSL"
+#            - name: KAFKA_SASL_JAAS_CONFIG
+#              value: "org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;"
+#            - name: KAFKA_SASL_MECHANISM
+#              value: OAUTHBEARER
+#            - name: KAFKA_SASL_LOGIN_CALLBACK_HANDLER_CLASS
+#              value: "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler"
+#            - name: KAFKA_SSL_TRUSTSTORE_TYPE
+#              value: PEM
+#            - name: KAFKA_SSL_TRUSTSTORE_CERTIFICATES
+#              valueFrom:
+#                secretKeyRef:
+#                  name: my-cluster-cluster-ca-cert
+#                  key: ca.crt
+#---
+#apiVersion: v1
+#kind: Secret
+#metadata:
+#  name: java-kafka-consumer-oauth
+#type: Opaque
+#data:
+#  clientSecret: ZGc5dGVJMjB6azRaVXRtSmh1RFlrMk5ub1VHM1h0VXI=
+#---
+#apiVersion: apps/v1
+#kind: Deployment
+#metadata:
+#  labels:
+#    app: java-kafka-consumer
+#  name: java-kafka-consumer
+#spec:
+#  replicas: 1
+#  selector:
+#    matchLabels:
+#      app: java-kafka-consumer
+#  template:
+#    metadata:
+#      labels:
+#        app: java-kafka-consumer
+#    spec:
+#      containers:
+#        - name: java-kafka-consumer
+#          image: quay.io/strimzi-examples/java-kafka-consumer:latest
+#          env:
+#            - name: STRIMZI_TOPIC
+#              value: my-topic-reversed
+#            - name: STRIMZI_LOG_LEVEL
+#              value: "INFO"
+#            - name: STRIMZI_MESSAGE_COUNT
+#              value: "1000000"
+#            - name: OAUTH_CLIENT_ID
+#              value: java-kafka-consumer
+#            - name: OAUTH_CLIENT_SECRET
+#              valueFrom:
+#                secretKeyRef:
+#                  name: java-kafka-consumer-oauth
+#                  key: clientSecret
+#            - name: OAUTH_TOKEN_ENDPOINT_URI
+#              value: https://keycloak:8443/auth/realms/kafka-authz/protocol/openid-connect/token
+#            - name: OAUTH_SSL_TRUSTSTORE_TYPE
+#              value: PEM
+#            - name: OAUTH_SSL_TRUSTSTORE_CERTIFICATES
+#              valueFrom:
+#                secretKeyRef:
+#                  name: tls-keys
+#                  key: tls.crt
+#            - name: KAFKA_BOOTSTRAP_SERVERS
+#              value: my-cluster-kafka-bootstrap:9093
+#            - name: KAFKA_GROUP_ID
+#              value: java-kafka-consumer
+#            - name: KAFKA_KEY_DESERIALIZER
+#              value: "org.apache.kafka.common.serialization.StringDeserializer"
+#            - name: KAFKA_VALUE_DESERIALIZER
+#              value: "org.apache.kafka.common.serialization.StringDeserializer"
+#            - name: KAFKA_SECURITY_PROTOCOL
+#              value: "SASL_SSL"
+#            - name: KAFKA_SASL_JAAS_CONFIG
+#              value: "org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;"
+#            - name: KAFKA_SASL_MECHANISM
+#              value: OAUTHBEARER
+#            - name: KAFKA_SASL_LOGIN_CALLBACK_HANDLER_CLASS
+#              value: "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler"
+#            - name: KAFKA_SSL_TRUSTSTORE_TYPE
+#              value: PEM
+#            - name: KAFKA_SSL_TRUSTSTORE_CERTIFICATES
+#              valueFrom:
+#                secretKeyRef:
+#                  name: my-cluster-cluster-ca-cert
+#                  key: ca.crt
+#
