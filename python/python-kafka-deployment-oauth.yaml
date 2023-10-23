@@ -55,32 +55,51 @@ spec:
 
             - name: SASL_OAUTHBEARER_CLIENT_ID
               value: python-kafka-producer
-#            - name: SASL_OAUTHBEARER_CLIENT_SECRET
-#              valueFrom:
-#                secretKeyRef:
-#                  name: python-kafka-producer-oauth
-#                  key: clientSecret
-#            - name: SASL_OAUTHBEARER_ENDPOINT_URL
-#              value: https://keycloak:8443/auth/realms/kafka-authz/protocol/openid-connect/token
-#            - name: OAUTH_SSL_TRUSTSTORE_TYPE
-#              value: PEM
-            - name: OAUTH_SSL_TRUSTSTORE_CERTIFICATES
+            - name: SASL_OAUTHBEARER_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: python-kafka-producer-oauth
+                  key: clientSecret
+            - name: SASL_OAUTHBEARER_ENDPOINT_URL
+              value: https://keycloak:8443/auth/realms/kafka-authz/protocol/openid-connect/token
+            - name: BUILTIN_FEATURES
+              value: SASL_OAUTHBEARER
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: "SASL_SSL"
+            - name: OAUTH_SSL_TRUSTSTORE_TYPE
+              value: PEM
+            - name: SSL_CA_PEM
               valueFrom:
                 secretKeyRef:
                   name: tls-keys
                   key: tls.crt
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: my-cluster-kafka-bootstrap:9093
-            - name: KAFKA_SECURITY_PROTOCOL
-              value: "SASL_PLAINTEXT"
-            - name: KAFKA_SASL_MECHANISMS
-              value: OAUTHBEARER
-#            - name: KAFKA_SSL_CA_PEM
-#              valueFrom:
-#                secretKeyRef:
-#                  name: my-cluster-cluster-ca-cert
-#                  key: ca.crt
-#---
+            - name: KAFKA_SSL_CA_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: my-cluster-cluster-ca-cert
+                  key: ca.crt
+              # Client's Public Key - part of client Keystore
+            - name: KAFKA_SSL_CERTIFICATE_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: python-kafka-producer
+                  key: user.crt
+              # Client's Private Key
+            - name: KAFKA_SSL_KEY_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: python-kafka-producer
+                  key: user.key
+              # Client's Keystore Password
+            - name: KAFKA_SSL_KEYSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: python-kafka-producer
+                  key: user.password
+
+---
 #apiVersion: v1
 #kind: Secret
 #metadata:

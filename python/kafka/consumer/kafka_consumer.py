@@ -18,6 +18,8 @@ if __name__ == '__main__':
     )
     consumer.subscribe([config.topic])
 
+    log.info(f'Config Properties: \n{str(config.properties)}')
+
     while True:
         message = consumer.poll(timeout=config.delay)
         if message is None:

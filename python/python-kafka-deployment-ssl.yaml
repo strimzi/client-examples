@@ -52,24 +52,6 @@ spec:
                 secretKeyRef:
                   name: my-cluster-cluster-ca-cert
                   key: ca.crt
-              # Client's Public Key - part of client Keystore
-            - name: KAFKA_SSL_CERTIFICATE_PEM
-              valueFrom:
-                secretKeyRef:
-                  name: python-kafka-producer
-                  key: user.crt
-              # Client's Private Key
-            - name: KAFKA_SSL_KEY_PEM
-              valueFrom:
-                secretKeyRef:
-                  name: python-kafka-producer
-                  key: user.key
-              # Client's Keystore Password
-            - name: KAFKA_SSL_KEYSTORE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: python-kafka-producer
-                  key: user.password
 ---
 apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaUser
@@ -114,20 +96,3 @@ spec:
                   name: my-cluster-cluster-ca-cert
                   key: ca.crt
               # Client's Public Key - part of client Keystore
-            - name: KAFKA_SSL_CERTIFICATE_PEM
-              valueFrom:
-                secretKeyRef:
-                  name: python-kafka-consumer
-                  key: user.crt
-              # Client's Private Key
-            - name: KAFKA_SSL_KEY_PEM
-              valueFrom:
-                secretKeyRef:
-                  name: python-kafka-consumer
-                  key: user.key
-              # Client's Keystore Password
-            - name: KAFKA_SSL_KEYSTORE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: python-kafka-consumer
-                  key: user.password

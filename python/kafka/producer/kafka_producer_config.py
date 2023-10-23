@@ -1,3 +1,4 @@
+import functools
 import os
 
 # Used in fromEnv() to find evnVar starting with KAFKA_
@@ -17,9 +18,16 @@ DEFAULT_LOG_LEVEL = '1'
 
 # default values for environmental variables in dictionary
 DEFAULT_PROPERTIES = {
-    'bootstrap.servers': 'localhost:9092'
-    # 'key.serializer': 'org.apache.kafka.common.serialization.StringSerializer',
-    # 'value.serializer': 'org.apache.kafka.common.serialization.StringSerializer'
+    'bootstrap.servers': 'localhost:9092',
+    'builtin.features': 'sasl_oauthbearer',
+    'sasl.oauthbearer.client.id': 'python-kafka-producer ',
+    'sasl.oauthbearer.client.secret': 'SURUS3hZbTFyc2c5bWxrakNlY01kYmRwQVNRRGpDckE ',
+    'log_level': '7',
+    'security.protocol': 'SASL_SSL',
+    'sasl.mechanisms': 'OAUTHBEARER',
+    'logger': 'logger',
+    'ssl.ca.location': '/home/owencorrigan/Documents/Keys Certs/certificatename.pem'
+    # "debug": "generic, topic, msg",
 }
 
 
