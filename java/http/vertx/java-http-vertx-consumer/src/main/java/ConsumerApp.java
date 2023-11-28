@@ -3,21 +3,19 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import io.jaegertracing.Configuration;
-import io.opentracing.Tracer;
-import io.opentracing.util.GlobalTracer;
-
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
 import io.vertx.core.json.JsonObject;
-import org.apache.logging.log4j.Logger;
+import io.vertx.tracing.opentelemetry.OpenTelemetryOptions;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public final class ConsumerApp {
 
@@ -26,7 +24,9 @@ public final class ConsumerApp {
     private static String deploymentId;
 
     public static void main(String[] args) throws Exception {
-        Vertx vertx = Vertx.vertx();
+        VertxOptions vertxOptions = new VertxOptions();
+        vertxOptions.setTracingOptions(new OpenTelemetryOptions());
+        Vertx vertx = Vertx.vertx(vertxOptions);
 
         CountDownLatch messagesReceivedLatch = new CountDownLatch(1);
         CountDownLatch exitLatch = new CountDownLatch(1);
@@ -49,12 +49,6 @@ public final class ConsumerApp {
             vertx.deployVerticle(httpKafkaConsumer, done -> {
                 if (done.succeeded()) {
                     deploymentId = done.result();
-
-                    if (envConfig.get("JAEGER_SERVICE_NAME") != null) {
-                        Tracer tracer = Configuration.fromEnv().getTracer();
-                        GlobalTracer.registerIfAbsent(tracer);
-                    }
-
                     log.info("HTTP Kafka consumer started successfully");
                 } else {
                     log.error("Failed to deploy HTTP Kafka consumer", done.cause());

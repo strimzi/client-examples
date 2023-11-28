@@ -1,50 +1,38 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>io.strimzi</groupId>
     <artifactId>client-examples</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
-
     <modules>
         <module>java</module>
     </modules>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>17</maven.compiler.release>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <!-- Maven plugin versions -->
+        <!--  Maven plugin versions  -->
         <maven.compiler.version>3.10.1</maven.compiler.version>
         <maven.dependency.version>3.3.0</maven.dependency.version>
         <maven.shade.version>3.4.1</maven.shade.version>
         <maven.checkstyle.version>3.2.0</maven.checkstyle.version>
-
-        <!-- Build tools -->
+        <!--  Build tools  -->
         <checkstyle.version>9.2.1</checkstyle.version>
         <spotbugs.version>4.7.3</spotbugs.version>
         <maven.spotbugs.version>4.7.3.0</maven.spotbugs.version>
-        <!-- Regular dependencies -->
+        <!--  Regular dependencies  -->
         <kafka.version>3.5.0</kafka.version>
         <log4j.version>2.17.1</log4j.version>
         <slf4j.version>1.7.36</slf4j.version>
-        <opentracing.version>0.33.0</opentracing.version>
-        <opentracing-kafka.version>0.1.15</opentracing-kafka.version>
         <opentelemetry-alpha.version>1.19.0-alpha</opentelemetry-alpha.version>
         <opentelemetry.version>1.19.0</opentelemetry.version>
-        <jaeger.version>1.1.0</jaeger.version>
         <strimzi-oauth-callback.version>0.13.0</strimzi-oauth-callback.version>
         <vertx.version>4.4.5</vertx.version>
         <netty.version>4.1.97.Final</netty.version>
         <jackson-databind.version>2.15.2</jackson-databind.version>
     </properties>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -109,6 +97,11 @@
                 <version>${vertx.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-opentelemetry</artifactId>
+                <version>4.4.5</version>
+            </dependency>
+            <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-common</artifactId>
                 <version>${netty.version}</version>
@@ -117,36 +110,6 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-codec-http</artifactId>
                 <version>${netty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.jaegertracing</groupId>
-                <artifactId>jaeger-core</artifactId>
-                <version>${jaeger.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.jaegertracing</groupId>
-                <artifactId>jaeger-client</artifactId>
-                <version>${jaeger.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.opentracing</groupId>
-                <artifactId>opentracing-api</artifactId>
-                <version>${opentracing.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.opentracing</groupId>
-                <artifactId>opentracing-util</artifactId>
-                <version>${opentracing.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.opentracing.contrib</groupId>
-                <artifactId>opentracing-kafka-client</artifactId>
-                <version>${opentracing-kafka.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.opentracing.contrib</groupId>
-                <artifactId>opentracing-kafka-streams</artifactId>
-                <version>${opentracing-kafka.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.opentelemetry</groupId>
@@ -169,6 +132,12 @@
                 <version>${opentelemetry-alpha.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-sdk-testing</artifactId>
+                <scope>test</scope>
+                <version>${opentelemetry-alpha.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>io.opentelemetry.instrumentation</groupId>
                 <artifactId>opentelemetry-kafka-clients-2.6</artifactId>
                 <version>${opentelemetry-alpha.version}</version>
@@ -177,6 +146,11 @@
                 <groupId>io.opentelemetry</groupId>
                 <artifactId>opentelemetry-sdk-extension-autoconfigure</artifactId>
                 <version>${opentelemetry-alpha.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-sdk</artifactId>
+                <version>${opentelemetry.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.strimzi</groupId>
@@ -238,11 +212,9 @@
                                 <ignoredUnusedDeclaredDependencies>
                                     <ignoredUnusedDeclaredDependency>org.apache.logging.log4j:log4j-core</ignoredUnusedDeclaredDependency>
                                     <ignoredUnusedDeclaredDependency>org.apache.logging.log4j:log4j-slf4j-impl</ignoredUnusedDeclaredDependency>
-                                    <ignoredUnusedDeclaredDependency>io.jaegertracing:jaeger-client</ignoredUnusedDeclaredDependency>
-                                    <ignoredUnusedDeclaredDependency>io.opentelemetry:opentelemetry-exporter-jaeger</ignoredUnusedDeclaredDependency>
                                     <ignoredUnusedDeclaredDependency>io.opentelemetry:opentelemetry-exporter-otlp</ignoredUnusedDeclaredDependency>
                                     <ignoredUnusedDeclaredDependency>io.strimzi:kafka-oauth-client</ignoredUnusedDeclaredDependency>
-                                    <!-- Due to the override in the Vert.x HTTP client examples -->
+                                    <!--  Due to the override in the Vert.x HTTP client examples  -->
                                     <ignoredUnusedDeclaredDependency>com.fasterxml.jackson.core:jackson-databind</ignoredUnusedDeclaredDependency>
                                 </ignoredUnusedDeclaredDependencies>
                             </configuration>
@@ -251,7 +223,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -288,7 +259,7 @@
                 <artifactId>spotbugs-maven-plugin</artifactId>
                 <version>${maven.spotbugs.version}</version>
                 <dependencies>
-                    <!-- overwrite dependency on spotbugs if you want to specify the version of˓→spotbugs -->
+                    <!--  overwrite dependency on spotbugs if you want to specify the version of˓→spotbugs  -->
                     <dependency>
                         <groupId>com.github.spotbugs</groupId>
                         <artifactId>spotbugs</artifactId>
@@ -297,13 +268,13 @@
                 </dependencies>
                 <configuration>
                     <effort>Max</effort>
-                    <!-- Reports all bugs (other values are medium and max) -->
+                    <!--  Reports all bugs (other values are medium and max)  -->
                     <threshold>Low</threshold>
-                    <!-- Produces XML report -->
+                    <!--  Produces XML report  -->
                     <xmlOutput>true</xmlOutput>
-                    <!-- Configures the directory in which the XML report is created -->
+                    <!--  Configures the directory in which the XML report is created  -->
                     <spotbugsXmlOutputDirectory>${project.build.directory}/spotbugs</spotbugsXmlOutputDirectory>
-                    <!-- Configures the file for excluding warnings -->
+                    <!--  Configures the file for excluding warnings  -->
                     <excludeFilterFile>${project.basedir}/../../.spotbugs/spotbugs-exclude.xml</excludeFilterFile>
                 </configuration>
             </plugin>

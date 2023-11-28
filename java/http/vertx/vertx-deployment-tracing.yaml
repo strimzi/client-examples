@@ -26,14 +26,16 @@ spec:
             value: my-topic
           - name: SEND_INTERVAL
             value: "1000"
-          - name: JAEGER_SERVICE_NAME
+          - name: MESSAGE_COUNT
+            value: "1000000"
+          - name: OTEL_SERVICE_NAME
             value: java-http-vertx-producer
-          - name: JAEGER_AGENT_HOST
-            value: my-jaeger-agent
-          - name: JAEGER_SAMPLER_TYPE
-            value: const
-          - name: JAEGER_SAMPLER_PARAM
-            value: "1"
+          - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: http://my-otlp-endpoint:4317
+          - name: COLLECTOR_OLTP_ENABLED
+            value: "true"
+          - name: OTEL_METRICS_EXPORTER
+            value: none
         resources:
           requests:
             memory: "256Mi"
@@ -41,6 +43,7 @@ spec:
           limits:
             memory: "256Mi"
             cpu: "250m"
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -72,14 +75,14 @@ spec:
             value: "my-group"
           - name: POLL_INTERVAL
             value: "1000"
-          - name: JAEGER_SERVICE_NAME
-            value: java-http-vertx-consumer
-          - name: JAEGER_AGENT_HOST
-            value: my-jaeger-agent
-          - name: JAEGER_SAMPLER_TYPE
-            value: const
-          - name: JAEGER_SAMPLER_PARAM
-            value: "1"
+          - name: OTEL_SERVICE_NAME
+            value: java-http-vertx-producer
+          - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: http://my-otlp-endpoint:4317
+          - name: COLLECTOR_OLTP_ENABLED
+            value: "true"
+          - name: OTEL_METRICS_EXPORTER
+            value: none
         resources:
           requests:
             memory: "256Mi"

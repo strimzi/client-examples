@@ -3,30 +3,29 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import io.jaegertracing.Configuration;
-import io.opentracing.Tracer;
-import io.opentracing.util.GlobalTracer;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
 import io.vertx.core.json.JsonObject;
+import io.vertx.tracing.opentelemetry.OpenTelemetryOptions;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public final class ProducerApp {
-    
+
     private static final Logger log = LogManager.getLogger(ProducerApp.class);
 
-    private static String deploymentId;
-
     public static void main(String[] args) throws Exception {
-        Vertx vertx = Vertx.vertx();
+
+        VertxOptions vertxOptions = new VertxOptions();
+        vertxOptions.setTracingOptions(new OpenTelemetryOptions());
+        Vertx vertx = Vertx.vertx(vertxOptions);
 
         CountDownLatch messagesSentLatch = new CountDownLatch(1);
         CountDownLatch exitLatch = new CountDownLatch(1);
@@ -44,17 +43,9 @@ public final class ProducerApp {
             Map<String, Object> envConfig = ar.result().getMap();
             HttpKafkaProducerConfig httpKafkaConsumerConfig = HttpKafkaProducerConfig.fromMap(envConfig);
 
-            HttpKafkaProducer httpKafkaProducer = new HttpKafkaProducer(httpKafkaConsumerConfig, messagesSentLatch);
-
+            HttpKafkaProducer httpKafkaProducer = new HttpKafkaProducer(httpKafkaConsumerConfig,  messagesSentLatch);
             vertx.deployVerticle(httpKafkaProducer, done -> {
                 if (done.succeeded()) {
-                    deploymentId = done.result();
-
-                    if (envConfig.get("JAEGER_SERVICE_NAME") != null) {
-                        Tracer tracer = Configuration.fromEnv().getTracer();
-                        GlobalTracer.registerIfAbsent(tracer);
-                    }
-                    
                     log.info("HTTP Kafka producer started successfully");
                 } else {
                     log.error("Failed to deploy HTTP Kafka producer", done.cause());
@@ -62,7 +53,6 @@ public final class ProducerApp {
                 }
             });
         });
-
         log.info("Waiting for sending all messages");
         messagesSentLatch.await();
         vertx.close(done -> exitLatch.countDown());
@@ -71,3 +61,8 @@ public final class ProducerApp {
         log.info("Latch released before Timeout: {}", releaseBeforeTimeout);
     }
 }
+
+
+
+
+
