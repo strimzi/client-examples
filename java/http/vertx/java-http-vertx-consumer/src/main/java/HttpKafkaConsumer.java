@@ -3,9 +3,14 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
-
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
@@ -20,12 +25,6 @@ import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.ext.web.codec.BodyCodec;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * HttpKafkaConsumer
@@ -172,21 +171,6 @@ public class HttpKafkaConsumer extends AbstractVerticle {
                         for (Map.Entry<String, String> header : rawHeaders) {
                             headers.put(header.getKey(), header.getValue());
                         }
-
-//                        String operation = "poll";
-//                        Tracer.SpanBuilder spanBuilder;
-//                        try {
-//                            SpanContext parentSpan = tracer.extract(Format.Builtin.HTTP_HEADERS, new TextMapAdapter(headers));
-//                            if (parentSpan == null) {
-//                                spanBuilder = tracer.buildSpan(operation);
-//                            } else {
-//                                spanBuilder = tracer.buildSpan(operation).asChildOf(parentSpan);
-//                            }
-//                        } catch (IllegalArgumentException e) {
-//                            spanBuilder = tracer.buildSpan(operation);
-//                        }
-//
-//                        Span span = spanBuilder.withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER).start();
 
                         List<ConsumerRecord> list = new ArrayList<>();
                         response.body().forEach(obj -> {

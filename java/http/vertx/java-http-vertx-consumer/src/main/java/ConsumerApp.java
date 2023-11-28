@@ -20,10 +20,11 @@ import java.util.concurrent.TimeUnit;
 public final class ConsumerApp {
 
     private static final Logger log = LogManager.getLogger(ConsumerApp.class);
-    
+
     private static String deploymentId;
 
     public static void main(String[] args) throws Exception {
+
         VertxOptions vertxOptions = new VertxOptions();
         vertxOptions.setTracingOptions(new OpenTelemetryOptions());
         Vertx vertx = Vertx.vertx(vertxOptions);

@@ -45,7 +45,6 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-opentelemetry</artifactId>
-            <!-- <version>4.4.5</version> -->
         </dependency>
         <dependency>
             <groupId>io.opentelemetry</groupId>

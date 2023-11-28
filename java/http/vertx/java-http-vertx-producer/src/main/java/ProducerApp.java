@@ -44,6 +44,7 @@ public final class ProducerApp {
             HttpKafkaProducerConfig httpKafkaConsumerConfig = HttpKafkaProducerConfig.fromMap(envConfig);
 
             HttpKafkaProducer httpKafkaProducer = new HttpKafkaProducer(httpKafkaConsumerConfig,  messagesSentLatch);
+
             vertx.deployVerticle(httpKafkaProducer, done -> {
                 if (done.succeeded()) {
                     log.info("HTTP Kafka producer started successfully");
@@ -61,8 +62,3 @@ public final class ProducerApp {
         log.info("Latch released before Timeout: {}", releaseBeforeTimeout);
     }
 }
-
-
-
-
-

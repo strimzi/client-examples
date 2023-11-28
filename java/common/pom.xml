@@ -18,6 +18,7 @@
             <artifactId>opentelemetry-sdk-extension-autoconfigure</artifactId>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
