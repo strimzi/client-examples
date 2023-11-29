@@ -3,17 +3,10 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
-import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -25,6 +18,10 @@ import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.ext.web.codec.BodyCodec;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * HttpKafkaConsumer
@@ -163,15 +160,6 @@ public class HttpKafkaConsumer extends AbstractVerticle {
                 if (ar.succeeded()) {
                     HttpResponse<JsonArray> response = ar.result();
                     if (response.statusCode() == HttpResponseStatus.OK.code()) {
-
-                    //    Tracer tracer = GlobalTracer.get();
-
-                        MultiMap rawHeaders = response.headers();
-                        final Map<String, String> headers = new HashMap<>();
-                        for (Map.Entry<String, String> header : rawHeaders) {
-                            headers.put(header.getKey(), header.getValue());
-                        }
-
                         List<ConsumerRecord> list = new ArrayList<>();
                         response.body().forEach(obj -> {
                             JsonObject json = (JsonObject) obj;

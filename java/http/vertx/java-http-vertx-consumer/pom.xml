@@ -55,6 +55,7 @@
             <artifactId>opentelemetry-exporter-otlp</artifactId>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>

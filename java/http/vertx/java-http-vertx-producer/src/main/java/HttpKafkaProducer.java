@@ -5,7 +5,6 @@
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.opentelemetry.api.OpenTelemetry;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
@@ -37,8 +36,9 @@ public class HttpKafkaProducer extends AbstractVerticle {
     private WebClient client;
     private long sendTimer;
     private int messagesSent;
+
     private CountDownLatch messagesSentLatch;
-    private OpenTelemetry openTelemetry;
+
     /**
      * Constructor
      *
@@ -97,8 +97,8 @@ public class HttpKafkaProducer extends AbstractVerticle {
                             response.body().getJsonArray("offsets").forEach(obj -> {
                                 JsonObject json = (JsonObject) obj;
                                 list.add(new OffsetRecordSent(
-                                        json.getInteger("partition"),
-                                        json.getLong("offset"))
+                                    json.getInteger("partition"),
+                                    json.getLong("offset"))
                                 );
                             });
                             fut.complete(list);
@@ -109,7 +109,7 @@ public class HttpKafkaProducer extends AbstractVerticle {
                         fut.fail(ar.cause());
                     }
                     if (this.config.getMessageCount().isPresent() &&
-                            this.messagesSent >= this.config.getMessageCount().get()) {
+                        this.messagesSent >= this.config.getMessageCount().get()) {
                         // signal to main thread that all messages are sent, application can exit
                         this.messagesSentLatch.countDown();
                         log.info("All messages sent");
@@ -121,7 +121,6 @@ public class HttpKafkaProducer extends AbstractVerticle {
     /**
      * Represents information about a message sent
      */
-
     static class OffsetRecordSent {
 
         private final int partition;

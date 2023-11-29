@@ -106,7 +106,7 @@
             <dependency>
                 <groupId>io.vertx</groupId>
                 <artifactId>vertx-opentelemetry</artifactId>
-                <version>4.4.5</version>
+                <version>${vertx.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
@@ -136,12 +136,6 @@
             <dependency>
                 <groupId>io.opentelemetry</groupId>
                 <artifactId>opentelemetry-semconv</artifactId>
-                <version>${opentelemetry-alpha.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-sdk-testing</artifactId>
-                <scope>test</scope>
                 <version>${opentelemetry-alpha.version}</version>
             </dependency>
             <dependency>

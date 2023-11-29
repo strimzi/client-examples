@@ -29,13 +29,11 @@ spec:
           - name: MESSAGE_COUNT
             value: "1000000"
           - name: OTEL_SERVICE_NAME
-            value: java-http-vertx-producer
-          - name: OTEL_EXPORTER_OTLP_ENDPOINT
-            value: http://my-otlp-endpoint:4317
-          - name: COLLECTOR_OLTP_ENABLED
-            value: "true"
+            value: http-vertx-otel
           - name: OTEL_METRICS_EXPORTER
             value: none
+          - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: http://my-otlp-endpoint:4317
         resources:
           requests:
             memory: "256Mi"
@@ -76,13 +74,11 @@ spec:
           - name: POLL_INTERVAL
             value: "1000"
           - name: OTEL_SERVICE_NAME
-            value: java-http-vertx-producer
-          - name: OTEL_EXPORTER_OTLP_ENDPOINT
-            value: http://my-otlp-endpoint:4317
-          - name: COLLECTOR_OLTP_ENABLED
-            value: "true"
+            value: http-vertx-otel
           - name: OTEL_METRICS_EXPORTER
             value: none
+          - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: http://my-otlp-endpoint:4317
         resources:
           requests:
             memory: "256Mi"

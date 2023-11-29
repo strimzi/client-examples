@@ -45,8 +45,7 @@ public class HttpKafkaProducerConfig {
     private HttpKafkaProducerConfig(String hostname, int port, 
                                     String topic, int sendInterval,
                                     Optional<Long> messageCount,
-                                    String endpointPrefix
-    ) {
+                                    String endpointPrefix) {
         this.hostname = hostname;
         this.port = port;
         this.topic = topic;

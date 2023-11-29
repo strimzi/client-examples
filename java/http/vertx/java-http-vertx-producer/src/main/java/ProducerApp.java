@@ -42,7 +42,6 @@ public final class ProducerApp {
         retriever.getConfig(ar -> {
             Map<String, Object> envConfig = ar.result().getMap();
             HttpKafkaProducerConfig httpKafkaConsumerConfig = HttpKafkaProducerConfig.fromMap(envConfig);
-
             HttpKafkaProducer httpKafkaProducer = new HttpKafkaProducer(httpKafkaConsumerConfig,  messagesSentLatch);
 
             vertx.deployVerticle(httpKafkaProducer, done -> {

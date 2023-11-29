@@ -9,6 +9,7 @@
         <artifactId>java-kafka-examples</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
+
     <artifactId>java-kafka-producer</artifactId>
 
     <dependencies>
