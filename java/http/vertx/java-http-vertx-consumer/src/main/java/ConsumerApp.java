@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import io.strimzi.common.TracingSystem;
 
 public final class ConsumerApp {
 
@@ -24,9 +25,15 @@ public final class ConsumerApp {
     private static String deploymentId;
 
     public static void main(String[] args) throws Exception {
-
+        TracingSystem tracingSystem = HttpKafkaConsumerConfig.getTracingSystemFromEnv();
         VertxOptions vertxOptions = new VertxOptions();
-        vertxOptions.setTracingOptions(new OpenTelemetryOptions());
+        if (tracingSystem != TracingSystem.NONE) {
+            if (tracingSystem == TracingSystem.OPENTELEMETRY) {
+                vertxOptions.setTracingOptions(new OpenTelemetryOptions());
+            } else {
+                log.error("Error: STRIMZI_TRACING_SYSTEM {} is not recognized or supported!", HttpKafkaConsumerConfig.getTracingSystemFromEnv());
+            }
+        }
         Vertx vertx = Vertx.vertx(vertxOptions);
 
         CountDownLatch messagesReceivedLatch = new CountDownLatch(1);
@@ -44,7 +51,6 @@ public final class ConsumerApp {
         retriever.getConfig(ar -> {
             Map<String, Object> envConfig = ar.result().getMap();
             HttpKafkaConsumerConfig httpKafkaConsumerConfig = HttpKafkaConsumerConfig.fromMap(envConfig);
-
             HttpKafkaConsumer httpKafkaConsumer = new HttpKafkaConsumer(httpKafkaConsumerConfig, messagesReceivedLatch);
 
             vertx.deployVerticle(httpKafkaConsumer, done -> {

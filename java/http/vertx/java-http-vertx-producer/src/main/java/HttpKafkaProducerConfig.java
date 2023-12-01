@@ -6,6 +6,8 @@
 import java.util.Map;
 import java.util.Optional;
 
+import io.strimzi.common.TracingSystem;
+
 /**
  * HttpKafkaProducerConfig
  */
@@ -111,6 +113,10 @@ public class HttpKafkaProducerConfig {
         Optional<Long> messageCount = envMessageCount != null ? Optional.of(Long.parseLong(envMessageCount)) : Optional.empty();
         String endpointPrefix = (String) map.getOrDefault(ENV_ENDPOINT_PREFIX, DEFAULT_ENDPOINT_PREFIX);
         return new HttpKafkaProducerConfig(hostname, port, topic, sendInterval, messageCount, endpointPrefix);
+    }
+
+    public static TracingSystem getTracingSystemFromEnv() {
+        return TracingSystem.forValue(System.getenv().getOrDefault("STRIMZI_TRACING_SYSTEM", ""));
     }
 
     @Override

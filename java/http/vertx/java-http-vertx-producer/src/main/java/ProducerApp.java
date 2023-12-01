@@ -3,6 +3,7 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
+import io.strimzi.common.TracingSystem;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
@@ -22,9 +23,15 @@ public final class ProducerApp {
     private static final Logger log = LogManager.getLogger(ProducerApp.class);
 
     public static void main(String[] args) throws Exception {
-
+        TracingSystem tracingSystem = HttpKafkaConsumerConfig.getTracingSystemFromEnv();
         VertxOptions vertxOptions = new VertxOptions();
-        vertxOptions.setTracingOptions(new OpenTelemetryOptions());
+        if (tracingSystem != TracingSystem.NONE) {
+            if (tracingSystem == TracingSystem.OPENTELEMETRY) {
+                vertxOptions.setTracingOptions(new OpenTelemetryOptions());
+            } else {
+                log.error("Error: STRIMZI_TRACING_SYSTEM {} is not recognized or supported!", HttpKafkaConsumerConfig.getTracingSystemFromEnv());
+            }
+        }
         Vertx vertx = Vertx.vertx(vertxOptions);
 
         CountDownLatch messagesSentLatch = new CountDownLatch(1);

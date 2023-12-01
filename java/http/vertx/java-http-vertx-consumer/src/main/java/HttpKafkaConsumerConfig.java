@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import io.vertx.core.http.HttpClientOptions;
+import io.strimzi.common.TracingSystem;
 
 /**
  * HttpKafkaConsumerConfig
@@ -63,8 +64,8 @@ public class HttpKafkaConsumerConfig {
      * @param endpointPrefix a prefix to use in the endpoint path
      */
     @SuppressWarnings("checkstyle:ParameterNumber")
-    private HttpKafkaConsumerConfig(String hostname, int port, 
-                                    String topic, String clientId, String groupid, 
+    private HttpKafkaConsumerConfig(String hostname, int port,
+                                    String topic, String clientId, String groupid,
                                     int pollInterval, int pollTimeout,
                                     boolean pipelining, int pipeliningLimit,
                                     Optional<Long> messageCount,
@@ -179,6 +180,10 @@ public class HttpKafkaConsumerConfig {
         Optional<Long> messageCount = envMessageCount != null ? Optional.of(Long.parseLong(envMessageCount)) : Optional.empty();
         String endpointPrefix = (String) map.getOrDefault(ENV_ENDPOINT_PREFIX, DEFAULT_ENDPOINT_PREFIX);
         return new HttpKafkaConsumerConfig(hostname, port, topic, clientId, groupid, pollInterval, pollTimeout, pipelining, pipeliningLimit, messageCount, endpointPrefix);
+    }
+
+    public static TracingSystem getTracingSystemFromEnv() {
+        return TracingSystem.forValue(System.getenv().getOrDefault("STRIMZI_TRACING_SYSTEM", ""));
     }
 
     @Override
