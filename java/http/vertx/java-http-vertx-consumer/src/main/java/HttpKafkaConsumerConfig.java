@@ -14,17 +14,17 @@ import io.strimzi.common.TracingSystem;
  */
 public class HttpKafkaConsumerConfig {
 
-    private static final String ENV_HOSTNAME = "HOSTNAME";
-    private static final String ENV_PORT = "PORT";
-    private static final String ENV_TOPIC = "TOPIC";
-    private static final String ENV_CLIENTID = "CLIENTID";
-    private static final String ENV_GROUPID = "GROUPID";
-    private static final String ENV_POLL_INTERVAL = "POLL_INTERVAL";
-    private static final String ENV_POLL_TIMEOUT = "POLL_TIMEOUT";
-    private static final String ENV_PIPELINING = "PIPELINING";
-    private static final String ENV_PIPELINING_LIMIT = "PIPELINING_LIMIT";
-    private static final String ENV_MESSAGE_COUNT = "MESSAGE_COUNT";
-    private static final String ENV_ENDPOINT_PREFIX = "ENDPOINT_PREFIX";
+    private static final String STRIMZI_HOSTNAME = "STRIMZI_HOSTNAME";
+    private static final String STRIMZI_PORT = "STRIMZI_PORT";
+    private static final String STRIMZI_TOPIC = "STRIMZI_TOPIC";
+    private static final String STRIMZI_CLIENTID = "STRIMZI_CLIENTID";
+    private static final String STRIMZI_GROUPID = "STRIMZI_GROUPID";
+    private static final String STRIMZI_POLL_INTERVAL = "STRIMZI_POLL_INTERVAL";
+    private static final String STRIMZI_POLL_TIMEOUT = "STRIMZI_POLL_TIMEOUT";
+    private static final String STRIMZI_PIPELINING = "STRIMZI_PIPELINING";
+    private static final String STRIMZI_PIPELINING_LIMIT = "STRIMZI_PIPELINING_LIMIT";
+    private static final String STRIMZI_MESSAGE_COUNT = "STRIMZI_MESSAGE_COUNT";
+    private static final String STRIMZI_ENDPOINT_PREFIX = "STRIMZI_ENDPOINT_PREFIX";
 
     private static final String DEFAULT_HOSTNAME = "localhost";
     private static final int DEFAULT_PORT = 8080;
@@ -47,10 +47,11 @@ public class HttpKafkaConsumerConfig {
     private final int pipeliningLimit;
     private final Optional<Long> messageCount; 
     private final String endpointPrefix;
+    private final TracingSystem tracingSystem;
 
     /**
      * Constructor
-     * 
+     *
      * @param hostname hostname to which connect to
      * @param port host port to which connect to
      * @param topic Kafka topic from which consume messages
@@ -62,6 +63,7 @@ public class HttpKafkaConsumerConfig {
      * @param pipeliningLimit the maximum number of requests in the pipeline
      * @param messageCount number of messages to receive
      * @param endpointPrefix a prefix to use in the endpoint path
+     * @param tracingSystem system used to enable tracing
      */
     @SuppressWarnings("checkstyle:ParameterNumber")
     private HttpKafkaConsumerConfig(String hostname, int port,
@@ -69,7 +71,8 @@ public class HttpKafkaConsumerConfig {
                                     int pollInterval, int pollTimeout,
                                     boolean pipelining, int pipeliningLimit,
                                     Optional<Long> messageCount,
-                                    String endpointPrefix) {
+                                    String endpointPrefix,
+                                    TracingSystem tracingSystem) {
         this.hostname = hostname;
         this.port = port;
         this.topic = topic;
@@ -81,6 +84,7 @@ public class HttpKafkaConsumerConfig {
         this.pipeliningLimit = pipeliningLimit;
         this.messageCount = messageCount;
         this.endpointPrefix = endpointPrefix;
+        this.tracingSystem = tracingSystem;
     }
 
     /**
@@ -161,29 +165,33 @@ public class HttpKafkaConsumerConfig {
     }
 
     /**
+     * @return an option to initialise tracing to openTelemetry
+     */
+    public TracingSystem getTracingSystem() {
+        return tracingSystem;
+    }
+
+    /**
      * Load all HTTP Kafka consumer configuration parameters from a related map
      * 
      * @param map map from which loading configuration parameters
      * @return HTTP Kafka consumer configuration
      */
     public static HttpKafkaConsumerConfig fromMap(Map<String, Object> map) {
-        String hostname = (String) map.getOrDefault(ENV_HOSTNAME, DEFAULT_HOSTNAME);
-        int port = Integer.parseInt(map.getOrDefault(ENV_PORT, DEFAULT_PORT).toString());
-        String topic = (String) map.getOrDefault(ENV_TOPIC, DEFAULT_TOPIC);
-        String clientId = (String) map.get(ENV_CLIENTID);
-        String groupid = (String) map.getOrDefault(ENV_GROUPID, DEFAULT_GROUPID);
-        int pollInterval = Integer.parseInt(map.getOrDefault(ENV_POLL_INTERVAL, DEFAULT_POLL_INTERVAL).toString());
-        int pollTimeout = Integer.parseInt(map.getOrDefault(ENV_POLL_TIMEOUT, DEFAULT_POLL_TIMEOUT).toString());
-        boolean pipelining = Boolean.valueOf(map.getOrDefault(ENV_PIPELINING, DEFAULT_PIPELINING).toString());
-        int pipeliningLimit = Integer.parseInt(map.getOrDefault(ENV_PIPELINING_LIMIT, DEFAULT_PIPELINING_LIMIT).toString());
-        String envMessageCount = (String) map.get(ENV_MESSAGE_COUNT);
+        String hostname = (String) map.getOrDefault(STRIMZI_HOSTNAME, DEFAULT_HOSTNAME);
+        int port = Integer.parseInt(map.getOrDefault(STRIMZI_PORT, DEFAULT_PORT).toString());
+        String topic = (String) map.getOrDefault(STRIMZI_TOPIC, DEFAULT_TOPIC);
+        String clientId = (String) map.get(STRIMZI_CLIENTID);
+        String groupid = (String) map.getOrDefault(STRIMZI_GROUPID, DEFAULT_GROUPID);
+        int pollInterval = Integer.parseInt(map.getOrDefault(STRIMZI_POLL_INTERVAL, DEFAULT_POLL_INTERVAL).toString());
+        int pollTimeout = Integer.parseInt(map.getOrDefault(STRIMZI_POLL_TIMEOUT, DEFAULT_POLL_TIMEOUT).toString());
+        boolean pipelining = Boolean.valueOf(map.getOrDefault(STRIMZI_PIPELINING, DEFAULT_PIPELINING).toString());
+        int pipeliningLimit = Integer.parseInt(map.getOrDefault(STRIMZI_PIPELINING_LIMIT, DEFAULT_PIPELINING_LIMIT).toString());
+        String envMessageCount = (String) map.get(STRIMZI_MESSAGE_COUNT);
         Optional<Long> messageCount = envMessageCount != null ? Optional.of(Long.parseLong(envMessageCount)) : Optional.empty();
-        String endpointPrefix = (String) map.getOrDefault(ENV_ENDPOINT_PREFIX, DEFAULT_ENDPOINT_PREFIX);
-        return new HttpKafkaConsumerConfig(hostname, port, topic, clientId, groupid, pollInterval, pollTimeout, pipelining, pipeliningLimit, messageCount, endpointPrefix);
-    }
-
-    public static TracingSystem getTracingSystemFromEnv() {
-        return TracingSystem.forValue(System.getenv().getOrDefault("STRIMZI_TRACING_SYSTEM", ""));
+        String endpointPrefix = (String) map.getOrDefault(STRIMZI_ENDPOINT_PREFIX, DEFAULT_ENDPOINT_PREFIX);
+        TracingSystem tracingSystem = TracingSystem.forValue(System.getenv().getOrDefault("STRIMZI_TRACING_SYSTEM", ""));
+        return new HttpKafkaConsumerConfig(hostname, port, topic, clientId, groupid, pollInterval, pollTimeout, pipelining, pipeliningLimit, messageCount, endpointPrefix, tracingSystem);
     }
 
     @Override
@@ -200,6 +208,7 @@ public class HttpKafkaConsumerConfig {
                 ",pipeliningLimit=" + this.pipeliningLimit +
                 ",messageCount=" + (this.messageCount.isPresent() ? this.messageCount.get() : null) +
                 ",endpointPrefix=" + this.endpointPrefix +
+                ", tracingSystem=" + tracingSystem +
                 ")";
     }
 }

@@ -3,63 +3,53 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import io.strimzi.common.TracingSystem;
-import io.vertx.config.ConfigRetriever;
-import io.vertx.config.ConfigRetrieverOptions;
-import io.vertx.config.ConfigStoreOptions;
-import io.vertx.core.Vertx;
-import io.vertx.core.VertxOptions;
-import io.vertx.core.json.JsonObject;
-import io.vertx.tracing.opentelemetry.OpenTelemetryOptions;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
+import io.vertx.tracing.opentelemetry.OpenTelemetryOptions;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import io.strimzi.common.TracingSystem;
 
 public final class ProducerApp {
 
     private static final Logger log = LogManager.getLogger(ProducerApp.class);
 
     public static void main(String[] args) throws Exception {
-        TracingSystem tracingSystem = HttpKafkaConsumerConfig.getTracingSystemFromEnv();
+        CountDownLatch messagesSentLatch = new CountDownLatch(1);
+        CountDownLatch exitLatch = new CountDownLatch(1);
+
+        Map<String, Object> objectMap = new HashMap<>();
+        for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
+            objectMap.put(entry.getKey(), entry.getValue());
+        }
+        HttpKafkaProducerConfig httpKafkaProducerConfig = HttpKafkaProducerConfig.fromMap(objectMap);
+        HttpKafkaProducer httpKafkaProducer = new HttpKafkaProducer(httpKafkaProducerConfig,  messagesSentLatch);
+
+        TracingSystem tracingSystem = httpKafkaProducerConfig.getTracingSystem();
         VertxOptions vertxOptions = new VertxOptions();
         if (tracingSystem != TracingSystem.NONE) {
             if (tracingSystem == TracingSystem.OPENTELEMETRY) {
                 vertxOptions.setTracingOptions(new OpenTelemetryOptions());
             } else {
-                log.error("Error: STRIMZI_TRACING_SYSTEM {} is not recognized or supported!", HttpKafkaConsumerConfig.getTracingSystemFromEnv());
+                log.error("Error: STRIMZI_TRACING_SYSTEM {} is not recognized or supported!", httpKafkaProducerConfig.getTracingSystem());
             }
         }
         Vertx vertx = Vertx.vertx(vertxOptions);
 
-        CountDownLatch messagesSentLatch = new CountDownLatch(1);
-        CountDownLatch exitLatch = new CountDownLatch(1);
-
-        ConfigStoreOptions envStore = new ConfigStoreOptions()
-                .setType("env")
-                .setConfig(new JsonObject().put("raw-data", true));
-
-        ConfigRetrieverOptions options = new ConfigRetrieverOptions()
-                .addStore(envStore);
-
-        ConfigRetriever retriever = ConfigRetriever.create(vertx, options);
-
-        retriever.getConfig(ar -> {
-            Map<String, Object> envConfig = ar.result().getMap();
-            HttpKafkaProducerConfig httpKafkaConsumerConfig = HttpKafkaProducerConfig.fromMap(envConfig);
-            HttpKafkaProducer httpKafkaProducer = new HttpKafkaProducer(httpKafkaConsumerConfig,  messagesSentLatch);
-
-            vertx.deployVerticle(httpKafkaProducer, done -> {
-                if (done.succeeded()) {
-                    log.info("HTTP Kafka producer started successfully");
-                } else {
-                    log.error("Failed to deploy HTTP Kafka producer", done.cause());
-                    System.exit(1);
-                }
-            });
+        vertx.deployVerticle(httpKafkaProducer, done -> {
+            if (done.succeeded()) {
+                log.info("HTTP Kafka producer started successfully");
+            } else {
+                log.error("Failed to deploy HTTP Kafka producer", done.cause());
+                System.exit(1);
+            }
         });
+
         log.info("Waiting for sending all messages");
         messagesSentLatch.await();
         vertx.close(done -> exitLatch.countDown());

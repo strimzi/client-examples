@@ -18,16 +18,18 @@ spec:
       - name: java-http-vertx-producer
         image: quay.io/strimzi-examples/java-http-vertx-producer:latest
         env:
-          - name: HOSTNAME
+          - name: STRIMZI_HOSTNAME
             value: my-bridge-bridge-service
-          - name: PORT
+          - name: STRIMZI_PORT
             value: "8080"
-          - name: TOPIC
+          - name: STRIMZI_TOPIC
             value: my-topic
-          - name: SEND_INTERVAL
+          - name: STRIMZI_SEND_INTERVAL
             value: "1000"
-          - name: MESSAGE_COUNT
+          - name: STRIMZI_MESSAGE_COUNT
             value: "1000000"
+          - name: STRIMZI_TRACING_SYSTEM
+            value: "opentelemetry"
           - name: OTEL_SERVICE_NAME
             value: http-vertx-otel
           - name: OTEL_METRICS_EXPORTER
@@ -63,16 +65,18 @@ spec:
       - name: java-http-vertx-consumer
         image: quay.io/strimzi-examples/java-http-vertx-consumer:latest
         env:
-          - name: HOSTNAME
+          - name: STRIMZI_HOSTNAME
             value: my-bridge-bridge-service
-          - name: PORT
+          - name: STRIMZI_PORT
             value: "8080"
-          - name: TOPIC
+          - name: STRIMZI_TOPIC
             value: my-topic
-          - name: GROUPID
+          - name: STRIMZI_GROUPID
             value: "my-group"
-          - name: POLL_INTERVAL
+          - name: STRIMZI_POLL_INTERVAL
             value: "1000"
+          - name: STRIMZI_TRACING_SYSTEM
+            value: "opentelemetry"
           - name: OTEL_SERVICE_NAME
             value: http-vertx-otel
           - name: OTEL_METRICS_EXPORTER

@@ -3,19 +3,16 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import io.vertx.config.ConfigRetriever;
-import io.vertx.config.ConfigRetrieverOptions;
-import io.vertx.config.ConfigStoreOptions;
-import io.vertx.core.Vertx;
-import io.vertx.core.VertxOptions;
-import io.vertx.core.json.JsonObject;
-import io.vertx.tracing.opentelemetry.OpenTelemetryOptions;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
+import io.vertx.tracing.opentelemetry.OpenTelemetryOptions;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import io.strimzi.common.TracingSystem;
 
 public final class ConsumerApp {
@@ -25,43 +22,35 @@ public final class ConsumerApp {
     private static String deploymentId;
 
     public static void main(String[] args) throws Exception {
-        TracingSystem tracingSystem = HttpKafkaConsumerConfig.getTracingSystemFromEnv();
+        CountDownLatch messagesReceivedLatch = new CountDownLatch(1);
+        CountDownLatch exitLatch = new CountDownLatch(1);
+
+        Map<String, Object> objectMap = new HashMap<>();
+        for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
+            objectMap.put(entry.getKey(), entry.getValue());
+        }
+        HttpKafkaConsumerConfig httpKafkaConsumerConfig = HttpKafkaConsumerConfig.fromMap(objectMap);
+        HttpKafkaConsumer httpKafkaConsumer = new HttpKafkaConsumer(httpKafkaConsumerConfig, messagesReceivedLatch);
+
+        TracingSystem tracingSystem = httpKafkaConsumerConfig.getTracingSystem();
         VertxOptions vertxOptions = new VertxOptions();
         if (tracingSystem != TracingSystem.NONE) {
             if (tracingSystem == TracingSystem.OPENTELEMETRY) {
                 vertxOptions.setTracingOptions(new OpenTelemetryOptions());
             } else {
-                log.error("Error: STRIMZI_TRACING_SYSTEM {} is not recognized or supported!", HttpKafkaConsumerConfig.getTracingSystemFromEnv());
+                log.error("Error: STRIMZI_TRACING_SYSTEM {} is not recognized or supported!", httpKafkaConsumerConfig.getTracingSystem());
             }
         }
         Vertx vertx = Vertx.vertx(vertxOptions);
 
-        CountDownLatch messagesReceivedLatch = new CountDownLatch(1);
-        CountDownLatch exitLatch = new CountDownLatch(1);
-
-        ConfigStoreOptions envStore = new ConfigStoreOptions()
-                .setType("env")
-                .setConfig(new JsonObject().put("raw-data", true));
-
-        ConfigRetrieverOptions options = new ConfigRetrieverOptions()
-                .addStore(envStore);
-
-        ConfigRetriever retriever = ConfigRetriever.create(vertx, options);
-
-        retriever.getConfig(ar -> {
-            Map<String, Object> envConfig = ar.result().getMap();
-            HttpKafkaConsumerConfig httpKafkaConsumerConfig = HttpKafkaConsumerConfig.fromMap(envConfig);
-            HttpKafkaConsumer httpKafkaConsumer = new HttpKafkaConsumer(httpKafkaConsumerConfig, messagesReceivedLatch);
-
-            vertx.deployVerticle(httpKafkaConsumer, done -> {
-                if (done.succeeded()) {
-                    deploymentId = done.result();
-                    log.info("HTTP Kafka consumer started successfully");
-                } else {
-                    log.error("Failed to deploy HTTP Kafka consumer", done.cause());
-                    System.exit(1);
-                }
-            });
+        vertx.deployVerticle(httpKafkaConsumer, done -> {
+            if (done.succeeded()) {
+                deploymentId = done.result();
+                log.info("HTTP Kafka consumer started successfully");
+            } else {
+                log.error("Failed to deploy HTTP Kafka consumer", done.cause());
+                System.exit(1);
+            }
         });
 
         log.info("Waiting for receiveing all messages");
