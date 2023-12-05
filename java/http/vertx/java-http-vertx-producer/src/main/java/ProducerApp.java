@@ -3,11 +3,6 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.tracing.opentelemetry.OpenTelemetryOptions;
@@ -15,31 +10,30 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import io.strimzi.common.TracingSystem;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 public final class ProducerApp {
 
     private static final Logger log = LogManager.getLogger(ProducerApp.class);
 
     public static void main(String[] args) throws Exception {
+        HttpKafkaProducerConfig config = HttpKafkaProducerConfig.fromEnv();
         CountDownLatch messagesSentLatch = new CountDownLatch(1);
         CountDownLatch exitLatch = new CountDownLatch(1);
 
-        Map<String, Object> objectMap = new HashMap<>();
-        for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
-            objectMap.put(entry.getKey(), entry.getValue());
-        }
-        HttpKafkaProducerConfig httpKafkaProducerConfig = HttpKafkaProducerConfig.fromMap(objectMap);
-        HttpKafkaProducer httpKafkaProducer = new HttpKafkaProducer(httpKafkaProducerConfig,  messagesSentLatch);
-
-        TracingSystem tracingSystem = httpKafkaProducerConfig.getTracingSystem();
+        TracingSystem tracingSystem = config.getTracingSystem();
         VertxOptions vertxOptions = new VertxOptions();
         if (tracingSystem != TracingSystem.NONE) {
             if (tracingSystem == TracingSystem.OPENTELEMETRY) {
                 vertxOptions.setTracingOptions(new OpenTelemetryOptions());
             } else {
-                log.error("Error: STRIMZI_TRACING_SYSTEM {} is not recognized or supported!", httpKafkaProducerConfig.getTracingSystem());
+                log.error("Error: STRIMZI_TRACING_SYSTEM {} is not recognized or supported!", config.getTracingSystem());
             }
         }
         Vertx vertx = Vertx.vertx(vertxOptions);
+
+        HttpKafkaProducer httpKafkaProducer = new HttpKafkaProducer(config,  messagesSentLatch);
 
         vertx.deployVerticle(httpKafkaProducer, done -> {
             if (done.succeeded()) {

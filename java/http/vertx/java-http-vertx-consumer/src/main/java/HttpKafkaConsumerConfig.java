@@ -3,7 +3,6 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import java.util.Map;
 import java.util.Optional;
 
 import io.vertx.core.http.HttpClientOptions;
@@ -14,21 +13,10 @@ import io.strimzi.common.TracingSystem;
  */
 public class HttpKafkaConsumerConfig {
 
-    private static final String STRIMZI_HOSTNAME = "STRIMZI_HOSTNAME";
-    private static final String STRIMZI_PORT = "STRIMZI_PORT";
-    private static final String STRIMZI_TOPIC = "STRIMZI_TOPIC";
-    private static final String STRIMZI_CLIENTID = "STRIMZI_CLIENTID";
-    private static final String STRIMZI_GROUPID = "STRIMZI_GROUPID";
-    private static final String STRIMZI_POLL_INTERVAL = "STRIMZI_POLL_INTERVAL";
-    private static final String STRIMZI_POLL_TIMEOUT = "STRIMZI_POLL_TIMEOUT";
-    private static final String STRIMZI_PIPELINING = "STRIMZI_PIPELINING";
-    private static final String STRIMZI_PIPELINING_LIMIT = "STRIMZI_PIPELINING_LIMIT";
-    private static final String STRIMZI_MESSAGE_COUNT = "STRIMZI_MESSAGE_COUNT";
-    private static final String STRIMZI_ENDPOINT_PREFIX = "STRIMZI_ENDPOINT_PREFIX";
-
     private static final String DEFAULT_HOSTNAME = "localhost";
     private static final int DEFAULT_PORT = 8080;
     private static final String DEFAULT_TOPIC = "test";
+    private static final String DEFAULT_CLIENTID = "my-consumer";
     private static final String DEFAULT_GROUPID = "my-group";
     private static final int DEFAULT_POLL_INTERVAL = 1000;
     private static final int DEFAULT_POLL_TIMEOUT = 100;
@@ -40,12 +28,12 @@ public class HttpKafkaConsumerConfig {
     private final int port;
     private final String topic;
     private final String clientId;
-    private final String groupid;
+    private final String groupId;
     private final int pollInterval;
     private final int pollTimeout;
     private final boolean pipelining;
     private final int pipeliningLimit;
-    private final Optional<Long> messageCount; 
+    private final Optional<Long> messageCount;
     private final String endpointPrefix;
     private final TracingSystem tracingSystem;
 
@@ -56,7 +44,7 @@ public class HttpKafkaConsumerConfig {
      * @param port host port to which connect to
      * @param topic Kafka topic from which consume messages
      * @param clientId Kafka consumer clientId used as consumer name
-     * @param groupid consumer group name the consumer belong to
+     * @param groupId consumer group name the consumer belong to
      * @param pollInterval interval (in ms) for polling to get messages
      * @param pollTimeout timeout (in ms) for polling to get messages
      * @param pipelining if the HTTP client has to pipeline requests
@@ -67,7 +55,7 @@ public class HttpKafkaConsumerConfig {
      */
     @SuppressWarnings("checkstyle:ParameterNumber")
     private HttpKafkaConsumerConfig(String hostname, int port,
-                                    String topic, String clientId, String groupid,
+                                    String topic, String clientId, String groupId,
                                     int pollInterval, int pollTimeout,
                                     boolean pipelining, int pipeliningLimit,
                                     Optional<Long> messageCount,
@@ -77,7 +65,7 @@ public class HttpKafkaConsumerConfig {
         this.port = port;
         this.topic = topic;
         this.clientId = clientId;
-        this.groupid = groupid;
+        this.groupId = groupId;
         this.pollInterval = pollInterval;
         this.pollTimeout = pollTimeout;
         this.pipelining = pipelining;
@@ -118,8 +106,8 @@ public class HttpKafkaConsumerConfig {
     /**
      * @return consumer group name the consumer belong to
      */
-    public String getGroupid() {
-        return groupid;
+    public String getGroupId() {
+        return groupId;
     }
 
     /**
@@ -172,26 +160,24 @@ public class HttpKafkaConsumerConfig {
     }
 
     /**
-     * Load all HTTP Kafka consumer configuration parameters from a related map
-     * 
-     * @param map map from which loading configuration parameters
+     * Load all HTTP Kafka consumer configuration parameters from fromEnv method
      * @return HTTP Kafka consumer configuration
      */
-    public static HttpKafkaConsumerConfig fromMap(Map<String, Object> map) {
-        String hostname = (String) map.getOrDefault(STRIMZI_HOSTNAME, DEFAULT_HOSTNAME);
-        int port = Integer.parseInt(map.getOrDefault(STRIMZI_PORT, DEFAULT_PORT).toString());
-        String topic = (String) map.getOrDefault(STRIMZI_TOPIC, DEFAULT_TOPIC);
-        String clientId = (String) map.get(STRIMZI_CLIENTID);
-        String groupid = (String) map.getOrDefault(STRIMZI_GROUPID, DEFAULT_GROUPID);
-        int pollInterval = Integer.parseInt(map.getOrDefault(STRIMZI_POLL_INTERVAL, DEFAULT_POLL_INTERVAL).toString());
-        int pollTimeout = Integer.parseInt(map.getOrDefault(STRIMZI_POLL_TIMEOUT, DEFAULT_POLL_TIMEOUT).toString());
-        boolean pipelining = Boolean.valueOf(map.getOrDefault(STRIMZI_PIPELINING, DEFAULT_PIPELINING).toString());
-        int pipeliningLimit = Integer.parseInt(map.getOrDefault(STRIMZI_PIPELINING_LIMIT, DEFAULT_PIPELINING_LIMIT).toString());
-        String envMessageCount = (String) map.get(STRIMZI_MESSAGE_COUNT);
-        Optional<Long> messageCount = envMessageCount != null ? Optional.of(Long.parseLong(envMessageCount)) : Optional.empty();
-        String endpointPrefix = (String) map.getOrDefault(STRIMZI_ENDPOINT_PREFIX, DEFAULT_ENDPOINT_PREFIX);
+    @SuppressWarnings({"CyclomaticComplexity", "NPathComplexity"})
+    public static HttpKafkaConsumerConfig fromEnv() {
+        String hostName = System.getenv("STRIMZI_HOSTNAME") == null ? DEFAULT_HOSTNAME : System.getenv("STRIMZI_HOSTNAME");
+        int port = System.getenv("STRIMZI_PORT") == null ? DEFAULT_PORT : Integer.parseInt(System.getenv("STRIMZI_PORT"));
+        String topic = System.getenv("STRIMZI_TOPIC") == null ? DEFAULT_TOPIC : System.getenv("STRIMZI_TOPIC");
+        String clientId = System.getenv("STRIMZI_CLIENT_ID") == null ? DEFAULT_CLIENTID : System.getenv("STRIMZI_CLIENT_ID");
+        String groupId = System.getenv("STRIMZI_GROUP_ID") == null ? DEFAULT_GROUPID : System.getenv("STRIMZI_GROUP_ID");
+        int pollInterval = System.getenv("STRIMZI_POLL_INTERVAL") == null ? DEFAULT_POLL_INTERVAL : Integer.parseInt(System.getenv("STRIMZI_POLL_INTERVAL"));
+        int pollTimeout = System.getenv("STRIMZI_POLL_TIMEOUT") == null ? DEFAULT_POLL_TIMEOUT : Integer.parseInt(System.getenv("STRIMZI_POLL_TIMEOUT"));
+        boolean pipelining = System.getenv("STRIMZI_PIPELINING")  == null ? DEFAULT_PIPELINING : Boolean.parseBoolean(System.getenv("STRIMZI_PIPELINING"));
+        int pipeliningLimit = System.getenv("STRIMZI_PIPELINING_LIMIT")  == null ? DEFAULT_PIPELINING_LIMIT : Integer.parseInt(System.getenv("STRIMZI_PIPELINING_LIMIT"));
+        Optional<Long> messageCount = System.getenv("STRIMZI_MESSAGE_COUNT") == null ? Optional.empty() : Optional.of(Long.parseLong(System.getenv("STRIMZI_MESSAGE_COUNT")));
+        String endpointPrefix = System.getenv("STRIMZI_ENDPOINT_PREFIX") == null ? DEFAULT_ENDPOINT_PREFIX : System.getenv("STRIMZI_ENDPOINT_PREFIX");
         TracingSystem tracingSystem = TracingSystem.forValue(System.getenv().getOrDefault("STRIMZI_TRACING_SYSTEM", ""));
-        return new HttpKafkaConsumerConfig(hostname, port, topic, clientId, groupid, pollInterval, pollTimeout, pipelining, pipeliningLimit, messageCount, endpointPrefix, tracingSystem);
+        return new HttpKafkaConsumerConfig(hostName, port, topic, clientId, groupId, pollInterval, pollTimeout, pipelining, pipeliningLimit, messageCount, endpointPrefix, tracingSystem);
     }
 
     @Override
@@ -201,14 +187,14 @@ public class HttpKafkaConsumerConfig {
                 ",port=" + this.port +
                 ",topic=" + this.topic +
                 ",clientId=" + this.clientId +
-                ",groupid=" + this.groupid +
+                ",groupId=" + this.groupId +
                 ",pollInterval=" + this.pollInterval +
                 ",pollTimeout=" + this.pollTimeout +
                 ",pipelining=" + this.pipelining + 
                 ",pipeliningLimit=" + this.pipeliningLimit +
                 ",messageCount=" + (this.messageCount.isPresent() ? this.messageCount.get() : null) +
                 ",endpointPrefix=" + this.endpointPrefix +
-                ", tracingSystem=" + tracingSystem +
+                ",tracingSystem=" + this.tracingSystem +
                 ")";
     }
 }
