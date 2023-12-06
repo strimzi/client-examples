@@ -65,19 +65,19 @@ Producer
 * `STRIMZI_MESSAGE` - the message the producer will send
 * `STRIMZI_LOG_LEVEL` - logging level  
 * `STRIMZI_HEADERS` - custom headers list separated by commas of `key1=value1, key2=value2`
-* `STRIMZI_TRACING_SYSTEM` - if it's set to `jaeger` or `opentelemetry`, this will enable tracing. 
+* `STRIMZI_TRACING_SYSTEM` - if it's set to or `opentelemetry`, this will enable tracing. 
 
 Consumer  
 * `STRIMZI_TOPIC` - name of topic which consumer subscribes  
 * `STRIMZI_MESSAGE_COUNT` - the number of messages the consumer should receive
 * `STRIMZI_LOG_LEVEL` - logging level  
-* `STRIMZI_TRACING_SYSTEM` - if it's set to `jaeger` or `opentelemetry`, this will enable tracing.
+* `STRIMZI_TRACING_SYSTEM` - if it's set to `opentelemetry`, this will enable tracing.
 
 Streams  
 * `STRIMZI_SOURCE_TOPIC` - name of topic which will be used as the source of messages
 * `STRIMZI_TARGET_TOPIC` - name of topic where the transformed messages are sent
 * `STRIMZI_LOG_LEVEL` - logging level
-* `STRIMZI_TRACING_SYSTEM` - if it's set to `jaeger` or `opentelemetry`, this will enable tracing.
+* `STRIMZI_TRACING_SYSTEM` - if it's set to `opentelemetry`, this will enable tracing.
 
 Additionally, any Kafka Consumer API, Kafka Producer API or Kafka Streams API configuration option can be passed as an environment variable.
 It should be prefixed with `KAFKA_` and use `_` instead of `.`.
@@ -85,11 +85,10 @@ For example environment variable `KAFKA_BOOTSTRAP_SERVERS` will be used as the `
 
 ### Tracing
 
-The examples support tracing using the [OpenTracing Apache Kafka Instrumentation](https://github.com/opentracing-contrib/java-kafka-client), 
-[OpenTelemetry Java Instrumentation](https://github.com/open-telemetry/opentelemetry-java-instrumentation) and the [Jaeger project](https://www.jaegertracing.io/).
-To enable tracing, configure the Jaeger Tracer using [environment variables](https://github.com/jaegertracing/jaeger-client-java/tree/master/jaeger-core#configuration-via-environment).
+The examples support tracing using the [OpenTelemetry Java Instrumentation](https://github.com/open-telemetry/opentelemetry-java-instrumentation).
+To enable tracing, configure the Tracer using [environment variables](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md).
 
-To run Jaeger Tracing, you can also use the provided example in [`deployment-tracing-jaeger.yaml`](./java/kafka/deployment-tracing-jaeger.yaml).
 To run Opentelemetry Tracing, you can also use the provided example in [`deployment-tracing-opentelemetry.yaml`](./java/kafka/deployment-tracing-opentelemetry.yaml).
 
-Jaeger / OpenTracing tracing is supported only in consumers / producers because OpenTracing support for Kafka Streams API is not compatible with the latest Kafka versions.
+CAUTION: Strimzi no longer supports OpenTracing.
+If you were previously using OpenTracing with these examples, we encourage you to transition to using OpenTelemetry instead.

@@ -4,31 +4,24 @@
  */
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.opentracing.Span;
-import io.opentracing.Tracer;
-import io.opentracing.propagation.Format;
-import io.opentracing.propagation.TextMap;
-import io.opentracing.tag.Tags;
-import io.opentracing.util.GlobalTracer;
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.tracing.TracingPolicy;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.ext.web.codec.BodyCodec;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * HttpKafkaProducer
@@ -47,7 +40,7 @@ public class HttpKafkaProducer extends AbstractVerticle {
 
     /**
      * Constructor
-     * 
+     *
      * @param config configuration
      * @param messagesSentLatch latch to set when the number of requested messaged are sent
      */
@@ -56,42 +49,20 @@ public class HttpKafkaProducer extends AbstractVerticle {
         this.messagesSentLatch = messagesSentLatch;
     }
 
-    public static class TextMapWrapper implements TextMap {
-
-        private final HttpRequest<Buffer> httpRequest;
-
-        public TextMapWrapper(HttpRequest<Buffer> httpRequest) {
-            this.httpRequest = httpRequest;
-        }
-
-        @Override
-        public Iterator<Map.Entry<String, String>> iterator() {
-            throw new UnsupportedOperationException("TextMapInjectAdapter should only be used with Tracer.inject()");
-        }
-
-        @Override
-        public void put(String key, String value) {
-            httpRequest.putHeader(key, value);
-        }
-    }
     @Override
     public void start(Promise<Void> startPromise) throws Exception {
         log.info("HTTP Kafka producer starting with config {}", this.config);
-
         WebClientOptions options = new WebClientOptions()
                 .setDefaultHost(this.config.getHostname())
-                .setDefaultPort(this.config.getPort());
+                .setDefaultPort(this.config.getPort())
+                .setTracingPolicy(TracingPolicy.ALWAYS);
+
         this.client = WebClient.create(vertx, options);
         this.sendTimer = vertx.setPeriodic(this.config.getSendInterval(), t -> {
-            Tracer tracer = GlobalTracer.get();
-            Span span = tracer.buildSpan("send").withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_CLIENT).start();
-
-            log.info("Sending ...");
-            this.send(this.config.getTopic(), span).future().onComplete(ar -> {
+            this.send(this.config.getTopic()).future().onComplete(ar -> {
                 if (ar.succeeded()) {
                     log.info("Sent {}", ar.result());
                 }
-                span.finish();
             });
         });
         startPromise.complete();
@@ -104,16 +75,13 @@ public class HttpKafkaProducer extends AbstractVerticle {
         stopPromise.complete();
     }
 
-    private Promise<List<OffsetRecordSent>> send(String topic, Span span) {
+    private Promise<List<OffsetRecordSent>> send(String topic) {
         Promise<List<OffsetRecordSent>> fut = Promise.promise();
 
         JsonObject records = new JsonObject();
         records.put("records", new JsonArray().add(new JsonObject().put("value", "message-" + this.messagesSent++)));
 
         HttpRequest<Buffer> httpRequest = this.client.post(this.config.getEndpointPrefix() + "/topics/" + topic);
-
-        Tracer tracer = GlobalTracer.get();
-        tracer.inject(span.context(), Format.Builtin.HTTP_HEADERS, new TextMapWrapper(httpRequest));
 
         httpRequest
                 .putHeader(HttpHeaderNames.CONTENT_LENGTH.toString(), String.valueOf(records.toBuffer().length()))

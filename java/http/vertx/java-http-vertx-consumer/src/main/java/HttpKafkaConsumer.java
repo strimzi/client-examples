@@ -4,33 +4,25 @@
  */
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.opentracing.Span;
-import io.opentracing.SpanContext;
-import io.opentracing.Tracer;
-import io.opentracing.propagation.Format;
-import io.opentracing.propagation.TextMapAdapter;
-import io.opentracing.tag.Tags;
-import io.opentracing.util.GlobalTracer;
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.MultiMap;
-import io.vertx.core.Promise;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.tracing.TracingPolicy;
+import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
-import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.ext.web.codec.BodyCodec;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * HttpKafkaConsumer
@@ -68,7 +60,8 @@ public class HttpKafkaConsumer extends AbstractVerticle {
                 .setDefaultHost(this.config.getHostname())
                 .setDefaultPort(this.config.getPort())
                 .setPipelining(this.config.isPipelining())
-                .setPipeliningLimit(this.config.getPipeliningLimit());
+                .setPipeliningLimit(this.config.getPipeliningLimit())
+                .setTracingPolicy(TracingPolicy.ALWAYS);
         this.client = WebClient.create(vertx, options);
 
         this.createConsumer()
@@ -109,8 +102,7 @@ public class HttpKafkaConsumer extends AbstractVerticle {
         if (config.getClientId() != null) {
             json.put("name", config.getClientId());
         }
-
-        this.client.post(this.config.getEndpointPrefix() + "/consumers/" + this.config.getGroupid())
+        this.client.post(this.config.getEndpointPrefix() + "/consumers/" + this.config.getGroupId())
              .putHeader(HttpHeaderNames.CONTENT_LENGTH.toString(), String.valueOf(json.toBuffer().length()))
              .putHeader(HttpHeaderNames.CONTENT_TYPE.toString(), "application/vnd.kafka.v2+json")
              .as(BodyCodec.jsonObject())
@@ -169,30 +161,6 @@ public class HttpKafkaConsumer extends AbstractVerticle {
                 if (ar.succeeded()) {
                     HttpResponse<JsonArray> response = ar.result();
                     if (response.statusCode() == HttpResponseStatus.OK.code()) {
-
-                        Tracer tracer = GlobalTracer.get();
-
-                        MultiMap rawHeaders = response.headers();
-                        final Map<String, String> headers = new HashMap<>();
-                        for (Map.Entry<String, String> header : rawHeaders) {
-                            headers.put(header.getKey(), header.getValue());
-                        }
-
-                        String operation = "poll";
-                        Tracer.SpanBuilder spanBuilder;
-                        try {
-                            SpanContext parentSpan = tracer.extract(Format.Builtin.HTTP_HEADERS, new TextMapAdapter(headers));
-                            if (parentSpan == null) {
-                                spanBuilder = tracer.buildSpan(operation);
-                            } else {
-                                spanBuilder = tracer.buildSpan(operation).asChildOf(parentSpan);
-                            }
-                        } catch (IllegalArgumentException e) {
-                            spanBuilder = tracer.buildSpan(operation);
-                        }
-
-                        Span span = spanBuilder.withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER).start();
-
                         List<ConsumerRecord> list = new ArrayList<>();
                         response.body().forEach(obj -> {
                             JsonObject json = (JsonObject) obj;
@@ -205,8 +173,6 @@ public class HttpKafkaConsumer extends AbstractVerticle {
                             );
                         });
                         this.messagesReceived += list.size();
-
-                        span.finish();
 
                         promise.complete(list);
                     } else {

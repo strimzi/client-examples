@@ -3,67 +3,51 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import java.util.Map;
+import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
+import io.vertx.tracing.opentelemetry.OpenTelemetryOptions;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import io.strimzi.common.TracingSystem;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import io.jaegertracing.Configuration;
-import io.opentracing.Tracer;
-import io.opentracing.util.GlobalTracer;
-
-import io.vertx.config.ConfigRetriever;
-import io.vertx.config.ConfigRetrieverOptions;
-import io.vertx.config.ConfigStoreOptions;
-import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 
 public final class ConsumerApp {
 
     private static final Logger log = LogManager.getLogger(ConsumerApp.class);
-    
+
     private static String deploymentId;
 
     public static void main(String[] args) throws Exception {
-        Vertx vertx = Vertx.vertx();
-
+        HttpKafkaConsumerConfig config = HttpKafkaConsumerConfig.fromEnv();
         CountDownLatch messagesReceivedLatch = new CountDownLatch(1);
         CountDownLatch exitLatch = new CountDownLatch(1);
 
-        ConfigStoreOptions envStore = new ConfigStoreOptions()
-                .setType("env")
-                .setConfig(new JsonObject().put("raw-data", true));
+        TracingSystem tracingSystem = config.getTracingSystem();
+        VertxOptions vertxOptions = new VertxOptions();
+        if (tracingSystem != TracingSystem.NONE) {
+            if (tracingSystem == TracingSystem.OPENTELEMETRY) {
+                vertxOptions.setTracingOptions(new OpenTelemetryOptions());
+            } else {
+                log.error("Error: STRIMZI_TRACING_SYSTEM {} is not recognized or supported!", config.getTracingSystem());
+            }
+        }
+        Vertx vertx = Vertx.vertx(vertxOptions);
 
-        ConfigRetrieverOptions options = new ConfigRetrieverOptions()
-                .addStore(envStore);
+        HttpKafkaConsumer httpKafkaConsumer = new HttpKafkaConsumer(config, messagesReceivedLatch);
 
-        ConfigRetriever retriever = ConfigRetriever.create(vertx, options);
-
-        retriever.getConfig(ar -> {
-            Map<String, Object> envConfig = ar.result().getMap();
-            HttpKafkaConsumerConfig httpKafkaConsumerConfig = HttpKafkaConsumerConfig.fromMap(envConfig);
-
-            HttpKafkaConsumer httpKafkaConsumer = new HttpKafkaConsumer(httpKafkaConsumerConfig, messagesReceivedLatch);
-
-            vertx.deployVerticle(httpKafkaConsumer, done -> {
-                if (done.succeeded()) {
-                    deploymentId = done.result();
-
-                    if (envConfig.get("JAEGER_SERVICE_NAME") != null) {
-                        Tracer tracer = Configuration.fromEnv().getTracer();
-                        GlobalTracer.registerIfAbsent(tracer);
-                    }
-
-                    log.info("HTTP Kafka consumer started successfully");
-                } else {
-                    log.error("Failed to deploy HTTP Kafka consumer", done.cause());
-                    System.exit(1);
-                }
-            });
+        vertx.deployVerticle(httpKafkaConsumer, done -> {
+            if (done.succeeded()) {
+                deploymentId = done.result();
+                log.info("HTTP Kafka consumer started successfully");
+            } else {
+                log.error("Failed to deploy HTTP Kafka consumer", done.cause());
+                System.exit(1);
+            }
         });
 
-        log.info("Waiting for receiveing all messages");
+        log.info("Waiting for receiving all messages");
         messagesReceivedLatch.await();
         vertx.close(done -> exitLatch.countDown());
         log.info("Waiting HTTP consumer verticle to be closed");

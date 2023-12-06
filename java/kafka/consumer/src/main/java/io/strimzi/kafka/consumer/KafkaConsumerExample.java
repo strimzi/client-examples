@@ -34,13 +34,8 @@ public class KafkaConsumerExample {
 
         TracingSystem tracingSystem = config.getTracingSystem();
         if (tracingSystem != TracingSystem.NONE) {
-            if (tracingSystem == TracingSystem.JAEGER) {
-                TracingInitializer.jaegerInitialize();
-
-                props.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentracing.contrib.kafka.TracingConsumerInterceptor.class.getName());
-            } else if (tracingSystem == TracingSystem.OPENTELEMETRY) {
+            if (tracingSystem == TracingSystem.OPENTELEMETRY) {
                 TracingInitializer.otelInitialize();
-
                 props.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentelemetry.instrumentation.kafkaclients.TracingConsumerInterceptor.class.getName());
             } else {
                 log.error("Error: TRACING_SYSTEM {} is not recognized or supported!", tracingSystem);
