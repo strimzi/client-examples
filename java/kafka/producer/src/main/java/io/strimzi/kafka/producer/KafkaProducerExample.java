@@ -33,13 +33,8 @@ public class KafkaProducerExample {
 
         TracingSystem tracingSystem = config.getTracingSystem();
         if (tracingSystem != TracingSystem.NONE) {
-            if (tracingSystem == TracingSystem.JAEGER) {
-                TracingInitializer.jaegerInitialize();
-
-                props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentracing.contrib.kafka.TracingProducerInterceptor.class.getName());
-            } else if (tracingSystem == TracingSystem.OPENTELEMETRY) {
+            if (tracingSystem == TracingSystem.OPENTELEMETRY) {
                 TracingInitializer.otelInitialize();
-
                 props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, io.opentelemetry.instrumentation.kafkaclients.TracingProducerInterceptor.class.getName());
             } else {
                 log.error("Error: STRIMZI_TRACING_SYSTEM {} is not recognized or supported!", config.getTracingSystem());

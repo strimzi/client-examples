@@ -8,14 +8,11 @@ package io.strimzi.common;
  * Provides enums to specify which system will be called to initialise tracing
  */
 public enum TracingSystem {
-    JAEGER,
     OPENTELEMETRY,
     NONE;
 
     public static TracingSystem forValue(String value) {
         switch (value) {
-            case "jaeger":
-                return TracingSystem.JAEGER;
             case "opentelemetry":
                 return TracingSystem.OPENTELEMETRY;
             default:

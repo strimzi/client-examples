@@ -30,15 +30,13 @@
         <checkstyle.version>9.2.1</checkstyle.version>
         <spotbugs.version>4.7.3</spotbugs.version>
         <maven.spotbugs.version>4.7.3.0</maven.spotbugs.version>
+
         <!-- Regular dependencies -->
         <kafka.version>3.5.0</kafka.version>
         <log4j.version>2.17.1</log4j.version>
         <slf4j.version>1.7.36</slf4j.version>
-        <opentracing.version>0.33.0</opentracing.version>
-        <opentracing-kafka.version>0.1.15</opentracing-kafka.version>
         <opentelemetry-alpha.version>1.19.0-alpha</opentelemetry-alpha.version>
         <opentelemetry.version>1.19.0</opentelemetry.version>
-        <jaeger.version>1.1.0</jaeger.version>
         <strimzi-oauth-callback.version>0.13.0</strimzi-oauth-callback.version>
         <vertx.version>4.4.5</vertx.version>
         <netty.version>4.1.97.Final</netty.version>
@@ -109,6 +107,11 @@
                 <version>${vertx.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-opentelemetry</artifactId>
+                <version>${vertx.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-common</artifactId>
                 <version>${netty.version}</version>
@@ -117,36 +120,6 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-codec-http</artifactId>
                 <version>${netty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.jaegertracing</groupId>
-                <artifactId>jaeger-core</artifactId>
-                <version>${jaeger.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.jaegertracing</groupId>
-                <artifactId>jaeger-client</artifactId>
-                <version>${jaeger.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.opentracing</groupId>
-                <artifactId>opentracing-api</artifactId>
-                <version>${opentracing.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.opentracing</groupId>
-                <artifactId>opentracing-util</artifactId>
-                <version>${opentracing.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.opentracing.contrib</groupId>
-                <artifactId>opentracing-kafka-client</artifactId>
-                <version>${opentracing-kafka.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.opentracing.contrib</groupId>
-                <artifactId>opentracing-kafka-streams</artifactId>
-                <version>${opentracing-kafka.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.opentelemetry</groupId>
@@ -177,6 +150,11 @@
                 <groupId>io.opentelemetry</groupId>
                 <artifactId>opentelemetry-sdk-extension-autoconfigure</artifactId>
                 <version>${opentelemetry-alpha.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-sdk</artifactId>
+                <version>${opentelemetry.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.strimzi</groupId>
@@ -238,9 +216,8 @@
                                 <ignoredUnusedDeclaredDependencies>
                                     <ignoredUnusedDeclaredDependency>org.apache.logging.log4j:log4j-core</ignoredUnusedDeclaredDependency>
                                     <ignoredUnusedDeclaredDependency>org.apache.logging.log4j:log4j-slf4j-impl</ignoredUnusedDeclaredDependency>
-                                    <ignoredUnusedDeclaredDependency>io.jaegertracing:jaeger-client</ignoredUnusedDeclaredDependency>
-                                    <ignoredUnusedDeclaredDependency>io.opentelemetry:opentelemetry-exporter-jaeger</ignoredUnusedDeclaredDependency>
                                     <ignoredUnusedDeclaredDependency>io.opentelemetry:opentelemetry-exporter-otlp</ignoredUnusedDeclaredDependency>
+                                    <ignoredUnusedDeclaredDependency>io.opentelemetry:opentelemetry-sdk-extension-autoconfigure</ignoredUnusedDeclaredDependency>
                                     <ignoredUnusedDeclaredDependency>io.strimzi:kafka-oauth-client</ignoredUnusedDeclaredDependency>
                                     <!-- Due to the override in the Vert.x HTTP client examples -->
                                     <ignoredUnusedDeclaredDependency>com.fasterxml.jackson.core:jackson-databind</ignoredUnusedDeclaredDependency>

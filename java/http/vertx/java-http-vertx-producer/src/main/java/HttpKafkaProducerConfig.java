@@ -3,7 +3,8 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import java.util.Map;
+import io.strimzi.common.TracingSystem;
+
 import java.util.Optional;
 
 /**
@@ -11,19 +12,11 @@ import java.util.Optional;
  */
 public class HttpKafkaProducerConfig {
 
-    private static final String ENV_HOSTNAME = "HOSTNAME";
-    private static final String ENV_PORT = "PORT";
-    private static final String ENV_TOPIC = "TOPIC";
-    private static final String ENV_SEND_INTERVAL = "SEND_INTERVAL";
-    private static final String ENV_MESSAGE_COUNT = "MESSAGE_COUNT";
-    private static final String ENV_ENDPOINT_PREFIX = "ENDPOINT_PREFIX";
-
     private static final String DEFAULT_HOSTNAME = "localhost";
     private static final int DEFAULT_PORT = 8080;
     private static final String DEFAULT_TOPIC = "test";
     private static final int DEFAULT_SEND_INTERVAL = 1000;
     private static final String DEFAULT_ENDPOINT_PREFIX = "";
-
 
     private final String hostname;
     private final int port;
@@ -31,6 +24,7 @@ public class HttpKafkaProducerConfig {
     private final int sendInterval;
     private final Optional<Long> messageCount;
     private final String endpointPrefix;
+    private final TracingSystem tracingSystem;
 
     /**
      * Constructor
@@ -41,17 +35,20 @@ public class HttpKafkaProducerConfig {
      * @param sendInterval interval (in ms) for sending messages
      * @param messageCount number of messages to sent
      * @param endpointPrefix a prefix to use in the endpoint path
+     * @param tracingSystem system used to enable tracing
      */
     private HttpKafkaProducerConfig(String hostname, int port, 
                                     String topic, int sendInterval,
                                     Optional<Long> messageCount,
-                                    String endpointPrefix) {
+                                    String endpointPrefix,
+                                    TracingSystem tracingSystem) {
         this.hostname = hostname;
         this.port = port;
         this.topic = topic;
         this.sendInterval = sendInterval;
         this.messageCount = messageCount;
         this.endpointPrefix = endpointPrefix;
+        this.tracingSystem = tracingSystem;
     }
 
     /**
@@ -97,20 +94,25 @@ public class HttpKafkaProducerConfig {
     }
 
     /**
-     * Load all HTTP Kafka producer configuration parameters from a related map
-     * 
-     * @param map map from which loading configuration parameters
+     * @return an option to initialise tracing to openTelemetry
+     */
+    public TracingSystem getTracingSystem() {
+        return tracingSystem;
+    }
+
+    /**
+     * Load all HTTP Kafka producer configuration parameters from fromEnv method
      * @return HTTP Kafka producer configuration
      */
-    public static HttpKafkaProducerConfig fromMap(Map<String, Object> map) {
-        String hostname = (String) map.getOrDefault(ENV_HOSTNAME, DEFAULT_HOSTNAME);
-        int port = Integer.parseInt(map.getOrDefault(ENV_PORT, DEFAULT_PORT).toString());
-        String topic = (String) map.getOrDefault(ENV_TOPIC, DEFAULT_TOPIC);
-        int sendInterval = Integer.parseInt(map.getOrDefault(ENV_SEND_INTERVAL, DEFAULT_SEND_INTERVAL).toString());
-        String envMessageCount = (String) map.get(ENV_MESSAGE_COUNT);
-        Optional<Long> messageCount = envMessageCount != null ? Optional.of(Long.parseLong(envMessageCount)) : Optional.empty();
-        String endpointPrefix = (String) map.getOrDefault(ENV_ENDPOINT_PREFIX, DEFAULT_ENDPOINT_PREFIX);
-        return new HttpKafkaProducerConfig(hostname, port, topic, sendInterval, messageCount, endpointPrefix);
+    public static HttpKafkaProducerConfig fromEnv() {
+        String hostName = System.getenv("STRIMZI_HOSTNAME") == null ? DEFAULT_HOSTNAME : System.getenv("STRIMZI_HOSTNAME");
+        int port = System.getenv("STRIMZI_PORT") == null ? DEFAULT_PORT : Integer.parseInt(System.getenv("STRIMZI_PORT"));
+        String topic = System.getenv("STRIMZI_TOPIC") == null ? DEFAULT_TOPIC : System.getenv("STRIMZI_TOPIC");
+        int sendInterval = System.getenv("STRIMZI_SEND_INTERVAL") == null ? DEFAULT_SEND_INTERVAL : Integer.parseInt(System.getenv("STRIMZI_SEND_INTERVAL"));
+        Optional<Long> messageCount = System.getenv("STRIMZI_MESSAGE_COUNT") == null ? Optional.empty() : Optional.of(Long.parseLong(System.getenv("STRIMZI_MESSAGE_COUNT")));
+        String endpointPrefix = System.getenv("STRIMZI_ENDPOINT_PREFIX") == null ? DEFAULT_ENDPOINT_PREFIX : System.getenv("STRIMZI_ENDPOINT_PREFIX");
+        TracingSystem tracingSystem = TracingSystem.forValue(System.getenv().getOrDefault("STRIMZI_TRACING_SYSTEM", ""));
+        return new HttpKafkaProducerConfig(hostName, port, topic, sendInterval, messageCount, endpointPrefix, tracingSystem);
     }
 
     @Override
@@ -120,8 +122,9 @@ public class HttpKafkaProducerConfig {
                 ",port=" + this.port +
                 ",topic=" + this.topic +
                 ",sendInterval=" + this.sendInterval +
-                ",messageCount=" + (this.messageCount.isPresent() ? this.messageCount.get() : null) +
+                ",messageCount=" + (this.messageCount.orElse(null)) +
                 ",endpointPrefix=" + this.endpointPrefix +
+                ",tracingSystem=" + this.tracingSystem +
                 ")";
     }
 }
