@@ -41,8 +41,7 @@ public class HttpKafkaProducer extends AbstractVerticle {
     /**
      * Constructor
      *
-     * @param config            configuration
-     *                          //@param vertxOptions
+     * @param config configuration
      * @param messagesSentLatch latch to set when the number of requested messaged are sent
      */
     public HttpKafkaProducer(HttpKafkaProducerConfig config, CountDownLatch messagesSentLatch) {
@@ -107,6 +106,7 @@ public class HttpKafkaProducer extends AbstractVerticle {
                     } else {
                         fut.fail(ar.cause());
                     }
+
                     if (this.config.getMessageCount().isPresent() &&
                         this.messagesSent >= this.config.getMessageCount().get()) {
                         // signal to main thread that all messages are sent, application can exit
