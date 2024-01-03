@@ -1,0 +1,216 @@
+apiVersion: kafka.strimzi.io/v1beta1
+kind: KafkaTopic
+metadata:
+  name: my-topic
+  labels:
+      strimzi.io/cluster: my-cluster
+spec:
+  replicas: 3
+  partitions: 12
+---
+apiVersion: kafka.strimzi.io/v1beta1
+kind: KafkaTopic
+metadata:
+  name: my-topic-reversed
+  labels:
+    strimzi.io/cluster: my-cluster
+spec:
+  replicas: 3
+  partitions: 12
+---
+apiVersion: kafka.strimzi.io/v1beta1
+kind: KafkaUser
+metadata:
+  name: java-kafka-producer
+  labels:
+    strimzi.io/cluster: my-cluster
+spec:
+  authentication:
+    type: scram-sha-512
+  authorization:
+    type: simple
+    acls:
+      - resource:
+          type: topic
+          name: my-topic
+        operation: Write
+      - resource:
+          type: topic
+          name: my-topic
+        operation: Create
+      - resource:
+          type: topic
+          name: my-topic
+        operation: Describe
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: java-kafka-producer
+  name: java-kafka-producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-kafka-producer
+  template:
+    metadata:
+      labels:
+        app: java-kafka-producer
+    spec:
+      containers:
+      - name: java-kafka-producer
+        image: quay.io/scholzj/java-kafka-producer:latest
+        env:
+          - name: BOOTSTRAP_SERVERS
+            value: my-cluster-kafka-bootstrap:9092
+          - name: TOPIC
+            value: my-topic
+          - name: DELAY_MS
+            value: "1000"
+          - name: LOG_LEVEL
+            value: "INFO"
+          - name: MESSAGE_COUNT
+            value: "1000000"
+          - name: ADDITIONAL_CONFIG
+            value: |
+              security.protocol=SASL_PLAINTEXT
+              sasl.mechanism=SCRAM-SHA-512
+              sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="java-kafka-producer" password="GZMzqlOAWjfJdsPW92f40bqtfzWtorSV";
+
+---
+apiVersion: kafka.strimzi.io/v1beta1
+kind: KafkaUser
+metadata:
+  name: java-kafka-streams
+  labels:
+    strimzi.io/cluster: my-cluster
+spec:
+  authentication:
+    type: scram-sha-512
+  authorization:
+    type: simple
+    acls:
+      - resource:
+          type: topic
+          name: my-topic
+        operation: Read
+      - resource:
+          type: topic
+          name: my-topic
+        operation: Describe
+      - resource:
+          type: group
+          name: java-kafka-streams
+          patternType: prefix
+        operation: Read
+      - resource:
+          type: topic
+          name: my-topic-reversed
+        operation: Write
+      - resource:
+          type: topic
+          name: my-topic-reversed
+        operation: Create
+      - resource:
+          type: topic
+          name: my-topic-reversed
+        operation: Describe
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: java-kafka-streams
+  name: java-kafka-streams
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-kafka-streams
+  template:
+    metadata:
+      labels:
+        app: java-kafka-streams
+    spec:
+      containers:
+        - name: java-kafka-streams
+          image: quay.io/scholzj/java-kafka-streams:latest
+          env:
+            - name: BOOTSTRAP_SERVERS
+              value: my-cluster-kafka-bootstrap:9092
+            - name: APPLICATION_ID
+              value: java-kafka-streams
+            - name: SOURCE_TOPIC
+              value: my-topic
+            - name: TARGET_TOPIC
+              value: my-topic-reversed
+            - name: LOG_LEVEL
+              value: "INFO"
+            - name: ADDITIONAL_CONFIG
+              value: |
+                security.protocol=SASL_PLAINTEXT
+                sasl.mechanism=SCRAM-SHA-512
+                sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="java-kafka-streams" password="XwCogLBNUdDj2rqrkgnsLUmXxDsocxU6";
+---
+apiVersion: kafka.strimzi.io/v1beta1
+kind: KafkaUser
+metadata:
+  name: java-kafka-consumer
+  labels:
+    strimzi.io/cluster: my-cluster
+spec:
+  authentication:
+    type: scram-sha-512
+  authorization:
+    type: simple
+    acls:
+      - resource:
+          type: topic
+          name: my-topic-reversed
+        operation: Read
+      - resource:
+          type: topic
+          name: my-topic-reversed
+        operation: Describe
+      - resource:
+          type: group
+          name: java-kafka-consumer
+        operation: Read
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: java-kafka-consumer
+  name: java-kafka-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-kafka-consumer
+  template:
+    metadata:
+      labels:
+        app: java-kafka-consumer
+    spec:
+      containers:
+      - name: java-kafka-consumer
+        image: quay.io/scholzj/java-kafka-consumer:latest
+        env:
+          - name: BOOTSTRAP_SERVERS
+            value: my-cluster-kafka-bootstrap:9092
+          - name: TOPIC
+            value: my-topic-reversed
+          - name: GROUP_ID
+            value: java-kafka-consumer
+          - name: LOG_LEVEL
+            value: "INFO"
+          - name: MESSAGE_COUNT
+            value: "1000000"
+          - name: ADDITIONAL_CONFIG
+            value: |
+              security.protocol=SASL_PLAINTEXT
+              sasl.mechanism=SCRAM-SHA-512
+              sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="java-kafka-consumer" password="zC0PYARPhkG0gu3hmcwMkKqiWl97yMBr";
