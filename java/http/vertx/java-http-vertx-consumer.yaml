@@ -18,17 +18,17 @@ spec:
       - name: java-http-vertx-consumer
         image: quay.io/strimzi-examples/java-http-vertx-consumer:latest
         env:
-          - name: HOSTNAME
+          - name: STRIMZI_HOSTNAME
             value: my-bridge-bridge-service
-          - name: PORT
+          - name: STRIMZI_PORT
             value: "8080"
-          - name: TOPIC
+          - name: STRIMZI_TOPIC
             value: my-topic
-          - name: CLIENTID
+          - name: STRIMZI_CLIENT_ID
             value: "my-consumer"
-          - name: GROUPID
+          - name: STRIMZI_GROUP_ID
             value: "my-group"
-          - name: POLL_INTERVAL
+          - name: STRIMZI_POLL_INTERVAL
             value: "1000"
         resources:
           requests:
