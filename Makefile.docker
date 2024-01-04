@@ -1,32 +1,82 @@
 # Makefile.docker contains the shared tasks for building, tagging and pushing Docker images.
 # This file is included into the Makefile files which contain the Dockerfile files (E.g.
-# kafka-base, kafka-statefulsets etc.).
+# kafka-base, kafka etc.).
 #
 # The DOCKER_ORG (default is name of the current user) and DOCKER_TAG (based on Git Tag,
 # default latest) variables are used to name the Docker image. DOCKER_REGISTRY identifies
-# the registry where the image will be pushed (default is Docker Hub). DOCKER_VERSION_ARG
-# is passed to the image build (based on Git commit, default latest)
+# the registry where the image will be pushed (default is Docker Hub).
+TOPDIR=$(dir $(lastword $(MAKEFILE_LIST)))
+ARCHIVE_DIR=$(TOPDIR)
 
 DOCKERFILE_DIR     ?= ./
+DOCKER_CMD         ?= docker
 DOCKER_REGISTRY    ?= docker.io
 DOCKER_ORG         ?= $(USER)
 DOCKER_TAG         ?= latest
-DOCKER_VERSION_ARG ?= latest
+BUILD_TAG          ?= latest
+BUILD_ID           ?= n/a
+BUILD_COMMIT       ?= n/a
 COPY_SCRIPTS       ?= cp ../../../scripts/run.sh ./scripts/run.sh
+
+ifdef DOCKER_ARCHITECTURE
+  DOCKER_PLATFORM = --platform linux/$(DOCKER_ARCHITECTURE)
+  DOCKER_PLATFORM_TAG_SUFFIX = -$(DOCKER_ARCHITECTURE)
+endif
 
 all: docker_build docker_push
 
 docker_build:
-	echo "Building Docker image ..."
+	# Build Docker image ...
 	mkdir -p scripts
 	$(COPY_SCRIPTS)
-	docker build $(DOCKER_PLATFORM) --build-arg version=$(DOCKER_VERSION_ARG) -t strimzi/$(PROJECT_NAME):$(DOCKER_TAG) $(DOCKERFILE_DIR)
+	$(DOCKER_CMD) $(DOCKER_BUILDX) build $(DOCKER_PLATFORM) $(DOCKER_BUILD_ARGS) --build-arg strimzi_version=$(RELEASE_VERSION) -t strimzi/$(PROJECT_NAME):latest $(DOCKERFILE_DIR)
+	# Also tag with $(BUILD_TAG)
+	$(DOCKER_CMD) tag strimzi/$(PROJECT_NAME):latest strimzi/$(PROJECT_NAME):$(BUILD_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX)
 	rm -rf ./scripts
 
 docker_tag:
-	echo "Tagging strimzi/$(PROJECT_NAME):$(DOCKER_TAG) to $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG) ..."
-	docker tag strimzi/$(PROJECT_NAME):$(DOCKER_TAG) $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)
+	# Tag the $(BUILD_TAG) image we built with the given $(DOCKER_TAG) tag
+	$(DOCKER_CMD) tag strimzi/$(PROJECT_NAME):$(BUILD_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX)
 
 docker_push: docker_tag
-	echo "Pushing $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG) ..."
-	docker push $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)
+	# Push the $(DOCKER_TAG)-tagged image to the registry
+	$(DOCKER_CMD) push $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX)
+
+.PHONY: docker_save
+docker_save:
+	# Saves the container as TGZ file
+	test -d $(ARCHIVE_DIR) || mkdir -p  $(ARCHIVE_DIR)
+	docker save strimzi/$(PROJECT_NAME):$(BUILD_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) | gzip > $(ARCHIVE_DIR)/$(PROJECT_NAME)-$(BUILD_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX).tar.gz
+
+.PHONY: docker_load
+docker_load:
+	# Loads the container as TGZ file
+	docker load < $(ARCHIVE_DIR)/$(PROJECT_NAME)-$(BUILD_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX).tar.gz
+
+.PHONY: docker_delete_archive
+docker_delete_archive:
+	# Deletes the archive
+	rm $(ARCHIVE_DIR)/$(PROJECT_NAME)-$(BUILD_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX).tar.gz
+
+.PHONY: docker_amend_manifest
+docker_amend_manifest:
+	# Create / Amend the manifest
+	docker manifest create $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG) --amend $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX)
+
+.PHONY: docker_push_manifest
+docker_push_manifest:
+	# Push the manifest to the registry
+	docker manifest push $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)
+
+.PHONY: docker_sign_manifest
+docker_sign_manifest:
+	# Signs the manifest and its images
+	@echo $$COSIGN_PRIVATE_KEY | base64 -d > cosign.key
+	MANIFEST_DIGEST=$(shell docker buildx imagetools inspect $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG) --format '{{ json . }}' | jq -r .manifest.digest); \
+	cosign sign --recursive --tlog-upload=false -a author=StrimziCI -a BuildID=$(BUILD_ID) -a Commit=$(BUILD_COMMIT) --key cosign.key $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME)@$$MANIFEST_DIGEST
+	@rm cosign.key
+
+.PHONY: docker_delete_manifest
+docker_delete_manifest:
+	# Delete the manifest to the registry, ignore the error if manifest doesn't exist
+	docker manifest rm $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG) || true

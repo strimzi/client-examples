@@ -4,15 +4,9 @@ all: java_install
 build: java_install
 clean: java_clean
 
-docker_build:
-
-docker_tag:
-
-docker_push:
-
-java_install:
+java_install_root:
 	echo "Installing root pom ..."
-	mvn install -f ../../pom.xml
+	mvn $(MVN_ARGS) install -f ../pom.xml -N
 
 include ../../Makefile.maven
 
