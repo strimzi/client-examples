@@ -32,15 +32,15 @@
         <maven.spotbugs.version>4.7.3.0</maven.spotbugs.version>
 
         <!-- Regular dependencies -->
-        <kafka.version>3.5.0</kafka.version>
-        <log4j.version>2.17.1</log4j.version>
+        <kafka.version>3.6.1</kafka.version>
+        <log4j.version>2.17.2</log4j.version>
         <slf4j.version>1.7.36</slf4j.version>
         <opentelemetry-alpha.version>1.19.0-alpha</opentelemetry-alpha.version>
         <opentelemetry.version>1.19.0</opentelemetry.version>
-        <strimzi-oauth-callback.version>0.13.0</strimzi-oauth-callback.version>
-        <vertx.version>4.4.5</vertx.version>
-        <netty.version>4.1.97.Final</netty.version>
-        <jackson-databind.version>2.15.2</jackson-databind.version>
+        <strimzi-oauth-callback.version>0.14.0</strimzi-oauth-callback.version>
+        <vertx.version>4.5.1</vertx.version>
+        <netty.version>4.1.103.Final</netty.version>
+        <jackson-databind.version>2.15.3</jackson-databind.version>
     </properties>
 
     <dependencyManagement>

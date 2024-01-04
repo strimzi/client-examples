@@ -13,9 +13,6 @@ ENV JAVA_HOME /usr/lib/jvm/jre-17
 # The user is in the group 0 to have access to the mounted volumes and storage
 RUN useradd -r -m -u 1001 -g 0 strimzi
 
-ARG version=latest
-ENV VERSION ${version}
-
 COPY ./scripts/ /bin
 COPY ./src/main/resources/log4j2.properties /bin/log4j2.properties
 

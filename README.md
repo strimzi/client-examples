@@ -92,3 +92,22 @@ To run Opentelemetry Tracing, you can also use the provided example in [`deploym
 
 CAUTION: Strimzi no longer supports OpenTracing.
 If you were previously using OpenTracing with these examples, we encourage you to transition to using OpenTelemetry instead.
+
+## Container signatures
+
+From the 0.38.0 release, Strimzi containers are signed using the [`cosign` tool](https://github.com/sigstore/cosign).
+Strimzi currently does not use the keyless signing and the transparency log.
+To verify the container, you can copy the following public key into a file:
+
+```
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAET3OleLR7h0JqatY2KkECXhA9ZAkC
+TRnbE23Wb5AzJPnpevvQ1QUEQQ5h/I4GobB7/jkGfqYkt6Ct5WOU2cc6HQ==
+-----END PUBLIC KEY-----
+```
+
+And use it to verify the signature:
+
+```
+cosign verify --key strimzi.pub quay.io/strimzi-examples/java-kafka-consumer:latest --insecure-ignore-tlog=true
+```
