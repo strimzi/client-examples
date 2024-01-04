@@ -24,9 +24,9 @@ spec:
             value: "8080"
           - name: STRIMZI_TOPIC
             value: my-topic
-          - name: STRIMZI_CLIENTID
+          - name: STRIMZI_CLIENT_ID
             value: "my-consumer"
-          - name: STRIMZI_GROUPID
+          - name: STRIMZI_GROUP_ID
             value: "my-group"
           - name: STRIMZI_POLL_INTERVAL
             value: "1000"
