@@ -58,7 +58,7 @@ public class HttpKafkaProducer extends AbstractVerticle {
                 .setTracingPolicy(TracingPolicy.ALWAYS);
 
         this.client = WebClient.create(vertx, options);
-        this.sendTimer = vertx.setPeriodic(this.config.getSendInterval(), t -> {
+        this.sendTimer = vertx.setPeriodic(this.config.getDelay(), t -> {
             this.send(this.config.getTopic()).future().onComplete(ar -> {
                 if (ar.succeeded()) {
                     log.info("Sent {}", ar.result());

@@ -15,13 +15,13 @@ public class HttpKafkaProducerConfig {
     private static final String DEFAULT_HOSTNAME = "localhost";
     private static final int DEFAULT_PORT = 8080;
     private static final String DEFAULT_TOPIC = "test";
-    private static final int DEFAULT_SEND_INTERVAL = 1000;
+    private static final int DEFAULT_DELAY_MS = 1000;
     private static final String DEFAULT_ENDPOINT_PREFIX = "";
 
     private final String hostname;
     private final int port;
     private final String topic;
-    private final int sendInterval;
+    private final int delay;
     private final Optional<Long> messageCount;
     private final String endpointPrefix;
     private final TracingSystem tracingSystem;
@@ -32,20 +32,20 @@ public class HttpKafkaProducerConfig {
      * @param hostname hostname to which connect to
      * @param port host port to which connect to
      * @param topic Kafka topic from which consume messages
-     * @param sendInterval interval (in ms) for sending messages
+     * @param delay (in ms) between sending messages
      * @param messageCount number of messages to sent
      * @param endpointPrefix a prefix to use in the endpoint path
      * @param tracingSystem system used to enable tracing
      */
     private HttpKafkaProducerConfig(String hostname, int port, 
-                                    String topic, int sendInterval,
+                                    String topic, int delay,
                                     Optional<Long> messageCount,
                                     String endpointPrefix,
                                     TracingSystem tracingSystem) {
         this.hostname = hostname;
         this.port = port;
         this.topic = topic;
-        this.sendInterval = sendInterval;
+        this.delay = delay;
         this.messageCount = messageCount;
         this.endpointPrefix = endpointPrefix;
         this.tracingSystem = tracingSystem;
@@ -73,10 +73,10 @@ public class HttpKafkaProducerConfig {
     }
 
     /**
-     * @return interval (in ms) for sending messages
+     * @return delay (in ms) between sending messages
      */
-    public int getSendInterval() {
-        return sendInterval;
+    public int getDelay() {
+        return delay;
     }
 
     /**
@@ -108,11 +108,11 @@ public class HttpKafkaProducerConfig {
         String hostName = System.getenv("STRIMZI_HOSTNAME") == null ? DEFAULT_HOSTNAME : System.getenv("STRIMZI_HOSTNAME");
         int port = System.getenv("STRIMZI_PORT") == null ? DEFAULT_PORT : Integer.parseInt(System.getenv("STRIMZI_PORT"));
         String topic = System.getenv("STRIMZI_TOPIC") == null ? DEFAULT_TOPIC : System.getenv("STRIMZI_TOPIC");
-        int sendInterval = System.getenv("STRIMZI_SEND_INTERVAL") == null ? DEFAULT_SEND_INTERVAL : Integer.parseInt(System.getenv("STRIMZI_SEND_INTERVAL"));
+        int delay = System.getenv("STRIMZI_DELAY_MS") == null ? DEFAULT_DELAY_MS : Integer.parseInt(System.getenv("STRIMZI_DELAY_MS"));
         Optional<Long> messageCount = System.getenv("STRIMZI_MESSAGE_COUNT") == null ? Optional.empty() : Optional.of(Long.parseLong(System.getenv("STRIMZI_MESSAGE_COUNT")));
         String endpointPrefix = System.getenv("STRIMZI_ENDPOINT_PREFIX") == null ? DEFAULT_ENDPOINT_PREFIX : System.getenv("STRIMZI_ENDPOINT_PREFIX");
         TracingSystem tracingSystem = TracingSystem.forValue(System.getenv().getOrDefault("STRIMZI_TRACING_SYSTEM", ""));
-        return new HttpKafkaProducerConfig(hostName, port, topic, sendInterval, messageCount, endpointPrefix, tracingSystem);
+        return new HttpKafkaProducerConfig(hostName, port, topic, delay, messageCount, endpointPrefix, tracingSystem);
     }
 
     @Override
@@ -121,7 +121,7 @@ public class HttpKafkaProducerConfig {
                 "hostname=" + this.hostname +
                 ",port=" + this.port +
                 ",topic=" + this.topic +
-                ",sendInterval=" + this.sendInterval +
+                ",delay=" + this.delay +
                 ",messageCount=" + (this.messageCount.orElse(null)) +
                 ",endpointPrefix=" + this.endpointPrefix +
                 ",tracingSystem=" + this.tracingSystem +
