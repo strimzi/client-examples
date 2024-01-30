@@ -92,42 +92,6 @@ spec:
                   name: my-cluster-cluster-ca-cert
                   key: ca.crt
 ---
-apiVersion: kafka.strimzi.io/v1beta1
-kind: KafkaUser
-metadata:
-  name: service-account-java-kafka-streams
-  labels:
-    strimzi.io/cluster: my-cluster
-spec:
-  authorization:
-    type: simple
-    acls:
-      - resource:
-          type: topic
-          name: my-topic
-        operation: Read
-      - resource:
-          type: topic
-          name: my-topic
-        operation: Describe
-      - resource:
-          type: group
-          name: java-kafka-streams
-          patternType: prefix
-        operation: Read
-      - resource:
-          type: topic
-          name: my-topic-reversed
-        operation: Write
-      - resource:
-          type: topic
-          name: my-topic-reversed
-        operation: Create
-      - resource:
-          type: topic
-          name: my-topic-reversed
-        operation: Describe
----
 apiVersion: v1
 kind: Secret
 metadata:
@@ -156,15 +120,11 @@ spec:
         - name: java-kafka-streams
           image: quay.io/strimzi-examples/java-kafka-streams:latest
           env:
-            - name: BOOTSTRAP_SERVERS
-              value: my-cluster-kafka-bootstrap:9092
-            - name: APPLICATION_ID
-              value: java-kafka-streams
-            - name: SOURCE_TOPIC
+            - name: STRIMZI_SOURCE_TOPIC
               value: my-topic
-            - name: TARGET_TOPIC
+            - name: STRIMZI_TARGET_TOPIC
               value: my-topic-reversed
-            - name: LOG_LEVEL
+            - name: STRIMZI_LOG_LEVEL
               value: "INFO"
             - name: OAUTH_CLIENT_ID
               value: java-kafka-streams
@@ -182,6 +142,31 @@ spec:
                 secretKeyRef:
                   name: sso-x509-https-secret
                   key: tls.crt
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: my-cluster-kafka-bootstrap:9092
+            - name: KAFKA_APPLICATION_ID
+              value: java-kafka-streams
+            - name: KAFKA_DEFAULT_COMMIT_INTERVAL_MS
+              value: "5000"
+            - name: KAFKA_DEFAULT_KEY_SERDE
+              value: "org.apache.kafka.common.serialization.Serdes$StringSerde"
+            - name: KAFKA_DEFAULT_VALUE_SERDE
+              value: "org.apache.kafka.common.serialization.Serdes$StringSerde"
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: "SASL_SSL"
+            - name: KAFKA_SASL_JAAS_CONFIG
+              value: "org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;"
+            - name: KAFKA_SASL_MECHANISM
+              value: OAUTHBEARER
+            - name: KAFKA_SASL_LOGIN_CALLBACK_HANDLER_CLASS
+              value: "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler"
+            - name: KAFKA_SSL_TRUSTSTORE_TYPE
+              value: PEM
+            - name: KAFKA_SSL_TRUSTSTORE_CERTIFICATES
+              valueFrom:
+                secretKeyRef:
+                  name: my-cluster-cluster-ca-cert
+                  key: ca.crt
 ---
 apiVersion: v1
 kind: Secret
