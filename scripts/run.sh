@@ -8,7 +8,4 @@ fi
 # Make sure that we use /dev/urandom
 JAVA_OPTS="${JAVA_OPTS} -Dvertx.cacheDirBase=/tmp/vertx-cache -Djava.security.egd=file:/dev/./urandom"
 
-# Enable GC logging for memory tracking
-JAVA_OPTS="${JAVA_OPTS} -Xlog:gc*:stdout:time -XX:NativeMemoryTracking=summary"
-
 exec java $JAVA_OPTS -jar $JAR "$@"

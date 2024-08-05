@@ -102,8 +102,12 @@ public class HttpConsumer {
 
     public Map<String, Object> createConsumerConfig(Properties props) {
         Map<String, Object> consumerConfig = new HashMap<>();
-        consumerConfig.put("name", "my-consumer");
         consumerConfig.put("format", "json");
+
+        if (config.getClientId() != null) {
+            consumerConfig.put("name", config.getClientId());
+        }
+
         for (String k : commonProps) {
             if (props.stringPropertyNames().contains(k)) {
                 String v = props.getProperty(k);
