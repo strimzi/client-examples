@@ -7,13 +7,9 @@ package io.strimzi.kafka.streams;
 import io.strimzi.common.ConfigUtil;
 import io.strimzi.common.TracingSystem;
 
-import java.util.Map;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 public class KafkaStreamsConfig {
-
-    private static final String KAFKA_PREFIX = "KAFKA_";
 
     private final String sourceTopic;
     private final String targetTopic;
@@ -32,12 +28,7 @@ public class KafkaStreamsConfig {
         String sourceTopic = System.getenv("STRIMZI_SOURCE_TOPIC");
         String targetTopic = System.getenv("STRIMZI_TARGET_TOPIC");
         TracingSystem tracingSystem = TracingSystem.forValue(System.getenv().getOrDefault("STRIMZI_TRACING_SYSTEM", ""));
-        Properties properties = new Properties();
-        properties.putAll(System.getenv()
-                .entrySet()
-                .stream()
-                .filter(mapEntry -> mapEntry.getKey().startsWith(KAFKA_PREFIX))
-                .collect(Collectors.toMap(mapEntry -> ConfigUtil.convertEnvVarToPropertyKey(mapEntry.getKey()), Map.Entry::getValue)));
+        Properties properties = ConfigUtil.getKafkaPropertiesFromEnv();
         return new KafkaStreamsConfig(sourceTopic, targetTopic, tracingSystem, properties);
     }
 

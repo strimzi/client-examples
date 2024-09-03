@@ -7,16 +7,12 @@ package io.strimzi.kafka.producer;
 import io.strimzi.common.ConfigUtil;
 import io.strimzi.common.TracingSystem;
 
-import java.util.Map;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 public class KafkaProducerConfig {
 
     private static final long DEFAULT_MESSAGES_COUNT = 10;
     private static final String DEFAULT_MESSAGE = "Hello world";
-    private static final String KAFKA_PREFIX = "KAFKA_";
-
     private final String topic;
     private final Long messageCount;
     private final int delay;
@@ -44,12 +40,7 @@ public class KafkaProducerConfig {
         String message = System.getenv("STRIMZI_MESSAGE") == null ? DEFAULT_MESSAGE : System.getenv("STRIMZI_MESSAGE");
         String headers = System.getenv("STRIMZI_HEADERS");
         TracingSystem tracingSystem = TracingSystem.forValue(System.getenv().getOrDefault("STRIMZI_TRACING_SYSTEM", ""));
-        Properties properties = new Properties();
-        properties.putAll(System.getenv()
-                .entrySet()
-                .stream()
-                .filter(mapEntry -> mapEntry.getKey().startsWith(KAFKA_PREFIX))
-                .collect(Collectors.toMap(mapEntry -> ConfigUtil.convertEnvVarToPropertyKey(mapEntry.getKey()), Map.Entry::getValue)));
+        Properties properties = ConfigUtil.getKafkaPropertiesFromEnv();
         return new KafkaProducerConfig(topic, messageCount, delay, message, headers, tracingSystem, properties);
     }
 
