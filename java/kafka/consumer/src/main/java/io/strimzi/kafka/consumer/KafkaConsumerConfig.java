@@ -7,14 +7,10 @@ package io.strimzi.kafka.consumer;
 import io.strimzi.common.ConfigUtil;
 import io.strimzi.common.TracingSystem;
 
-import java.util.Map;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 public class KafkaConsumerConfig {
     private static final long DEFAULT_MESSAGES_COUNT = 10;
-    private static final String KAFKA_PREFIX = "KAFKA_";
-
     private final String topic;
     private final Long messageCount;
     private final TracingSystem tracingSystem;
@@ -31,12 +27,7 @@ public class KafkaConsumerConfig {
         String topic = System.getenv("STRIMZI_TOPIC");
         Long messageCount = System.getenv("STRIMZI_MESSAGE_COUNT") == null ? DEFAULT_MESSAGES_COUNT : Long.parseLong(System.getenv("STRIMZI_MESSAGE_COUNT"));
         TracingSystem tracingSystem = TracingSystem.forValue(System.getenv().getOrDefault("STRIMZI_TRACING_SYSTEM", ""));
-        Properties properties = new Properties();
-        properties.putAll(System.getenv()
-                .entrySet()
-                .stream()
-                .filter(mapEntry -> mapEntry.getKey().startsWith(KAFKA_PREFIX))
-                .collect(Collectors.toMap(mapEntry -> ConfigUtil.convertEnvVarToPropertyKey(mapEntry.getKey()), Map.Entry::getValue)));
+        Properties properties = ConfigUtil.getKafkaPropertiesFromEnv();
         return new KafkaConsumerConfig(topic, messageCount, tracingSystem, properties);
     }
 

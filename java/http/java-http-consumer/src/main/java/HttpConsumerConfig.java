@@ -5,9 +5,7 @@
 import io.strimzi.common.ConfigUtil;
 import io.strimzi.common.TracingSystem;
 
-import java.util.Map;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 public class HttpConsumerConfig {
 
@@ -59,12 +57,7 @@ public class HttpConsumerConfig {
         int pollInterval = System.getenv("STRIMZI_POLL_INTERVAL") == null ? DEFAULT_POLL_INTERVAL : Integer.parseInt(System.getenv("STRIMZI_POLL_INTERVAL"));
         int pollTimeout = System.getenv("STRIMZI_POLL_TIMEOUT") == null ? DEFAULT_POLL_TIMEOUT : Integer.parseInt(System.getenv("STRIMZI_POLL_TIMEOUT"));
         TracingSystem tracingSystem = TracingSystem.forValue(System.getenv().getOrDefault("STRIMZI_TRACING_SYSTEM", ""));
-        Properties properties = new Properties();
-        properties.putAll(System.getenv()
-                .entrySet()
-                .stream()
-                .filter(mapEntry -> mapEntry.getKey().startsWith(KAFKA_PREFIX))
-                .collect(Collectors.toMap(mapEntry -> ConfigUtil.convertEnvVarToPropertyKey(mapEntry.getKey()), Map.Entry::getValue)));
+        Properties properties = ConfigUtil.getKafkaPropertiesFromEnv();
         return new HttpConsumerConfig(hostName, port, topic, groupId, clientId, messageCount, pollInterval, pollTimeout, tracingSystem, properties);
     }
 
