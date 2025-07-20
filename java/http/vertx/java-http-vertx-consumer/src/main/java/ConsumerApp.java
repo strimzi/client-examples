@@ -17,8 +17,6 @@ public final class ConsumerApp {
 
     private static final Logger log = LogManager.getLogger(ConsumerApp.class);
 
-    private static String deploymentId;
-
     public static void main(String[] args) throws Exception {
         HttpKafkaConsumerConfig config = HttpKafkaConsumerConfig.fromEnv();
         CountDownLatch messagesReceivedLatch = new CountDownLatch(1);
@@ -37,19 +35,18 @@ public final class ConsumerApp {
 
         HttpKafkaConsumer httpKafkaConsumer = new HttpKafkaConsumer(config, messagesReceivedLatch);
 
-        vertx.deployVerticle(httpKafkaConsumer, done -> {
-            if (done.succeeded()) {
-                deploymentId = done.result();
-                log.info("HTTP Kafka consumer started successfully");
-            } else {
-                log.error("Failed to deploy HTTP Kafka consumer", done.cause());
-                System.exit(1);
-            }
-        });
+        vertx.deployVerticle(httpKafkaConsumer)
+                .onSuccess(deploymentId -> {
+                    log.info("HTTP Kafka consumer verticle started successfully [{}]", deploymentId);
+                })
+                .onFailure(t -> {
+                    log.error("Failed to deploy HTTP Kafka consumer verticle", t);
+                    System.exit(1);
+                });
 
         log.info("Waiting for receiving all messages");
         messagesReceivedLatch.await();
-        vertx.close(done -> exitLatch.countDown());
+        vertx.close().onComplete(v -> exitLatch.countDown());
         log.info("Waiting HTTP consumer verticle to be closed");
         boolean releaseBeforeTimeout = exitLatch.await(60000, TimeUnit.MILLISECONDS);
         log.info("Latch released before Timeout: {}", releaseBeforeTimeout);

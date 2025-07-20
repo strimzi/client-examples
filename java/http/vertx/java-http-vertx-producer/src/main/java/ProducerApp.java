@@ -35,18 +35,18 @@ public final class ProducerApp {
 
         HttpKafkaProducer httpKafkaProducer = new HttpKafkaProducer(config,  messagesSentLatch);
 
-        vertx.deployVerticle(httpKafkaProducer, done -> {
-            if (done.succeeded()) {
-                log.info("HTTP Kafka producer started successfully");
-            } else {
-                log.error("Failed to deploy HTTP Kafka producer", done.cause());
-                System.exit(1);
-            }
-        });
+        vertx.deployVerticle(httpKafkaProducer)
+                .onSuccess(deploymentId -> {
+                    log.info("HTTP Kafka producer verticle started successfully [{}]", deploymentId);
+                })
+                .onFailure(t -> {
+                    log.error("Failed to deploy HTTP Kafka producer verticle", t);
+                    System.exit(1);
+                });
 
         log.info("Waiting for sending all messages");
         messagesSentLatch.await();
-        vertx.close(done -> exitLatch.countDown());
+        vertx.close().onComplete(v -> exitLatch.countDown());
         log.info("Waiting HTTP producer verticle to be closed");
         boolean releaseBeforeTimeout = exitLatch.await(60000, TimeUnit.MILLISECONDS);
         log.info("Latch released before Timeout: {}", releaseBeforeTimeout);

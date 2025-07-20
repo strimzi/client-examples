@@ -87,7 +87,8 @@ public class HttpKafkaProducer extends AbstractVerticle {
                 .putHeader(HttpHeaderNames.CONTENT_LENGTH.toString(), String.valueOf(records.toBuffer().length()))
                 .putHeader(HttpHeaderNames.CONTENT_TYPE.toString(), "application/vnd.kafka.json.v2+json")
                 .as(BodyCodec.jsonObject())
-                .sendJsonObject(records, ar -> {
+                .sendJsonObject(records)
+                .onComplete(ar -> {
                     if (ar.succeeded()) {
                         HttpResponse<JsonObject> response = ar.result();
                         if (response.statusCode() == HttpResponseStatus.OK.code()) {
@@ -95,8 +96,8 @@ public class HttpKafkaProducer extends AbstractVerticle {
                             response.body().getJsonArray("offsets").forEach(obj -> {
                                 JsonObject json = (JsonObject) obj;
                                 list.add(new OffsetRecordSent(
-                                    json.getInteger("partition"),
-                                    json.getLong("offset"))
+                                        json.getInteger("partition"),
+                                        json.getLong("offset"))
                                 );
                             });
                             fut.complete(list);
@@ -108,7 +109,7 @@ public class HttpKafkaProducer extends AbstractVerticle {
                     }
 
                     if (this.config.getMessageCount().isPresent() &&
-                        this.messagesSent >= this.config.getMessageCount().get()) {
+                            this.messagesSent >= this.config.getMessageCount().get()) {
                         // signal to main thread that all messages are sent, application can exit
                         this.messagesSentLatch.countDown();
                         log.info("All messages sent");

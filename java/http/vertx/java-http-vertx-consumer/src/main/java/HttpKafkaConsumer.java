@@ -155,40 +155,40 @@ public class HttpKafkaConsumer extends AbstractVerticle {
 
         log.info("Poll ...");
         this.client.get(this.consumer.getBaseUri() + "/records?timeout=" + this.config.getPollTimeout())
-            .putHeader(HttpHeaderNames.ACCEPT.toString(), "application/vnd.kafka.json.v2+json")
-            .as(BodyCodec.jsonArray())
-            .send(ar -> {
-                if (ar.succeeded()) {
-                    HttpResponse<JsonArray> response = ar.result();
-                    if (response.statusCode() == HttpResponseStatus.OK.code()) {
-                        List<ConsumerRecord> list = new ArrayList<>();
-                        response.body().forEach(obj -> {
-                            JsonObject json = (JsonObject) obj;
-                            list.add(new ConsumerRecord(
-                                json.getString("topic"),
-                                json.getValue("key"),
-                                json.getValue("value"),
-                                json.getInteger("partition"),
-                                json.getLong("offset"))
-                            );
-                        });
-                        this.messagesReceived += list.size();
-
-                        promise.complete(list);
+                .putHeader(HttpHeaderNames.ACCEPT.toString(), "application/vnd.kafka.json.v2+json")
+                .as(BodyCodec.jsonArray())
+                .send()
+                .onComplete(ar -> {
+                    if (ar.succeeded()) {
+                        HttpResponse<JsonArray> response = ar.result();
+                        if (response.statusCode() == HttpResponseStatus.OK.code()) {
+                            List<ConsumerRecord> list = new ArrayList<>();
+                            response.body().forEach(obj -> {
+                                JsonObject json = (JsonObject) obj;
+                                list.add(new ConsumerRecord(
+                                        json.getString("topic"),
+                                        json.getValue("key"),
+                                        json.getValue("value"),
+                                        json.getInteger("partition"),
+                                        json.getLong("offset"))
+                                );
+                            });
+                            this.messagesReceived += list.size();
+                            promise.complete(list);
+                        } else {
+                            promise.fail(new RuntimeException("Got HTTP status code " + response.statusCode()));
+                        }
                     } else {
-                        promise.fail(new RuntimeException("Got HTTP status code " + response.statusCode()));
+                        promise.fail(ar.cause());
                     }
-                } else {
-                    promise.fail(ar.cause());
-                }
 
-                if (this.config.getMessageCount().isPresent() &&
-                        this.messagesReceived >= this.config.getMessageCount().get()) {
-                    // signal to main thread that all messages are received, application can exit
-                    this.messagesReceivedLatch.countDown();
-                    log.info("All messages received");
-                }
-            });
+                    if (this.config.getMessageCount().isPresent() &&
+                            this.messagesReceived >= this.config.getMessageCount().get()) {
+                        // signal to main thread that all messages are received, application can exit
+                        this.messagesReceivedLatch.countDown();
+                        log.info("All messages received");
+                    }
+                });
         return promise.future();
     }
 
@@ -196,21 +196,18 @@ public class HttpKafkaConsumer extends AbstractVerticle {
         Promise<Void> fut = Promise.promise();
 
         this.client.delete(this.consumer.getBaseUri())
-            .putHeader(HttpHeaderNames.CONTENT_TYPE.toString(), "application/vnd.kafka.v2+json")
-            .as(BodyCodec.jsonObject())
-            .send(ar -> {
-                if (ar.succeeded()) {
-                    HttpResponse<JsonObject> response = ar.result();
+                .putHeader(HttpHeaderNames.CONTENT_TYPE.toString(), "application/vnd.kafka.v2+json")
+                .as(BodyCodec.jsonObject())
+                .send()
+                .onSuccess(response -> {
                     if (response.statusCode() == HttpResponseStatus.NO_CONTENT.code()) {
                         log.info("Consumer {} deleted", this.consumer.getInstanceId());
                         fut.complete();
                     } else {
                         fut.fail(new RuntimeException("Got HTTP status code " + response.statusCode()));
                     }
-                } else {
-                    fut.fail(ar.cause());
-                }
-            });
+                })
+                .onFailure(t -> fut.fail(t));
         return fut;
     }
 
