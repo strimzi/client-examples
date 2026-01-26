@@ -85,12 +85,3 @@ runs:
       with:
         path: ~/.m2/repository
         key: maven-${{ hashFiles('**/pom.xml') }}
-
-    - name: Publish test results
-      uses: dorny/test-reporter@v2
-      if: always()
-      with:
-        name: 'Unit & Integration Tests'
-        path: '**/TEST-*.xml'
-        reporter: java-junit
-        fail-on-error: false
