@@ -1,0 +1,81 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - "main"
+      - "release-*"
+    tags:
+      - "*"
+  pull_request:
+    branches:
+      - "*"
+
+# Declare default permissions as read only
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-client-examples:
+    name: Build Client Examples
+    strategy:
+      matrix:
+        # Java 17 is used as default version
+        # In case of adding new version make sure that build-containers has correct static version set
+        java:
+          - version: "17"
+            mainBuild: true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/build/build-binaries
+        with:
+          javaVersion: ${{ matrix.java.version }}
+          mainBuild: ${{ matrix.java.mainBuild }}
+          runnerArch: "amd64"
+
+  build-containers:
+    name: Build Containers
+    needs:
+      - build-client-examples
+    strategy:
+      matrix:
+        architecture:
+          - amd64
+          - arm64
+          - s390x
+          - ppc64le
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/build/build-containers
+        with:
+          architecture: ${{ matrix.architecture }}
+          runnerArch: "amd64"
+
+  push-containers:
+    name: Push Containers
+    needs:
+      - build-client-examples
+      - build-containers
+    if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      DOCKER_REGISTRY: "quay.io"
+      DOCKER_ORG: "strimzi-examples"
+      DOCKER_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'latest' }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/build/push-containers
+        with:
+          architectures: "amd64,arm64,ppc64le,s390x"
+          runnerArch: "amd64"
+          quayUser: ${{ secrets.QUAY_USER }}
+          quayPass: ${{ secrets.QUAY_PASS }}
