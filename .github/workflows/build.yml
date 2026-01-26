@@ -5,6 +5,8 @@ on:
     branches:
       - "main"
       - "release-*"
+      # TODO - remove this before merge!
+      - "gha-migration"
     tags:
       - "*"
   pull_request:
