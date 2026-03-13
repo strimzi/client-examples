@@ -24,10 +24,10 @@ jobs:
     name: Build Client Examples
     strategy:
       matrix:
-        # Java 21 is used as default version
+        # Java 17 is used as default version
         # In case of adding new version make sure that build-containers has correct static version set
         java:
-          - version: "21"
+          - version: "17"
             mainBuild: true
     runs-on: ubuntu-latest
     steps:

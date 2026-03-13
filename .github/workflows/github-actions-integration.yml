@@ -28,14 +28,14 @@ jobs:
       repo: ${{ github.repository }}
       ref: ${{ github.sha }}
       architecture: "amd64"
-      artifactSuffix: "test-clients"
+      artifactSuffix: "client-examples"
       buildContainers: false
-      modules: "./"
-      nexusCheck: "test-clients"
-      javaVersion: "21"
+      modules: "none"
+      nexusCheck: "none"
+      javaVersion: "17"
       helmChartName: "none"
-      releaseVersion: "6.6.6"
-      imagesDir: "none"
+      releaseVersion: "none"
+      imagesDir: "*-amd64.tar.gz"
       clusterOperatorBuild: false
       githubActionsRef: "v1"
     secrets: inherit
